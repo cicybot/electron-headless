@@ -1,5 +1,8 @@
 {
   "name": "electron-headless",
   "version": "1.0.1",
-  "main": "main.js"
+  "main": "main.js",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
 }

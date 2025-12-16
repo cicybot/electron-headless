@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <script>
+      function getProcessInfo(){
+        const {defaultApp,platform,arch,pid,env,argv,execPath,versions} = process
+        const getCPUUsage = process.getCPUUsage()
+        const getHeapStatistics = process.getHeapStatistics()
+        const getBlinkMemoryInfo = process.getBlinkMemoryInfo()
+        const getProcessMemoryInfo = process.getProcessMemoryInfo()
+        const getSystemMemoryInfo = process.getSystemMemoryInfo()
+        const getSystemVersion = process.getSystemVersion()
+        return {
+          processId:pid,
+          is64Bit: arch === 'x64' || arch === 'arm64',
+          platform,
+          versions,
+          defaultApp,
+          else:{
+            env,argv,execPath,
+            CPUUsage:getCPUUsage,
+            HeapStatistics:getHeapStatistics,
+            BlinkMemoryInfo:getBlinkMemoryInfo,
+            ProcessMemoryInfo:getProcessMemoryInfo,
+            SystemMemoryInfo:getSystemMemoryInfo,
+            SystemVersion:getSystemVersion
+          }
+        }
+      }
+      console.log(JSON.stringify(getProcessInfo()))
+
+    </script>
+  </body>
+</html>

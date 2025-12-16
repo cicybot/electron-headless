@@ -1,6 +1,6 @@
 # electron-headless
 
-    docker run -it -v ./src:/data cicybot/xvfb-electron bash
 
-    xvfb-run electron --no-sandbox --disable-gpu --disable-features=UseDBus --log-level=3 --version
-    xvfb-run electron --no-sandbox --disable-gpu --disable-features=UseDBus --log-level=3 . 
+    docker build -t my-electron .
+    docker run --network=host -it -p 3000:3000 -v ./src:/data my-electron bash
+
