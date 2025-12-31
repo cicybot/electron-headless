@@ -13,7 +13,7 @@ router = APIRouter(
 )
 # api_url = "http://192.168.100.68:3000/rpc"
 api_url = "http://127.0.0.1:3000/rpc"
-
+# api_url = "https://jubilant-space-engine-69p7q9wxvx44fr4w5-3000.app.github.dev/rpc"
 
 def post_rpc(method,params = None):
     res = requests.post(
@@ -24,10 +24,57 @@ def post_rpc(method,params = None):
         }
     )
     return res.json()
+@router.get("/dev")
+async def dev():
+    code = """
+(()=>{
+    
+    const keyword = "ACCEPT";
+    
+    const elements = Array.from(
+      document.querySelectorAll("button")
+    ).filter(el =>
+      el.innerText &&
+      el.innerText.trim().toUpperCase() === keyword
+    );
+    
+    console.log("Found ACCEPT elements:", elements);
+    
+    if (elements.length > 0) {
+        elements[0].click();
+        console.log("Clicked ACCEPT button");
+        return true;
+    }
+
+    return false;
+})()
+    """
+    return post_rpc("executeJavaScript",{
+        "code":code,
+        "win_id":1
+    })
 
 @router.get("/info")
 async def info():
     return post_rpc("info")
+
+@router.get("/openWindow")
+async def openWindow(
+        url: str = Query(
+            ...,
+            example="https://www.google.com",
+            description="URL to load in Electron BrowserWindow"
+        ),
+        account_index: str = Query(
+            ...,
+            example="0",
+            description="the account index of browser"
+        )
+):
+    return post_rpc("openWindow",{
+        "url":url,
+        "account_index":account_index
+    })
 
 @router.get("/getWindows")
 async def getWindows():
@@ -141,24 +188,6 @@ async def executeJavaScript(
     })
 
 
-
-@router.get("/openWindow")
-async def openWindow(
-        url: str = Query(
-            ...,
-            example="https://www.google.com",
-            description="URL to load in Electron BrowserWindow"
-        ),
-        account_index: str = Query(
-            ...,
-            example="0",
-            description="the account index of browser"
-        )
-):
-    return post_rpc("openWindow",{
-        "url":url,
-        "account_index":account_index
-    })
 
 @router.post("/proxy")
 async def proxy_set(

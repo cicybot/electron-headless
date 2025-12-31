@@ -91,6 +91,10 @@ function createWindow(account_index,url,options) {
     const p ='p_'+account_index
     const win = new BrowserWindow({
         ...options,
+        width: 1920,
+        height: 1280,
+        x:0,
+        y:0,
         webPreferences: {
             webviewTag: true,
             nodeIntegration: true,
@@ -149,18 +153,10 @@ function createWindow(account_index,url,options) {
 
     return win;
 }
-function createMainWindow(){
-    createWindow(0,"about:blank",{
-        width: 360,
-        height: 360,
-        x:0,
-        y:0
-    });
-}
+
 app.whenReady().then(() => {
     console.log('app ready');
     startHttpServer();
-    createMainWindow()
 });
 
 app.on('window-all-closed', () => {
@@ -168,6 +164,3 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
 
-app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createMainWindow();
-});
