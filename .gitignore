@@ -1,2 +1,5 @@
+src/node_modules/
+.ipynb_checkpoints
+*.pyc
+src/node_modules
 .idea
-__pycache__
