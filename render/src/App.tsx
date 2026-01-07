@@ -136,6 +136,18 @@ document.querySelectorAll('div[id^="login-full-panel-"]').forEach(el => el.remov
                     }}>DevTools</button>
                     <View w12 />
 
+
+                    <View>
+                        <button onClick={async ()=>{
+                            const {result} =  await post_rpc({
+                                method:"downloadMedia1",
+                                params:{
+
+                                }
+                            })
+                        }}>FetchVideo1sss</button>
+                    </View>
+                    s
                     <View w12 />
                     <View hide={!mediaUrl}>
                         <button onClick={async ()=>{

@@ -7,9 +7,7 @@ const fs = require('fs');
 const serveIndex = require('serve-index'); // 用于生成目录列表
 const {openTerminal,getAppInfo,windowSitesToJSON,setCookies} = require("./utils")
 
-
 const MediaDir = path.join(app.getPath('home'),"assets")
-
 
 let mainWindow;
 let server;
@@ -17,8 +15,9 @@ const WindowSites = new Map();
 let RequestsMap = [];
 const MAX_REQUEST_LOGS = 1000;
 let requestIndex = 0;
-
-app.setName("Electron");
+const isLocal = process.env.IS_LOCAL === "true"
+console.log("IS_LOCAL",isLocal,process.env.IS_LOCAL === 'true')
+app.setName(process.env.APP_NAME ||"Electron");
 
 async function handleMethod(method, params, { server: { req, res } }) {
     let win;
@@ -59,6 +58,53 @@ async function handleMethod(method, params, { server: { req, res } }) {
             });
             result = await response.json();
             break;
+        }
+
+        case 'downloadMedia1':
+        {
+            const {session} = mainWindow.webContents
+            session.setDownloadPath(MediaDir)
+            const {mediaUrl}= params
+            const url = "https://v3-dy-o.zjcdn.com/21a9e1d82dbbb17c040a1ca41910381b/695e6db8/video/tos/cn/tos-cn-ve-15/oskPGeZnBIzGRNfvsBSALCJfgb77AzKUhBpcpt/?a=6383&ch=26&cr=13&dr=0&lr=all&cd=0%7C0%7C0%7C&cv=1&br=592&bt=592&cs=0&ds=6&ft=CZdgCYlIDyjNNRVQ9weiKYShd.6HI7103-ApQX&mime_type=video_mp4&qs=12&rc=ZzZmaDkzODhkNWczZzk4ZUBpamU8anA5cjd3NzMzNGkzM0BfNWAwNTZiXzQxNTAwMTZjYSNuMmdhMmRzbWNhLS1kLTBzcw%3D%3D&btag=80000e00030000&cc=1f&cquery=100w_100B_100H_100K_100o&dy_q=1767785032&feature_id=0ea98fd3bdc3c6c14a3d0804cc272721&l=2026010719235158364BC453BB6C01A01A&req_cdn_type=&__vid=7575015889800531200"
+            session.on('will-download', (event, item) => {
+                const original = item.getFilename();
+
+                const mime = item.getMimeType();
+                const ext = path.extname(original);
+
+                const newName = `my_new_name_${Date.now()}${ext}`;
+                const url = item.getURL();
+
+                console.log('Download started:');
+                console.log('  Filename:', original);
+                console.log('  MIME type:', mime);
+                console.log('  URL:', url);
+
+                // Set automatic save path
+                const savePath = path.join(MediaDir, newName);
+                item.setSavePath(savePath);
+
+                // Resume the download
+                item.resume();
+
+                // Track progress
+                item.on('updated', (event, state) => {
+                    if (state === 'progressing') {
+                        console.log(`Downloading: ${item.getReceivedBytes()}/${item.getTotalBytes()}`);
+                    }
+                });
+
+                item.once('done', (event, state) => {
+                    if (state === 'completed') {
+                        console.log(`Download finished`);
+                    } else {
+                        console.log(`Download failed: ${state}`);
+                    }
+                });
+            });
+
+            await session.downloadURL(url)
+            break
         }
         case 'downloadMedia':
             const {mediaUrl,name,title,url,ext,showWin}= params
@@ -195,9 +241,7 @@ function startHttpServer() {
     });
     appServer.get('/screenshot', async (req, res) => {
         try {
-            // Note: mainWindow is the initial window, but ID param should override
             const id = req.query.id ? Number(req.query.id) : (mainWindow ? mainWindow.id : 1);
-            // console.log('[screenshot] id =', id);
 
             const win = BrowserWindow.fromId(id);
             if (!win) {
@@ -257,7 +301,11 @@ async function createWindow(account_index, url, options, others) {
     if (!options) {
         options = {};
     }
-    const { userAgent, cookies, openDevtools, proxy } = others || {};
+    const { userAgent, cookies, openDevtools, proxy,wrapUrl } = others || {};
+    if(!wrapUrl){
+        url = `${isLocal ?"http://127.0.0.1:3455":"https://render.cicy.de5.net" }/render?u=${encodeURIComponent(url)}`
+    }
+    console.log(isLocal,url)
     if (userAgent) {
         if (options.userAgent) delete options.userAgent;
     }
@@ -272,7 +320,12 @@ async function createWindow(account_index, url, options, others) {
         x: 0,
         y: 0,
         ...options,
+        args: [
+            '--safebrowsing-disable-download-protection',
+            '--safebrowsing-disable-extension-blacklist'
+        ],
         webPreferences: {
+
             partition: 'persist:' + p,
             // webviewTag: true,
             // nodeIntegration: true,
@@ -338,8 +391,8 @@ async function createWindow(account_index, url, options, others) {
             callback({ cancel: false });
             return;
         }
-        if(!win.isDestroyed()){
-          return;
+        if(win.isDestroyed()){
+            return;
         }
         win.webContents.executeJavaScript(`
 if(window.__onBeforeSendHeaders){
@@ -396,8 +449,9 @@ if(window.__onBeforeSendHeaders){
 
     win.webContents.on('did-finish-load', async () => {
         console.log(`[${key}] DOM ready`, { account_index, id, wcId }, win.webContents.getURL());
+        console.log(path.join(__dirname,"content.js"))
         const content_js= fs.readFileSync(path.join(__dirname,"content.js"))
-        win.webContents.executeJavaScript(content_js)
+        win.webContents.executeJavaScript(content_js.toString())
     });
 
     return win;
@@ -408,12 +462,10 @@ contextMenu({
     showSaveImageAs: true
 });
 app.whenReady().then(() => {
-
     console.log('app ready');
     startHttpServer();
 });
-
-app.on('window-all-closed', () => {
-    if (server) server.close();
-    if (process.platform !== 'darwin') app.quit();
+app.on('before-quit', (event) => {
+    console.log("before-quit")
+    event.preventDefault();
 });

@@ -1,5 +1,8 @@
 const baseUrl = process.env.ELECTRON_BASE_URL || "http://127.0.0.1:3456"
 
+// const baseUrl = process.env.ELECTRON_BASE_URL || "https://ga-ubuntu-3456.cicy.de5.net"
+
+
 const Site = {
     "localhost_8173":"http://localhost:8173/",
     "myip":"https://api.myip.com",

@@ -1,9 +1,9 @@
 {
-  "name": "app",
+  "name": "electron-cicy",
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron src/main.js",
+    "start": "IS_LOCAL=true electron src/main.js",
     "prod": "electron dist/main.js",
     "dev": "nodemon",
     "build": "node build.js"

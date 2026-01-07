@@ -50,7 +50,8 @@ export const Dashboard = () => {
     try {
       await rpc('openWindow', {
         account_index: newAccountIdx,
-        url: `http://localhost:8173/?u=${encodeURIComponent(newUrl)}`,
+        // url: `http://localhost:3455/render/?u=${encodeURIComponent(newUrl)}`,
+        url:newUrl,
         options: {
           width:1280,
           webPreferences:{
