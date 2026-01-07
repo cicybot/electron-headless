@@ -4,16 +4,12 @@ const contextMenu = require('electron-context-menu').default || require('electro
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { spawn, exec} = require('child_process');
-
 const serveIndex = require('serve-index'); // 用于生成目录列表
+const {openTerminal,getAppInfo,windowSitesToJSON,setCookies} = require("./utils")
+
 
 const MediaDir = path.join(app.getPath('home'),"assets")
 
-//https://www.npmjs.com/package/electron-context-menu
-contextMenu({
-    showSaveImageAs: true
-});
 
 let mainWindow;
 let server;
@@ -23,160 +19,6 @@ const MAX_REQUEST_LOGS = 1000;
 let requestIndex = 0;
 
 app.setName("Electron");
-
-
-function openTerminal(command, showWin) {
-    if (!showWin) {
-        if (process.platform === 'win32') {
-            const p = spawn('cmd.exe', ['/c', 'start', '/B', command], {
-                windowsHide: true,
-                detached: false,
-                stdio: 'ignore',
-                shell: false,
-                windowsVerbatimArguments: true // 避免参数转义问题
-            });
-            return p.pid;
-        } else {
-            const p = spawn(command, [], {
-                windowsHide: true,
-                detached: true,
-                stdio: 'ignore',
-                shell: true
-            });
-            return p.pid;
-        }
-    }
-    const width = 1024;
-    const height = 320;
-    let p;
-
-    if (process.platform === 'win32') {
-        const sizedCmd = `mode con: cols=${Math.floor(width / 8)} lines=${Math.floor(
-            height / 16
-        )} && ${command}`;
-        p = spawn('cmd.exe', ['/k', sizedCmd], { detached: true });
-    } else if (process.platform === 'darwin') {
-        const script = `
-    tell application "Terminal"
-        do script "${command.replace(/"/g, '\\"')}"
-        set bounds of front window to {0, 0, ${width}, ${height}}
-    end tell
-    `;
-        p = spawn('osascript', ['-e', script], { detached: true });
-    } else {
-        // Linux - try different terminals
-        try {
-            p = spawn(
-                'gnome-terminal',
-                [`--geometry=${width}x${height}`, '--', 'bash', '-c', command],
-                { detached: true }
-            );
-        } catch {
-            p = spawn(
-                'xterm',
-                ['-geometry', `${Math.floor(width / 8)}x${Math.floor(height / 16)}`, '-e', command],
-                { detached: true }
-            );
-        }
-    }
-
-    return p.pid;
-}
-async function setCookies(wc, cookies) {
-    for (const c of cookies) {
-        const cookie = { ...c }; // don't mutate original
-        const isSecurePrefix = cookie.name.startsWith("__Secure-");
-        const isHostPrefix = cookie.name.startsWith("__Host-");
-
-        let url =
-            (cookie.secure ? "https://" : "http://") +
-            cookie.domain.replace(/^\./, "");
-        if (isSecurePrefix) {
-            cookie.secure = true;        // must be secure
-            if (!url.startsWith("https://")) {
-                url = "https://" + cookie.domain.replace(/^\./, "");
-            }
-        }
-        if (isHostPrefix) {
-            cookie.secure = true;        // must be secure
-            cookie.path = "/";           // must be /
-            cookie.domain = undefined;   // MUST NOT have domain attribute
-
-            if (!url.startsWith("https://")) {
-                url = "https://" + cookie.domain?.replace(/^\./, "") || "https://localhost";
-            }
-        }
-
-        if (!cookie.path) cookie.path = "/";
-
-        try {
-            await wc.session.cookies.set({
-                url,
-                name: cookie.name,
-                value: cookie.value,
-
-                path: cookie.path,
-                domain: cookie.domain, // may be undefined when __Host-
-
-                httpOnly: !!cookie.httpOnly,
-                secure: !!cookie.secure,
-
-                expirationDate: cookie.session ? undefined : cookie.expirationDate,
-
-                sameSite:
-                    cookie.sameSite === "no_restriction" ? "no_restriction" :
-                        cookie.sameSite === "lax" ? "lax" :
-                            cookie.sameSite === "strict" ? "strict" :
-                                "unspecified",
-            });
-        } catch (e) {
-            console.error("Failed to set cookie", cookie.name, e);
-        }
-    }
-}
-
-function getAppInfo() {
-    const { defaultApp, platform, arch, pid, env, argv, execPath, versions } = process;
-    const getCPUUsage = process.getCPUUsage();
-    const getHeapStatistics = process.getHeapStatistics();
-    const getBlinkMemoryInfo = process.getBlinkMemoryInfo();
-    const getProcessMemoryInfo = process.getProcessMemoryInfo();
-    const getSystemMemoryInfo = process.getSystemMemoryInfo();
-    const getSystemVersion = process.getSystemVersion();
-
-    return {
-        session: session.defaultSession.getStoragePath(),
-        userData: app.getPath('userData'),
-        processId: pid,
-        is64Bit: arch === 'x64' || arch === 'arm64',
-        platform,
-        versions,
-        defaultApp,
-        else: {
-            env, argv, execPath,
-            CPUUsage: getCPUUsage,
-            HeapStatistics: getHeapStatistics,
-            BlinkMemoryInfo: getBlinkMemoryInfo,
-            ProcessMemoryInfo: getProcessMemoryInfo,
-            SystemMemoryInfo: getSystemMemoryInfo,
-            SystemVersion: getSystemVersion
-        }
-    };
-}
-
-function windowSitesToJSON(windowSites) {
-    const result = {};
-    for (const [groupKey, siteMap] of windowSites.entries()) {
-        result[groupKey] = {};
-        for (const [url, info] of siteMap.entries()) {
-            result[groupKey][url] = {
-                id: info.id,
-                wcId: info.wcId
-            };
-        }
-    }
-    return result;
-}
 
 async function handleMethod(method, params, { server: { req, res } }) {
     let win;
@@ -198,6 +40,7 @@ async function handleMethod(method, params, { server: { req, res } }) {
 
     }
     let result;
+    let ok = true;
     switch (method) {
         case 'ping':
             result = 'pong';
@@ -214,11 +57,8 @@ async function handleMethod(method, params, { server: { req, res } }) {
                 },
                 body: audioBuffer,
             });
-            const result = await response.json();
-            return {
-                ok: true,
-                result: result
-            };
+            result = await response.json();
+            break;
         }
         case 'downloadMedia':
             const {mediaUrl,name,title,url,ext,showWin}= params
@@ -235,37 +75,44 @@ async function handleMethod(method, params, { server: { req, res } }) {
             fs.writeFileSync(filePathJson,content)
             const cmd = `ffmpeg -i "${filePathMedia}" -vn -acodec libmp3lame -y "${audioPathAudio}"`;
             openTerminal(`wget ${mediaUrl} -O ${filePathMedia} && ${cmd}`,!!showWin)
-            return {
+            result = {
                 MediaDir,
                 mediaUrl,name,title,url,ext,showWin,
                 filePathJson,
                 filePathMedia,
                 audioPathAudio
             }
+            break
         case 'info':
             const primaryDisplay = screen.getPrimaryDisplay();
             const { width, height } = primaryDisplay.workAreaSize;
-            return {
+            result = {
                 process: getAppInfo(),
                 screen: { width, height },
             };
+            break
         case 'openWindow':
             // Added await here to ensure we get the window object before destructuring
             const winObj = await createWindow(params?.account_index || 0, params?.url, params?.options || {}, params?.others || {});
-            return { id: winObj.id };
+            result = { id: winObj.id };
+            break;
         case 'getRequests':
             if (params && params.win_id) {
-                return RequestsMap.filter(req => req.win_id === Number(params.win_id));
+                result =  RequestsMap.filter(req => req.win_id === Number(params.win_id));
+            }else{
+                result =  RequestsMap;
             }
-            return RequestsMap;
-            //
+
+            break
         case 'clearRequests':
             RequestsMap = []
-            return {}
+            break;
         case 'getWindows':
-            return windowSitesToJSON(WindowSites);
+            result = windowSitesToJSON(WindowSites);
+            break;
         case 'getBounds':
-            return wc ? wc.getBounds() : null;
+            result = wc ? wc.getBounds() : null;
+            break;
         case 'loadURL':
             if (wc) wc.loadURL(params?.url);
             break;
@@ -274,13 +121,13 @@ async function handleMethod(method, params, { server: { req, res } }) {
                 const { cookies } = params;
                 await setCookies(wc, cookies);
             }
-            return {};
+            break
         case 'exportCookies':
             if (wc) {
                 const { options } = params;
                 return await wc.session.cookies.get(options || {});
             }
-            return [];
+            break
         case 'executeJavaScript':
             if (wc) {
                 const { code } = params;
@@ -293,38 +140,40 @@ async function handleMethod(method, params, { server: { req, res } }) {
             }
             break;
         case 'getURL':
-            return wc ? wc.getURL() : '';
+            wc ? wc.getURL() : '';
+            break
         case 'reload':
-            return wc ? wc.reload() : null;
+            wc ? wc.reload() : null;
+            break
         case 'getTitle':
-            return wc ? wc.getTitle() : '';
+            wc ? wc.getTitle() : '';
+            break
         case 'setUserAgent':
             if (wc) {
                 const { userAgent } = params || {};
                 return wc.setUserAgent(userAgent);
             }
-            return null;
-        case 'screenshot':
-            if (wc) {
-                const image = await getScreenshot(wc);
-                result = image.toPNG().toString('base64');
-                // console.log(result); // Reduced log noise
-            }
-            break;
+            break
         default:
-            return res.status(404).json({ error: 'unknown method' });
+            result = "error method"
+            ok = false;
+            break
+
     }
-    return result;
+    if (result && result.headersSent) return;
+    res.json({
+        ok: true,
+        result
+    });
 }
 
 async function getScreenshot(wc) {
     if (!wc) return null;
     const image = await wc.capturePage();
-    const scaled = image.resize({
+    return image.resize({
         width: Math.floor(image.getSize().width / 2),
         height: Math.floor(image.getSize().height / 2),
     });
-    return scaled;
 }
 
 /* -----------------------------
@@ -341,7 +190,9 @@ function startHttpServer() {
         serveIndex(MediaDir, { icons: true }) // lists directory
     );
 
-    // 📸 Screenshot endpoint
+    appServer.get('/', async (req, res) => {
+        res.status(500).json({ message: "pong" });
+    });
     appServer.get('/screenshot', async (req, res) => {
         try {
             // Note: mainWindow is the initial window, but ID param should override
@@ -370,20 +221,12 @@ function startHttpServer() {
             return res.status(400).json({ error: 'method is required' });
         }
         try {
-            const result = await handleMethod(method, params, {
+            await handleMethod(method, params, {
                 server: {
                     req,
                     res
                 }
             });
-            // Handle if result is the response object (e.g. 404)
-            if (result && result.headersSent) return;
-
-            res.json({
-                ok: true,
-                result
-            });
-
         } catch (err) {
             console.error('[rpc] error', err);
             res.status(500).json({
@@ -396,7 +239,6 @@ function startHttpServer() {
     server = appServer.listen(port, '0.0.0.0', () => {
         const url = `http://127.0.0.1:${port}`;
         console.log(`[express] listening on ${url}`);
-        // createWindow(0, url);
     });
 }
 
@@ -408,7 +250,6 @@ async function createWindow(account_index, url, options, others) {
     if (currentWindowSites.get(url)) {
         const currentWinEntry = currentWindowSites.get(url);
         if (currentWinEntry.win && !currentWinEntry.win.isDestroyed()) {
-            // currentWinEntry.win.show();
             return currentWinEntry.win;
         }
     }
@@ -418,7 +259,6 @@ async function createWindow(account_index, url, options, others) {
     }
     const { userAgent, cookies, openDevtools, proxy } = others || {};
     if (userAgent) {
-        // Remove userAgent from options if it exists, handled via webContents
         if (options.userAgent) delete options.userAgent;
     }
     if (!options.webPreferences) {
@@ -498,9 +338,12 @@ async function createWindow(account_index, url, options, others) {
             callback({ cancel: false });
             return;
         }
+        if(!win.isDestroyed()){
+          return;
+        }
         win.webContents.executeJavaScript(`
-if(window.onBeforeSendHeaders){
-    window.onBeforeSendHeaders(${JSON.stringify({
+if(window.__onBeforeSendHeaders){
+    window.__onBeforeSendHeaders(${JSON.stringify({
             index: requestIndex++,
             url,
             requestHeaders,
@@ -519,7 +362,6 @@ if(window.onBeforeSendHeaders){
             timestamp: Date.now() // Added timestamp for frontend display
         });
 
-        // Cap the log size
         if (RequestsMap.length > MAX_REQUEST_LOGS) {
             RequestsMap.shift();
         }
@@ -561,7 +403,12 @@ if(window.onBeforeSendHeaders){
     return win;
 }
 
+//https://www.npmjs.com/package/electron-context-menu
+contextMenu({
+    showSaveImageAs: true
+});
 app.whenReady().then(() => {
+
     console.log('app ready');
     startHttpServer();
 });

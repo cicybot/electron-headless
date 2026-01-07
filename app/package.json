@@ -1,0 +1,30 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron src/main.js",
+    "prod": "electron dist/main.js",
+    "dev": "nodemon",
+    "build": "node build.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "electron-context-menu": "^4.1.1",
+    "emitter": "^0.0.5",
+    "express": "^5.2.1",
+    "node-cron": "^4.2.1",
+    "serve-index": "^1.9.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.5",
+    "@babel/preset-env": "^7.28.5",
+    "esbuild": "^0.27.2",
+    "nodemon": "^3.1.11"
+  }
+}

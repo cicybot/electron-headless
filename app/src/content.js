@@ -1,6 +1,5 @@
 console.log("content.js")
-
-window.onBeforeSendHeaders =(reuest)=>{
+window.__onBeforeSendHeaders =(reuest)=>{
     const {
         index,
         url,
@@ -28,21 +27,6 @@ https://v5-dy-o-abtest.zjcdn.com/5f15201372a4ee9e559fc60b5187ee55/695d3174/video
         url.includes("/v3-dy-o") &&
         url.includes("__vid=")
     ) {
-        //
-        // fetch("http://127.0.0.1:3456/rpc",{
-        //     method:"post",
-        //     headers:{
-        //         "content-type":"application/json"
-        //     },
-        //     body:JSON.stringify({
-        //         method:"downloadVideo",
-        //         params:{
-        //             media_url:url,
-        //             title:document.title,
-        //             url:location.href
-        //         }
-        //     })
-        // })
         console.log("ON_REQUEST match",{
             video_url:url,
             title:document.title,

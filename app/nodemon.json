@@ -1,0 +1,8 @@
+{
+  "watch": ["src"],
+  "ext": "js,json",
+  "ignore": ["dist/*", "node_modules/*"],
+  "exec": "npm run build",
+  "legacyWatch": true,
+  "delay": "500"
+}

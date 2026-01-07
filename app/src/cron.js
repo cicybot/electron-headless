@@ -1,5 +1,5 @@
 const cron = require("node-cron");
-const {Site} = require("./tests/utils");
+
 const baseUrl = process.env.ELECTRON_BASE_URL || "http://127.0.0.1:3456"
 
 const post_rpc = async ({method,params})=>{

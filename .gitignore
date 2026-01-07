@@ -2,6 +2,5 @@
 *.pyc
 node_modules
 .idea
-assets
 .DS_Store
-manage/.vite/
+.vite/

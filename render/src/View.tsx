@@ -1,4 +1,5 @@
-import {CSSProperties, JSXElementConstructor, ReactElement, ReactNode, useEffect, useRef, useState} from 'react';
+import { useEffect, useRef, useState} from 'react';
+import type {CSSProperties, JSXElementConstructor, ReactElement, ReactNode} from 'react';
 
 export interface UtilsProps {
     json?: Object | any;
