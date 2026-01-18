@@ -62,8 +62,11 @@ class ExpressServer {
       res.status(200).json({ message: "pong" });
     });
 
-    // Screenshot endpoint
-    this.app.get('/screenshot', this.handleScreenshot.bind(this));
+     // Screenshot endpoint
+     this.app.get('/screenshot', this.handleScreenshot.bind(this));
+
+     // PyAutoGUI screenshot endpoint
+     this.app.get('/screen', this.handlePyAutoGUIScreenshot.bind(this));
 
     // Legacy RPC endpoint
     this.app.post('/rpc', this.handleRpc.bind(this));
