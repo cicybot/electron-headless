@@ -82,7 +82,6 @@ class ExpressServer {
      * Handle PyAutoGUI screenshot requests
      */
     async handlePyAutoGUIScreenshot(req, res) {
-      console.log('[screen] Handling request');
       try {
         const result = await this.rpcHandler.handleMethod('pyautoguiScreenshot', {});
         if (!result.ok) {
