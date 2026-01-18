@@ -84,10 +84,7 @@ class ExpressServer {
      */
     async handlePyAutoGUIScreenshot(req, res) {
       try {
-        const filePath = req.query.path;
-        if (!filePath) {
-          return res.status(400).json({ error: 'path query parameter is required' });
-        }
+        const filePath = 'screen.png';
 
         const result = await this.rpcHandler.handleMethod('pyautoguiScreenshot', {});
         if (!result.ok) {
