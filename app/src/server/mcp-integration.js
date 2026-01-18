@@ -379,8 +379,13 @@ class McpIntegration {
     this.registerTool('pyautogui_screenshot', 'Take a screenshot using PyAutoGUI', {}, async () => {
       try {
         const result = await this.rpcHandler.handleMethod('pyautoguiScreenshot', {});
+        const { base64, format } = result.result;
         return {
-          content: [{ type: 'text', text: `Screenshot saved to: ${result.result.filepath}` }]
+          content: [{
+            type: 'image',
+            data: `data:image/${format};base64,${base64}`,
+            mimeType: `image/${format}`
+          }]
         };
       } catch (error) {
         return {

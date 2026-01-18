@@ -1,18 +1,18 @@
 import pyautogui
 import sys
 import json
-import os
-from datetime import datetime
+import base64
+from io import BytesIO
 
 data = json.loads(sys.argv[1])
 
 # Take screenshot
 screenshot = pyautogui.screenshot()
 
-# Save to file
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-filename = f"screenshot_{timestamp}.png"
-filepath = os.path.join(os.getcwd(), filename)
-screenshot.save(filepath)
+# Convert to base64
+buffer = BytesIO()
+screenshot.save(buffer, format='PNG')
+img_bytes = buffer.getvalue()
+img_base64 = base64.b64encode(img_bytes).decode('utf-8')
 
-print(json.dumps({"filepath": filepath}))
+print(json.dumps({"base64": img_base64, "format": "png"}))
