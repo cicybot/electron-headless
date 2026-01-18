@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
-    "start": "IS_LOCAL=true electron --trace-warnings src/main.js",
+    "start": "electron --trace-warnings src/main.js",
     "prod": "electron dist/main.js",
     "dev": "nodemon",
     "build": "node build.js"
