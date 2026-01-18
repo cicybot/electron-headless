@@ -322,6 +322,18 @@ class RPCHandler {
           await this._runPyAutoGUIScript('move', params);
           break;
 
+        case 'pyautoguiPressEnter':
+          await this._runPyAutoGUIScript('press_enter', params);
+          break;
+
+        case 'pyautoguiPressBackspace':
+          await this._runPyAutoGUIScript('press_backspace', params);
+          break;
+
+        case 'pyautoguiPressSpace':
+          await this._runPyAutoGUIScript('press_space', params);
+          break;
+
         case 'methods':
           result = {
             ping: "Check if the server is responding",
