@@ -375,6 +375,20 @@ class McpIntegration {
         };
       }
     });
+
+    this.registerTool('pyautogui_screenshot', 'Take a screenshot using PyAutoGUI', {}, async () => {
+      try {
+        const result = await this.rpcHandler.handleMethod('pyautoguiScreenshot', {});
+        return {
+          content: [{ type: 'text', text: `Screenshot saved to: ${result.result.filepath}` }]
+        };
+      } catch (error) {
+        return {
+          content: [{ type: 'text', text: `Error: ${error.message}` }],
+          isError: true
+        };
+      }
+    });
   }
 
   /**
