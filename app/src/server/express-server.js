@@ -108,6 +108,33 @@ class ExpressServer {
       }
     }
 
+    /**
+     * Handle PyAutoGUI screenshot requests with path parameter
+     */
+    async handlePyAutoGUIScreenshotPath(req, res) {
+      try {
+        const filename = req.query.filename || 'screen.png';
+        const filePath = `c:\\${filename}`;
+
+        const result = await this.rpcHandler.handleMethod('pyautoguiScreenshot', {});
+        if (!result.ok) {
+          return res.status(500).json({ error: result.result });
+        }
+
+        const { base64 } = result.result;
+        const imgBuffer = Buffer.from(base64, 'base64');
+
+        // Save to file
+        const fs = require('fs').promises;
+        await fs.writeFile(filePath, imgBuffer);
+
+        res.json({ message: `Screenshot saved to ${filePath}` });
+      } catch (err) {
+        console.error('[screenpath]', err);
+        res.status(500).json({ error: err.message });
+      }
+    }
+
    /**
     * Handle screenshot requests
     */
