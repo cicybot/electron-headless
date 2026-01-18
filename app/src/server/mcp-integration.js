@@ -338,8 +338,7 @@ class McpIntegration {
       try {
         await this.rpcHandler.handleMethod('pyautoguiPressBackspace', {});
         return {
-          content: [{ type: 'text', text: `Error: ${error.message}` }],
-          isError: true
+          content: [{ type: 'text', text: 'PyAutoGUI pressed Backspace' }]
         };
       } catch (error) {
         return {
