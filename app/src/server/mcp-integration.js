@@ -290,8 +290,8 @@ class McpIntegration {
       }
     });
 
-    this.registerTool('pyautogui_press', 'Press a key using PyAutoGUI', {
-      key: z.string().describe('Key to press (e.g., "a", "enter", "f1")')
+    this.registerTool('pyautogui_press', 'Press a single key using PyAutoGUI. Supports letters, numbers, special keys (enter, space, backspace, esc), function keys (f1-f24), modifier keys (ctrl, alt, shift), and many more.', {
+      key: z.string().describe('Key to press (e.g., "a", "enter", "f1", "ctrl", "space", "esc", "backspace", "tab", "up", "down", "left", "right")')
     }, async ({ key }) => {
       try {
         await this.rpcHandler.handleMethod('pyautoguiPress', { key });
