@@ -94,7 +94,7 @@ class ExpressServer {
         res.set('Content-Type', 'image/png');
         res.send(imgBuffer);
       } catch (err) {
-        console.error('[screen]', err);
+        console.error('[screen]', err.stack);
         res.status(500).json({ error: err.message });
       }
     }
