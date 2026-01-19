@@ -14,6 +14,8 @@ esbuild.build({
 }).then(() => {
     console.log('Build finished');
     // Copy content.js to dist
+    const srcContent = path.join(__dirname, 'src/content-inject.js');
+    const distContent = path.join(__dirname, 'dist/content.js');
     fs.copyFile(srcContent, distContent, (err) => {
         if (err) {
             console.error('Failed to copy content.js:', err);
