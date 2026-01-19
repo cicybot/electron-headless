@@ -52,6 +52,17 @@ describe('llm', () => {
         })
         console.log(res)
     });
+    it('click', async () => {
+        const res = await post_rpc({
+            method: "pyautoguiClick",
+            params: {
+                win_id:1,
+                x:289,
+                y:20
+            }
+        })
+        console.log(res)
+    });
     it('run', async () => {
         const res = await post_rpc({
             method: "pyautoguiWrite",

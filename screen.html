@@ -36,8 +36,8 @@
     document.querySelector("img").addEventListener("click",(e)=>{
         e.preventDefault();
         // 获取鼠标相对于图片的坐标
-        var x = e.clientX + document.querySelector("div").scrollLeft;
-        var y = e.clientY+ document.querySelector("div").scrollTop;
+        var x = parseInt(e.clientX + document.querySelector("div").scrollLeft);
+        var y = parseInt(e.clientY+ document.querySelector("div").scrollTop);
         console.log(e)
         // 弹出显示坐标
         alert('当前坐标: X=' + x + ', Y=' + y);
@@ -47,8 +47,10 @@
                 win_id:1,
                 x,y
             }
+        }).finally(()=>{
+            location.reload()
         })
-        location.reload()
+
     })
     //
     // document.querySelector("img").addEventListener("click",(e)=>{
