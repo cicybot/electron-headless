@@ -174,6 +174,29 @@ class RPCHandler {
           }
           break;
 
+        case 'sendElectronClick':
+          if (wc && params?.x !== undefined && params?.y !== undefined) {
+            await wc.sendInputEvent({
+              type: 'mouseDown',
+              x: params.x,
+              y: params.y,
+              button: params.button || 'left',
+              clickCount: params.clickCount || 1
+            });
+            
+            // Wait 300ms then send mouse up
+            setTimeout(async () => {
+              await wc.sendInputEvent({
+                type: 'mouseUp',
+                x: params.x,
+                y: params.y,
+                button: params.button || 'left',
+                clickCount: params.clickCount || 1
+              });
+            }, 300);
+          }
+          break;
+
         // Cookies
         case 'importCookies':
           if (wc) {
