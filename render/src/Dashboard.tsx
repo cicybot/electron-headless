@@ -2,14 +2,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRpc } from './RpcContext';
 import { ConnectionManager } from './ConnectionManager';
-import { WindowDetail } from './WindowDetail';
 import { IconAlert } from './Icons';
 import { WindowMap } from './types';
 
 export const Dashboard = () => {
-  const { rpc, rpcBaseUrl } = useRpc();
-  const [view, setView] = useState<'dashboard' | 'detail'>('dashboard');
-  const [selectedWindow, setSelectedWindow] = useState<{ id: number, url: string } | null>(null);
+  const { rpc } = useRpc();
 
   // Dashboard State
   const [windows, setWindows] = useState<WindowMap>({});
@@ -105,92 +102,82 @@ export const Dashboard = () => {
         </div>
       )}
 
-      {view === 'dashboard' ? (
-        <div className="main-content scroll-y p-4">
+      <div className="main-content scroll-y p-4">
 
-          {/* Create Bar */}
-          <div className="card p-4 mb-6 flex items-end gap-4">
-            <div className="flex-1">
-              <label className="block text-xs text-secondary mb-1">Target URL</label>
-              <input
-                className="input w-full"
-                value={newUrl}
-                onChange={e => setNewUrl(e.target.value)}
-                placeholder="https://..."
-              />
-            </div>
-            <div style={{ width: '120px' }}>
-              <label className="block text-xs text-secondary mb-1">Account Index</label>
-              <input
-                type="number"
-                className="input w-full"
-                value={newAccountIdx}
-                onChange={e => setNewAccountIdx(Number(e.target.value))}
-              />
-            </div>
-            <button
-              className="btn btn-primary"
-              onClick={handleOpenWindow}
-              disabled={isCreating}
-            >
-              {isCreating ? 'Launching...' : 'Open Window'}
-            </button>
+        {/* Create Bar */}
+        <div className="card p-4 mb-6 flex items-end gap-4">
+          <div className="flex-1">
+            <label className="block text-xs text-secondary mb-1">Target URL</label>
+            <input
+              className="input w-full"
+              value={newUrl}
+              onChange={e => setNewUrl(e.target.value)}
+              placeholder="https://..."
+            />
           </div>
+          <div style={{ width: '120px' }}>
+            <label className="block text-xs text-secondary mb-1">Account Index</label>
+            <input
+              type="number"
+              className="input w-full"
+              value={newAccountIdx}
+              onChange={e => setNewAccountIdx(Number(e.target.value))}
+            />
+          </div>
+          <button
+            className="btn btn-primary"
+            onClick={handleOpenWindow}
+            disabled={isCreating}
+          >
+            {isCreating ? 'Launching...' : 'Open Window'}
+          </button>
+        </div>
 
-          {/* Window List */}
-          <h2 className="text-lg font-bold mb-4">Active Sessions</h2>
-          {Object.keys(windows).length === 0 ? (
-            <div className="text-secondary text-center p-12 border border-dashed border-border rounded-lg">
-              {connectionError ? (
-                <div className="text-danger opacity-80">Connection lost. Check server status.</div>
-              ) : (
-                "No active windows found. Use the control bar above to launch a new session."
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {Object.entries(windows).map(([accIdx, sites]) => (
-                <div key={accIdx} className="card flex flex-col">
-                  <div className="p-3 border-b border-border bg-hover flex justify-between items-center" style={{ background: 'var(--bg-hover)' }}>
-                    <span className="font-mono font-bold text-sm">Account #{accIdx}</span>
-                    <span className="badge">{Object.keys(sites).length} Sessions</span>
-                  </div>
-                  <div className="p-2">
-                    {Object.entries(sites).map(([url, info]) => (
-                      <div
-                        key={info.id}
-                        className="p-3 border border-border rounded mb-2 cursor-pointer hover:bg-hover transition-colors"
-                        onClick={() => handleSelectWindow(info.id, url)}
-                        style={{ background: 'var(--bg-card)' }}
-                      >
-                        <div className="flex justify-between items-center">
-                          <div className="flex-1 min-w-0">
-                            <div className="font-mono text-sm font-semibold">win_id: {info.id}</div>
-                            <div className="text-xs text-secondary truncate" style={{ maxWidth: '500px' }}>
-                              {url}
-                            </div>
-                          </div>
-                          <div className="badge font-mono" style={{fontSize: '0.7rem'}}>
-                            #{info.id}
+        {/* Window List */}
+        <h2 className="text-lg font-bold mb-4">Active Sessions</h2>
+        {Object.keys(windows).length === 0 ? (
+          <div className="text-secondary text-center p-12 border border-dashed border-border rounded-lg">
+            {connectionError ? (
+              <div className="text-danger opacity-80">Connection lost. Check server status.</div>
+            ) : (
+              "No active windows found. Use the control bar above to launch a new session."
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {Object.entries(windows).map(([accIdx, sites]) => (
+              <div key={accIdx} className="card flex flex-col">
+                <div className="p-3 border-b border-border bg-hover flex justify-between items-center" style={{ background: 'var(--bg-hover)' }}>
+                  <span className="font-mono font-bold text-sm">Account #{accIdx}</span>
+                  <span className="badge">{Object.keys(sites).length} Sessions</span>
+                </div>
+                <div className="p-2">
+                  {Object.entries(sites).map(([url, info]) => (
+                    <div
+                      key={info.id}
+                      className="p-3 border border-border rounded mb-2 cursor-pointer hover:bg-hover transition-colors"
+                      onClick={() => handleSelectWindow(info.id, url)}
+                      style={{ background: 'var(--bg-card)' }}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-mono text-sm font-semibold">win_id: {info.id}</div>
+                          <div className="text-xs text-secondary truncate" style={{ maxWidth: '500px' }}>
+                            {url}
                           </div>
                         </div>
+                        <div className="badge font-mono" style={{fontSize: '0.7rem'}}>
+                          #{info.id}
+                        </div>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        selectedWindow && (
-          <WindowDetail
-            windowId={selectedWindow.id}
-            initialUrl={selectedWindow.url}
-            onBack={() => setView('dashboard')}
-          />
-        )
-      )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

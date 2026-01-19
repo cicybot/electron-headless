@@ -9,7 +9,7 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
     const { rpc, rpcBaseUrl } = useRpc();
     const [currentUrl, setCurrentUrl] = useState(initialUrl);
     const [navUrl, setNavUrl] = useState(initialUrl);
-    const [screenshotTs, setScreenshotTs] = useState(Date.now());
+    const [screenshotUrl, setScreenshotUrl] = useState<string>('');
 
     // JS Exec State
     const [jsCode, setJsCode] = useState(`(() => { 
@@ -24,7 +24,7 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
     const [expandedRequestId, setExpandedRequestId] = useState<string | null>(null);
     const [urlFilter, setUrlFilter] = useState('');
 
-    const refreshScreenshot = () => setScreenshotTs(Date.now());
+    const refreshScreenshot = () => setScreenshotUrl('');
 
     // Consolidated Refresh Loop
     useEffect(() => {
@@ -95,8 +95,35 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
         setTimeout(refreshScreenshot, 500);
     }
 
-    // Construct screenshot URL
-    const screenshotUrl = (rpcBaseUrl ? `${rpcBaseUrl}/screenshot` : '/screenshot') + `?id=${windowId}&t=${screenshotTs}`;
+    // Auto-fetch screenshot as blob URL
+    useEffect(() => {
+        let interval: any;
+
+        const fetchScreenshot = async () => {
+            try {
+                const url = (rpcBaseUrl ? `${rpcBaseUrl}/screenshot` : '/screenshot') + `?id=${windowId}&t=${Date.now()}`;
+                const response = await fetch(url);
+                if (response.ok) {
+                    const arrayBuffer = await response.arrayBuffer();
+                    const blob = new Blob([arrayBuffer], { type: 'image/png' });
+                    const blobUrl = URL.createObjectURL(blob);
+                    setScreenshotUrl(blobUrl);
+                }
+            } catch (error) {
+                console.error('Failed to fetch screenshot:', error);
+            }
+        };
+
+        // Initial fetch
+        fetchScreenshot();
+
+        // Set up interval for auto-refresh
+        interval = setInterval(fetchScreenshot, 1000);
+
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [windowId, rpcBaseUrl]);
 
     return (
         <div className="flex flex-col h-full">
@@ -116,43 +143,65 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
                     <button className="btn" onClick={handleNavigate}>Go</button>
                 </div>
                 <div className="w-px h-6 bg-border mx-2"></div>
+                <button className="btn btn-sm" onClick={async () => {
+                    await rpc('showWindow', { win_id: windowId });
+                }} title="Active Window">
+                    Active
+                </button>
+                <button className="btn btn-sm" onClick={async () => {
+                    await rpc('closeWindow', { win_id: windowId });
+                }} title="Close Window">
+                    Close
+                </button>
+                <button className="btn btn-sm" onClick={async () => {
+                    await rpc('hideWindow', { win_id: windowId });
+                }} title="Hide Window">
+                    Hide
+                </button>
                 <button className="btn btn-icon" onClick={handleReload} title="Reload Page">
                     <IconRefresh />
                 </button>
+                <button className="btn btn-sm" onClick={async () => {
+                    await rpc('executeJavaScript', { win_id: windowId, code: 'location.reload()' });
+                }} title="Reload via JavaScript">
+                    JS Reload
+                </button>
             </div>
             <View relative w100p h="calc(100vh - 134px)">
-                <View red absFull right={300} center p12 borderBox>
-                    <View abs top0 xx0 pl12 pr12 bgColor='black' borderBox>
-                        <div className="flex justify-between items-center">
-                            <h3 className="font-bold text-secondary text-sm uppercase tracking-wide">Live Preview</h3>
-                            <div className="flex gap-2 items-center">
-                                <label className="flex items-center gap-2 text-xs text-secondary cursor-pointer">
-                                    <input type="checkbox" checked={isAutoRefresh} onChange={e => setIsAutoRefresh(e.target.checked)} />
-                                    Auto-Refresh
-                                </label>
-                                <button className="btn btn-sm btn-icon" onClick={refreshScreenshot}>
-                                    <IconCamera />
-                                </button>
+                <div className="relative flex-1 h-full">
+                    <div className="absolute inset-0 right-[300px] flex items-center justify-center p-3 bg-black">
+                        <div className="absolute top-0 left-0 right-0 px-3 py-2 bg-black border-b border-gray-700">
+                            <div className="flex justify-between items-center">
+                                <h3 className="font-bold text-gray-400 text-sm uppercase tracking-wide">Live Preview</h3>
+                                <div className="flex gap-2 items-center">
+                                    <label className="flex items-center gap-2 text-xs text-gray-400 cursor-pointer">
+                                        <input type="checkbox" checked={isAutoRefresh} onChange={e => setIsAutoRefresh(e.target.checked)} />
+                                        Auto-Refresh
+                                    </label>
+                                    <button className="btn btn-sm btn-icon" onClick={refreshScreenshot}>
+                                        <IconCamera />
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </View>
-                    <View borderBox abs borderRadius={12} overflowHidden right={12} left={12} top={52} bottom={12} blue center>
-                        <img
-                            src={screenshotUrl}
-                            alt="Window Screenshot"
-                            className="preview-img"
-                            style={{
-                                maxWidth: '100%',
-                                maxHeight: '100%',
-                                height: 'auto',
-                                objectFit: 'contain'
-                            }}
-                        />
-                    </View>
-                </View>
-                <View abs yy0 right0 blue w={300}>
-                    <button onClick={removeLogin}>removeLogin</button>
-                </View>
+                        <div className="absolute inset-3 rounded-lg overflow-hidden bg-gray-900 border border-gray-700">
+                            <img
+                                src={screenshotUrl || ''}
+                                alt="Window Screenshot"
+                                className="preview-img w-full h-full"
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '100%',
+                                    height: 'auto',
+                                    objectFit: 'contain'
+                                }}
+                            />
+                        </div>
+                    </div>
+                    <div className="absolute inset-y-0 right-0 w-[300px] bg-gray-900 p-3">
+                        <button onClick={removeLogin} className="btn btn-sm w-full">Remove Login</button>
+                    </div>
+                </div>
             </View>
             <div className="flex flex-1 overflow-hidden" style={{ display: "none" }} >
 
@@ -165,7 +214,7 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
 
                     <div className="flex-1 flex items-center justify-center bg-black rounded border border-border overflow-hidden">
                         <img
-                            src={screenshotUrl}
+                            src={screenshotUrl || ''}
                             alt="Window Screenshot"
                             className="preview-img"
                             style={{
