@@ -93,7 +93,6 @@ async function backupToZ({
     }
 }
 
-const { backupToZ } = require("./backup-to-z");
 
 (async () => {
     // Chrome
