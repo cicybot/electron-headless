@@ -13,7 +13,7 @@ const http = require('http');
 class TestSuite {
     constructor() {
         this.testResults = [];
-        this.testDir = path.join(__dirname, '..');
+        this.testDir = __dirname;
         this.cacheDir = path.join(require('os').homedir(), '.electron-mcp', 'screenshot-cache');
         this.windowStateFile = path.join(require('os').homedir(), '.electron-mcp', 'window-states.json');
     }
