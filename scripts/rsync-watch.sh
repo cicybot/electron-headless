@@ -6,9 +6,9 @@
 #chmod +x rsync-watch.sh
 #./rsync-watch.sh
 
-LOCAL_DIR="/Users/data/electron/electron-headless/"
+LOCAL_DIR="/Users/data/electron/electron-mcp/"
 REMOTE="vm"
-REMOTE_DIR="~/electron-headless/"
+REMOTE_DIR="~/electron-mcp/"
 DELAY=1
 
 sync() {
@@ -30,7 +30,7 @@ fswatch -o "$LOCAL_DIR" | while read _; do
     docker rm -f  my-electron
     docker run -d --name my-electron --rm \
       --network=host -p 3000:3000 \
-      -v /home/ton/electron-headless/src:/data \
+      -v /home/ton/electron-mcp/src:/data \
       my-electron
   "
 done

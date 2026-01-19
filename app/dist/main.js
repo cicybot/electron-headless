@@ -38305,7 +38305,7 @@ ${code}})()`;
 // src/services/screenshot-service.js
 var require_screenshot_service = __commonJS({
   "src/services/screenshot-service.js"(exports2, module2) {
-    var { desktopCapturer: desktopCapturer2 } = require("electron");
+    var { desktopCapturer } = require("electron");
     var ScreenshotService = class {
       constructor() {
         this.appManager = require_app_manager();
@@ -38384,7 +38384,7 @@ var require_screenshot_service = __commonJS({
        */
       async captureSystemScreenshot(options = {}) {
         try {
-          const sources = await desktopCapturer2.getSources({
+          const sources = await desktopCapturer.getSources({
             types: ["screen", "window"],
             thumbnailSize: options.thumbnailSize || { width: 1920, height: 1080 }
           });
@@ -75185,7 +75185,7 @@ var require_mcp_integration = __commonJS({
     var McpIntegration = class {
       constructor() {
         this.server = new McpServer({
-          name: "electron-headless-ptools",
+          name: "electron-mcp-ptools",
           version: "1.0.0",
           description: "Playwright-style browser automation tools for Electron headless browser"
         });

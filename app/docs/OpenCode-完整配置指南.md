@@ -10,7 +10,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "enabled": true,
@@ -72,7 +72,7 @@ await mcp.tools.call('click', {
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "enabled": true,
@@ -93,14 +93,14 @@ await mcp.tools.call('click', {
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "enabled": true
     }
   },
   "tools": {
-    "electron-headless-ptools_*": false
+    "electron-mcp-ptools_*": false
   }
 }
 ```
@@ -111,19 +111,19 @@ await mcp.tools.call('click', {
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "enabled": true
     }
   },
   "tools": {
-    "electron-headless-ptools_*": false
+    "electron-mcp-ptools_*": false
   },
   "agent": {
     "my-agent": {
       "tools": {
-        "electron-headless-ptools_*": true
+        "electron-mcp-ptools_*": true
       }
     }
   }
@@ -171,7 +171,7 @@ OpenCode 会自动调用相应的 MCP 工具。
 ### 明确指定工具
 
 ```
-use electron-headless-ptools to navigate to https://example.com and take a screenshot
+use electron-mcp-ptools to navigate to https://example.com and take a screenshot
 ```
 
 ### 编程方式调用

@@ -10,7 +10,7 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "description": "Playwright-style browser automation tools for Electron headless browser with account isolation",
@@ -128,7 +128,7 @@ await mcp.tools.call('evaluate_script', {
 ```json
 {
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       // 主服务器配置
     },
     "another-mcp-server": {

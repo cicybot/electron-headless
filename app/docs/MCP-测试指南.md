@@ -164,7 +164,7 @@ curl -X POST http://127.0.0.1:3456/mcp \
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["curl", "-X", "POST", "http://127.0.0.1:3456/mcp", "-H", "Content-Type: application/json", "-d", "@-"],
       "description": "Playwright风格的浏览器自动化工具"

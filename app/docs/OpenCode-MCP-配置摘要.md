@@ -30,7 +30,7 @@ npm start
 ```json
 {
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "description": "Playwright-style browser automation tools for Electron headless browser with account isolation"

@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
-    "start": "node auto-reload.js && electron --trace-warnings src/main.js",
+    "start": "node preload.js && electron --trace-warnings src/main.js",
     "prod": "electron dist/main.js",
     "dev": "nodemon",
-    "auto-reload": "npm start && nodemon --watch ./src --exec \"npm start\" --delay 1",
+    "hot-reload": "npm start && nodemon --watch ./src --exec \"npm start\" --delay 1",
     "hot-push": "nodemon --watch .. --exec \"cd .. && git add . && git commit -m 'auto' && git push origin mcp\" --delay 1",
     "build": "node build.js"
   },

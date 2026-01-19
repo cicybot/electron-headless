@@ -100,7 +100,7 @@ describe('llm', () => {
         console.log(res)
     });
     it('prompt', async () => {
-        let prompt = fs.readFileSync("/Users/data/electron/electron-headless/app/tests/llm/prompt.md").toString()
+        let prompt = fs.readFileSync("/Users/data/electron/electron-mcp/app/tests/llm/prompt.md").toString()
         prompt = prompt.split("---")[0]
         console.log(prompt)
 
@@ -121,7 +121,7 @@ describe('llm', () => {
     });
 
     it('prompt local jupyter', async () => {
-        let prompt = fs.readFileSync("/Users/data/electron/electron-headless/app/tests/llm/prompt_local_jupyter.md").toString()
+        let prompt = fs.readFileSync("/Users/data/electron/electron-mcp/app/tests/llm/prompt_local_jupyter.md").toString()
         prompt = prompt.split("---")[0]
         console.log(prompt)
         // await post_rpc({

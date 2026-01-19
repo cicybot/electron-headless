@@ -64,7 +64,7 @@ npm start
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "description": "Playwright-style browser automation tools"
@@ -97,13 +97,13 @@ node test-opencode-mcp.js
 
 ```bash
 # 构建镜像
-docker build -t electron-headless .
+docker build -t electron-mcp .
 
 # 运行容器
-docker run --name electron-headless \
+docker run --name electron-mcp \
   -p 3456:3456 \
-  -v $(pwd)/assets:/home/electron/.config/electron-headless \
-  electron-headless
+  -v $(pwd)/assets:/home/electron/.config/electron-mcp \
+  electron-mcp
 ```
 
     docker restart electron

@@ -11,7 +11,7 @@ Cursor 是最受欢迎的 MCP 支持工具之一。
 ```json
 {
   "mcpServers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
       "args": ["/absolute/path/to/your/project/opencode-mcp-server.js"],
       "cwd": "/absolute/path/to/your/project",
@@ -39,7 +39,7 @@ Claude Desktop 原生支持 MCP。
 ```json
 {
   "mcpServers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
       "args": ["/path/to/your/project/opencode-mcp-server.js"],
       "cwd": "/path/to/your/project"
@@ -57,7 +57,7 @@ Claude Desktop 原生支持 MCP。
 ```json
 {
   "servers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
       "args": ["opencode-mcp-server.js"],
       "cwd": "${workspaceFolder}"
@@ -75,7 +75,7 @@ Windsurf 也支持 MCP。
 ```json
 {
   "mcpServers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
       "args": ["opencode-mcp-server.js"],
       "cwd": "/path/to/your/project"
@@ -93,7 +93,7 @@ Windsurf 也支持 MCP。
 ```json
 {
   "mcpServers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
       "args": ["opencode-mcp-server.js"],
       "cwd": "/path/to/your/project"
@@ -113,10 +113,10 @@ mkdir -p ~/.config/cursor
 cat > ~/.config/cursor/mcp.json << 'EOF'
 {
   "mcpServers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
-      "args": ["/Users/data/electron/electron-headless/opencode-mcp-server.js"],
-      "cwd": "/Users/data/electron/electron-headless",
+      "args": ["/Users/data/electron/electron-mcp/opencode-mcp-server.js"],
+      "cwd": "/Users/data/electron/electron-mcp",
       "env": {
         "NODE_PATH": "."
       }
@@ -133,10 +133,10 @@ mkdir -p ~/Library/Application\ Support/Claude
 cat > ~/Library/Application\ Support/Claude/claude_desktop_config.json << 'EOF'
 {
   "mcpServers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
-      "args": ["/Users/data/electron/electron-headless/opencode-mcp-server.js"],
-      "cwd": "/Users/data/electron/electron-headless"
+      "args": ["/Users/data/electron/electron-mcp/opencode-mcp-server.js"],
+      "cwd": "/Users/data/electron/electron-mcp"
     }
   }
 }
@@ -150,7 +150,7 @@ mkdir -p .vscode
 cat > .vscode/mcp.json << 'EOF'
 {
   "servers": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "command": "node",
       "args": ["../opencode-mcp-server.js"],
       "cwd": "${workspaceFolder}"
@@ -199,7 +199,7 @@ function testClientConfig(clientName) {
 
   try {
     const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    if (config.mcpServers && config.mcpServers['electron-headless-ptools']) {
+    if (config.mcpServers && config.mcpServers['electron-mcp-ptools']) {
       console.log(`✅ ${client.processName} 配置存在`);
 
       // 测试服务器是否可以启动

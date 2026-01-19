@@ -1,6 +1,6 @@
 {
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": [
         "node",

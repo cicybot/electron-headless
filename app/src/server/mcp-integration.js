@@ -11,7 +11,7 @@ const transports = {};
 class McpIntegration {
   constructor() {
     this.server = new McpServer({
-      name: 'electron-headless-ptools',
+      name: 'electron-mcp-ptools',
       version: '1.0.0',
       description: 'Playwright-style browser automation tools for Electron headless browser'
     });

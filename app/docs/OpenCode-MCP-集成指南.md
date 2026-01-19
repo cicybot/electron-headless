@@ -32,7 +32,7 @@ npm install -g electron
 {
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "description": "Playwright-style browser automation tools for Electron headless browser with account isolation",
@@ -59,7 +59,7 @@ cd app
 npm start &
 
 # 或者使用 PM2 等进程管理器
-pm2 start "cd app && npm start" --name electron-headless
+pm2 start "cd app && npm start" --name electron-mcp
 ```
 
 ### 4. 在 OpenCode 中使用
@@ -291,7 +291,7 @@ this.server.tool('custom_tool', 'Custom tool description', {
 ```json
 {
   "mcp": {
-    "electron-headless-ptools": {
+    "electron-mcp-ptools": {
       "type": "local",
       "command": ["node", "opencode-mcp-server.js"],
       "env": {
