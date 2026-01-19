@@ -303,6 +303,72 @@ class WindowManager {
     }
     return false;
   }
+
+  /**
+   * Save individual window state
+   */
+  _saveWindowState(winId, win, accountIndex, url) {
+    try {
+      if (win && !win.isDestroyed()) {
+        const bounds = win.getBounds();
+        this.windowStates[winId] = {
+          accountIndex,
+          url,
+          bounds,
+          timestamp: Date.now()
+        };
+      }
+    } catch (error) {
+      console.error(`Failed to save window state for ${winId}:`, error);
+    }
+  }
+
+  /**
+   * Save all window states to persistent storage
+   */
+  async saveWindowStates() {
+    if (Object.keys(this.windowStates).length > 0) {
+      await storageManager.saveWindowStates(this.windowStates);
+    }
+  }
+
+  /**
+   * Restore windows from saved state
+   */
+  async restoreWindows() {
+    try {
+      const savedStates = await storageManager.loadWindowStates();
+      console.log('Restoring windows from saved state:', Object.keys(savedStates));
+      
+      for (const [winId, state] of Object.entries(savedStates)) {
+        if (state && state.accountIndex !== undefined && state.url) {
+          console.log(`Restoring window ${winId}: ${state.url}`);
+          await this.createWindow(
+            state.accountIndex,
+            state.url,
+            state.bounds || {},
+            {
+              userAgent: null,
+              cookies: null,
+              openDevtools: null,
+              proxy: null,
+              wrapUrl: true,
+              showWin: true
+            }
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Failed to restore windows:', error);
+    }
+  }
+
+  /**
+   * Initialize window manager and restore previous session
+   */
+  async init() {
+    await this.restoreWindows();
+  }
 }
 
 module.exports = new WindowManager();
