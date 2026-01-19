@@ -75,17 +75,7 @@ class WindowManager {
     const partition = `persist:p_${accountIndex}`;
     finalOptions.webPreferences.partition = partition;
 
-    // Handle URL wrapping for local development
     let finalUrl = url;
-    if (wrapUrl) {
-      const appManager = require('./app-manager');
-      const baseUrl = appManager.isLocalMode()
-        ? "http://127.0.0.1:3455"
-        : "https://render.cicy.de5.net";
-      finalUrl = `${baseUrl}/render?u=${encodeURIComponent(url)}`;
-    }
-
-    console.log(appManager.isLocalMode(), finalUrl);
 
     // Create the window
     const win = new BrowserWindow(finalOptions);
