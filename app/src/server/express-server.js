@@ -280,12 +280,24 @@ class ExpressServer {
   }
 
   /**
-   * Stop the server
+   * Stop the Express server
    */
   stop() {
-    if (this.server) {
-      this.server.close();
+    // Stop screenshot cache service
+    try {
+      const screenshotCache = require('../services/screenshot-cache-service');
+      screenshotCache.stop();
+      console.log('[ExpressServer] Screenshot cache service stopped');
+    } catch (error) {
+      console.error('[ExpressServer] Failed to stop screenshot cache:', error);
     }
+
+    if (this.server) {
+      this.server.close(() => {
+        console.log('[ExpressServer] Server stopped');
+      });
+    }
+  }
   }
 
   /**
