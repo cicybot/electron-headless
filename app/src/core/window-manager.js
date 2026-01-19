@@ -208,6 +208,14 @@ class WindowManager {
       window._G.win_id = ${winId};
       window._G._l("dom-ready")
       `);
+      
+      // Update window title with win_id prefix
+      this._updateWindowTitle(winId, win);
+    });
+
+    // Handle document title changes
+    win.webContents.on('page-title-updated', (event, title) => {
+      this._updateWindowTitle(winId, win, title);
     });
 
     // Set up network request monitoring
