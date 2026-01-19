@@ -9,7 +9,7 @@ const os = require('os');
 
 class StorageManager {
     constructor() {
-        this.storageDir = path.join(os.homedir(), '.electron-mcp');
+        this.storageDir = path.join(os.homedir(), 'electron-mcp');
         this.windowStateFile = path.join(this.storageDir, 'window-states.json');
         this.appStateFile = path.join(this.storageDir, 'app-state.json');
     }
