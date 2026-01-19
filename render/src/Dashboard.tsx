@@ -70,9 +70,17 @@ export const Dashboard = () => {
     }
   };
 
-  const handleSelectWindow = (id: number, url: string) => {
-    setSelectedWindow({ id, url });
-    setView('detail');
+  const handleSelectWindow = async (id: number, url: string) => {
+    try {
+      // Open the window in a new browser window
+      await rpc('focusWindow', { window_id: id });
+      // Alternatively, you could open the URL directly in a new browser tab:
+      // window.open(url, '_blank');
+    } catch (e) {
+      console.error('Failed to focus window:', e);
+      // Fallback to opening URL in new tab
+      window.open(url, '_blank');
+    }
   };
 
   return (
