@@ -148,9 +148,18 @@ function windowSitesToJSON(windowSites) {
     for (const [groupKey, siteMap] of windowSites.entries()) {
         result[groupKey] = {};
         for (const [url, info] of siteMap.entries()) {
+            let bounds = null;
+            if (info.win && !info.win.isDestroyed()) {
+                try {
+                    bounds = info.win.getBounds();
+                } catch (error) {
+                    console.error('Failed to get window bounds:', error);
+                }
+            }
             result[groupKey][url] = {
                 id: info.id,
-                wcId: info.wcId
+                wcId: info.wcId,
+                bounds: bounds
             };
         }
     }
