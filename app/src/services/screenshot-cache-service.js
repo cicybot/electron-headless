@@ -262,58 +262,23 @@ class ScreenshotCacheService {
 
 // Worker thread implementation
 if (!isMainThread) {
-  const { desktopCapturer } = require('electron');
   const fs = require('fs').promises;
-  const { workerData } = require('worker_threads');
-  const { webContents } = require('electron');
 
   parentPort.on('message', async (task) => {
     try {
-      let buffer;
-      
-      if (task.type === 'system') {
-        const sources = await desktopCapturer.getSources({
-          types: ['screen'],
-          thumbnailSize: { width: 1920, height: 1080 }
-        });
-        
-        if (sources.length === 0) {
-          throw new Error('No screen sources found');
-        }
-        
-        // Keep real size for system screenshots
-        buffer = sources[0].thumbnail.toPNG();
-      } else if (task.type === 'window') {
-        const wc = webContents.fromId(task.wcId);
-        if (!wc) {
-          throw new Error('WebContents not found');
-        }
-        
-        const image = await wc.capturePage();
-        
-        // Scale to half size for window screenshots
-        const scaleFactor = 0.5;
-        const scaled = image.resize({
-          width: Math.floor(image.getSize().width * scaleFactor),
-          height: Math.floor(image.getSize().height * scaleFactor),
-        });
-        
-        buffer = scaled.toPNG();
-      } else {
-        throw new Error('Unknown task type');
-      }
-      
-      // Write to cache file
-      await fs.writeFile(task.cacheFile, buffer);
-      
+      const { buffer, cacheFile, type, winId, workerId } = task;
+
+      // Write buffer to cache file
+      await fs.writeFile(cacheFile, buffer);
+
       parentPort.postMessage({
         success: true,
-        type: task.type,
-        winId: task.winId,
+        type: type,
+        winId: winId,
         size: buffer.length,
-        workerId: task.workerId
+        workerId: workerId
       });
-      
+
     } catch (error) {
       parentPort.postMessage({
         success: false,
