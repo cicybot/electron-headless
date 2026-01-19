@@ -39221,7 +39221,7 @@ var require_screenshot_cache_service = __commonJS({
           cacheFile: this.systemCacheFile,
           workerId: 0
         });
-        windows.forEach((accountWindows) => {
+        Object.values(windows).forEach((accountWindows) => {
           Object.values(accountWindows).forEach((windowInfo) => {
             if (windowInfo.win && !windowInfo.win.isDestroyed()) {
               const winId = windowInfo.id;
