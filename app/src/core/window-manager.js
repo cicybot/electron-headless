@@ -15,6 +15,19 @@ class WindowManager {
     this.windowSites = new Map(); // account_index -> Map<url, {id, wcId, win}>
     this.windowState = new Map(); // win_id -> state
     this.requestIndex = 0;
+    this.windowStates = {}; // For persistent storage
+    this.isShuttingDown = false;
+    
+    // Set up auto-save interval
+    this.autoSaveInterval = setInterval(() => {
+      this.saveWindowStates();
+    }, 5000); // Save every 5 seconds
+
+    // Handle app shutdown
+    app.on('before-quit', () => {
+      this.isShuttingDown = true;
+      this.saveWindowStates();
+    });
   }
 
   /**
