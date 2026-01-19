@@ -23,6 +23,7 @@ const post_rpc = async ({method, params}) => {
 }
 
 function openWindow(url, options, others) {
+    console.log(url)
     return post_rpc({
         method: "openWindow",
         params: {

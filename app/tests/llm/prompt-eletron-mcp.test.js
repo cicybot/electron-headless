@@ -46,90 +46,113 @@ setBaseApi("https://ga-win-electron-3456-v1.cicy.de5.net")
  pyautoguiPaste: 'Paste content',
  pyautoguiMove: 'Move mouse to position'
  */
-describe('llm', () => {
+describe('electron-mcp', () => {
     it('local jupyter', async () => {
         const res = await openWindow("http://127.0.0.1:8888",{})
         console.log(res)
     });
+    //
+    // it('gcs', async () => {
+    //     const res = await openWindow("https://gcs-8888.cicy.de5.net/lab?",{})
+    //     console.log(res)
+    // });
+    //
+    // it('google', async () => {
+    //     const res = await openWindow("https://www.google.com",{})
+    //     console.log(res)
+    // });
+    //
+    //
+    // it('colab', async () => {
+    //     const res = await openWindow("https://colab.research.google.com/",{})
+    //     console.log(res)
+    // });
+    //
+    // it('aistudio', async () => {
+    //     const res = await openWindow("https://aistudio.google.com/apps",{})
+    //     console.log(res)
+    // });
+    // it('openRect', async () => {
+    //     const res = await openWindow("https://www.google.com",{
+    //         width:100,height:100,x:100,y:100
+    //     })
+    //     console.log(res)
+    // });
+    //
+    // it('click', async () => {
+    //     const res = await post_rpc({
+    //         method: "pyautoguiClick",
+    //         params: {
+    //             win_id:1,
+    //             x:289,
+    //             y:20
+    //         }
+    //     })
+    //     console.log(res)
+    // });
+    // it('run', async () => {
+    //     const res = await post_rpc({
+    //         method: "pyautoguiWrite",
+    //         params: {
+    //             win_id:1,
+    //             text:"hi"
+    //         }
+    //     })
+    //     console.log(res)
+    // });
 
-    it('gcs', async () => {
-        const res = await openWindow("https://gcs-8888.cicy.de5.net/lab?",{})
-        console.log(res)
-    });
-
-    it('google', async () => {
-        const res = await openWindow("https://www.google.com",{})
-        console.log(res)
-    });
-
-
-    it('colab', async () => {
-        const res = await openWindow("https://colab.research.google.com/",{})
-        console.log(res)
-    });
-
-    it('aistudio', async () => {
-        const res = await openWindow("https://aistudio.google.com/apps",{})
-        console.log(res)
-    });
-    it('openRect', async () => {
-        const res = await openWindow("https://www.google.com",{
-            width:100,height:100,x:100,y:100
-        })
-        console.log(res)
-    });
-    it('click', async () => {
-        const res = await post_rpc({
-            method: "pyautoguiClick",
-            params: {
-                win_id:1,
-                x:289,
-                y:20
-            }
-        })
-        console.log(res)
-    });
-    it('run', async () => {
-        const res = await post_rpc({
-            method: "pyautoguiWrite",
-            params: {
-                win_id:1,
-                text:"hi"
-            }
-        })
-        console.log(res)
-    });
-    it('prompt', async () => {
-        let prompt = fs.readFileSync("/Users/data/electron/electron-headless/app/tests/llm/prompt.md").toString()
-        prompt = prompt.split("---")[0]
-        console.log(prompt)
-
+    it('showWindow', async () => {
         await post_rpc({
-            method: "pyautoguiText",
+            method: "showWindow",
             params: {
-                win_id:1,
-                text:prompt.trim(),
+                win_id:2,
+            }
+        })
+    });
+
+    it('hideFloatDiv', async () => {
+        await post_rpc({
+            method: "hideFloatDiv",
+            params: {
+                win_id:2,
+            }
+        })
+    });
+    it('showFloatDiv', async () => {
+        await post_rpc({
+            method: "showFloatDiv",
+            params: {
+                win_id:2,
+            }
+        })
+    });
+    it('writeClipboard', async () => {
+        await post_rpc({
+            method: "writeClipboard",
+            params: {
+                win_id:2,text:"测试中文 11223"
             }
         })
         await post_rpc({
-            method: "pyautoguiPress",
+            method: "sendElectronCtlV",
             params: {
-                win_id:1,
-                key:"enter",
+                win_id:2,
             }
         })
+        await post_rpc({
+            method: "sendElectronPressEnter",
+            params: {
+                win_id:2,
+            }
+        })
+
     });
 
     it('prompt local jupyter', async () => {
         let prompt = fs.readFileSync("/Users/data/electron/electron-headless/app/tests/llm/prompt_local_jupyter.md").toString()
         prompt = prompt.split("---")[0]
         console.log(prompt)
-        // await post_rpc({
-        //     method: "showWindow",
-        //     params: {
-        //         win_id:2,
-        //     }
-        // })
+
         await post_rpc({
             method: "pyautoguiText",
             params: {
@@ -144,35 +167,5 @@ describe('llm', () => {
                 key:"enter",
             }
         })
-    });
-});
-
-
-
-describe('open windows', () => {
-    it('local jupyter1', async () => {
-        const res = await openWindow("http://127.0.0.1:8888",{})
-        console.log(res)
-    });
-
-    it('gcs', async () => {
-        const res = await openWindow("https://gcs-8888.cicy.de5.net/lab?",{})
-        console.log(res)
-    });
-
-    it('google', async () => {
-        const res = await openWindow("https://www.google.com",{})
-        console.log(res)
-    });
-
-
-    it('colab', async () => {
-        const res = await openWindow("https://colab.research.google.com/",{})
-        console.log(res)
-    });
-
-    it('aistudio', async () => {
-        const res = await openWindow("https://aistudio.google.com/apps",{})
-        console.log(res)
     });
 });
