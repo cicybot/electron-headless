@@ -29,10 +29,10 @@ app.whenReady().then(async () => {
   // Start Express server (includes MCP integration)
   expressServer.start();
   
-  if (BrowserWindow.getAllWindows().length === 0) {
-    // Could create a default window here if needed
-    winManager.createWindow(0,"http://localhost:3455/",{})
-  }
+   if (BrowserWindow.getAllWindows().length === 0) {
+     // Could create a default window here if needed
+     winManager.createWindow(0,"http://localhost:3456/",{})
+   }
   // Handle app activation (macOS)
   app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
