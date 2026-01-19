@@ -165,7 +165,8 @@ function regxHTML1(html) {
 
 const FLOAT_DIV_ID = '__floatDiv'
 
-function showFloatDiv({width,height,top,left}) {
+function showFloatDiv(options) {
+    const {width,height,top,left} = options||{}
     if(!width) width = 200
     if(!height) height = 80
     if(!top) top = 50
