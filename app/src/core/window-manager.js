@@ -125,6 +125,9 @@ class WindowManager {
     // Store window reference
     this._registerWindow(accountIndex, finalUrl, win, winId, wcId);
 
+    // Save initial window state
+    this._saveWindowState(winId, win, accountIndex, finalUrl);
+
     // Set up event handlers
     this._setupWindowEvents(win, winId, accountIndex, finalUrl);
 
