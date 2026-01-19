@@ -251,6 +251,9 @@ function showFloatDiv(options) {
     `
     div.appendChild(textDisplay)
 
+    // Initialize text display content
+    textDisplay.innerHTML = `Pos: ${left},${top}<br>Size: ${width}x${height}`
+
     document.body.appendChild(div)
 
     let isDragging = false
