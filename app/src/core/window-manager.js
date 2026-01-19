@@ -343,7 +343,11 @@ class WindowManager {
       const savedStates = await storageManager.loadWindowStates();
       console.log('Restoring windows from saved state:', Object.keys(savedStates));
       
-      for (const [winId, state] of Object.entries(savedStates)) {
+      // Sort by window ID (as number) to restore in order
+      const sortedWinIds = Object.keys(savedStates).sort((a, b) => parseInt(a) - parseInt(b));
+      
+      for (const winId of sortedWinIds) {
+        const state = savedStates[winId];
         if (state && state.accountIndex !== undefined && state.url) {
           console.log(`Restoring window ${winId}: ${state.url}`);
           await this.createWindow(
