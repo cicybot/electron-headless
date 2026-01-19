@@ -158,8 +158,23 @@ class WindowManager {
    */
   _setupWindowEvents(win, winId, accountIndex, url) {
     // Handle window close
-    win.on("close", () => {
-      this._unregisterWindow(accountIndex, url);
+    win.on("close", (event) => {
+      // Save state before closing
+      this._saveWindowState(winId, win, accountIndex, url);
+      
+      // If shutting down unexpectedly, prevent close and save state
+      if (!this.isShuttingDown) {
+        this._unregisterWindow(accountIndex, url);
+      }
+    });
+
+    // Handle window state changes
+    win.on('resize', () => {
+      this._saveWindowState(winId, win, accountIndex, url);
+    });
+
+    win.on('move', () => {
+      this._saveWindowState(winId, win, accountIndex, url);
     });
 
     // Handle navigation events for request tracking
