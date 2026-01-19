@@ -287,10 +287,9 @@ class ExpressServer {
       });
     }
   }
-  }
 
   /**
-   * Get the Express app instance
+   * Get Express app instance
    */
   getApp() {
     return this.app;

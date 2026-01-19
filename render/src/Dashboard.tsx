@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRpc } from './RpcContext';
 import { ConnectionManager } from './ConnectionManager';
-import { WindowThumbnail } from './WindowThumbnail';
 import { WindowDetail } from './WindowDetail';
 import { IconAlert } from './Icons';
 import { WindowMap } from './types';
@@ -130,7 +129,7 @@ export const Dashboard = () => {
             </button>
           </div>
 
-          {/* Window Grid */}
+          {/* Window List */}
           <h2 className="text-lg font-bold mb-4">Active Sessions</h2>
           {Object.keys(windows).length === 0 ? (
             <div className="text-secondary text-center p-12 border border-dashed border-border rounded-lg">
@@ -141,23 +140,33 @@ export const Dashboard = () => {
               )}
             </div>
           ) : (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               {Object.entries(windows).map(([accIdx, sites]) => (
                 <div key={accIdx} className="card flex flex-col">
                   <div className="p-3 border-b border-border bg-hover flex justify-between items-center" style={{ background: 'var(--bg-hover)' }}>
                     <span className="font-mono font-bold text-sm">Account #{accIdx}</span>
                     <span className="badge">{Object.keys(sites).length} Sessions</span>
                   </div>
-                  <div className="window-thumbs-grid">
+                  <div className="p-2">
                     {Object.entries(sites).map(([url, info]) => (
-                      <WindowThumbnail
+                      <div
                         key={info.id}
-                        id={info.id}
-                        url={url}
-                        refreshKey={refreshTick}
+                        className="p-3 border border-border rounded mb-2 cursor-pointer hover:bg-hover transition-colors"
                         onClick={() => handleSelectWindow(info.id, url)}
-                        rpcBaseUrl={rpcBaseUrl}
-                      />
+                        style={{ background: 'var(--bg-card)' }}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-mono text-sm font-semibold">win_id: {info.id}</div>
+                            <div className="text-xs text-secondary truncate" style={{ maxWidth: '500px' }}>
+                              {url}
+                            </div>
+                          </div>
+                          <div className="badge font-mono" style={{fontSize: '0.7rem'}}>
+                            #{info.id}
+                          </div>
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
