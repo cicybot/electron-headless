@@ -78,6 +78,7 @@ describe('llm', () => {
         prompt = prompt.split("---")[0]
         console.log(prompt)
 
+
         const post_rpc = async ({method, params}) => {
             const url = `${getBaseApi()}/rpc`
             // console.log(ELECTRON_BASE_API_URL,params)
