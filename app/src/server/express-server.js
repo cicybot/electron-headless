@@ -151,26 +151,43 @@ class ExpressServer {
     }
 
    /**
-    * Handle screenshot requests
-    */
+     * Handle window screenshot requests
+     */
    async handleScreenshot(req, res) {
-    try {
-      const winId = req.query.id ? Number(req.query.id) : null;
-      const win = winId ? require('../core/window-manager').getWindow(winId) : null;
+     try {
+       const winId = req.query.id ? Number(req.query.id) : null;
+       const isLive = req.query.live === '1';
+       
+       if (!winId) {
+         return res.status(400).json({ error: 'Window ID is required' });
+       }
 
-      if (!win) {
-        return res.status(404).json({ error: 'Window not found' });
-      }
+       const screenshotCache = require('../services/screenshot-cache-service');
+       let imgBuffer;
+       
+       if (isLive) {
+         // Live capture
+         imgBuffer = await screenshotCache.captureLiveScreenshot('window', winId);
+         console.log(`[screenshot] Live screenshot captured for window ${winId}`);
+       } else {
+         // Cached version
+         imgBuffer = await screenshotCache.getCachedScreenshot('window', winId);
+         if (!imgBuffer) {
+           // Fallback to live if cache not available
+           imgBuffer = await screenshotCache.captureLiveScreenshot('window', winId);
+           console.log(`[screenshot] Cache miss, using live capture for window ${winId}`);
+         } else {
+           console.log(`[screenshot] Cached screenshot served for window ${winId}`);
+         }
+       }
 
-      const scaled = await this.getScreenshot(win.webContents);
-      const buffer = scaled.toPNG();
-      res.setHeader('Content-Type', 'image/png');
-      res.send(buffer);
-    } catch (err) {
-      console.error('[screenshot]', err);
-      res.status(500).json({ error: err.message });
-    }
-  }
+       res.setHeader('Content-Type', 'image/png');
+       res.send(imgBuffer);
+     } catch (err) {
+       console.error('[screenshot]', err);
+       res.status(500).json({ error: err.message });
+     }
+   }
 
   /**
    * Handle legacy RPC requests
