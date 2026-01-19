@@ -81,25 +81,32 @@ class ExpressServer {
      this.app.use(express.json({ limit: '50mb' }));
    }
 
-   /**
-    * Authentication middleware
-    * Allows local requests (127.0.0.1/localhost) without token
-    * Requires token for external requests
-    */
-   authMiddleware(req, res, next) {
-     const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
+  /**
+   * Authentication middleware
+   * Allows local requests (127.0.0.1/localhost) without token
+   * Requires token for external requests
+   */
+  authMiddleware(req, res, next) {
+    const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
+    const hostname = req.hostname;
+    const host = req.get('Host') || '';
+    const forwardedHost = req.get('X-Forwarded-Host') || '';
 
-     // Check if request is from localhost/127.0.0.1
-     const isLocalRequest = clientIP === '127.0.0.1' ||
-                           clientIP === '::1' ||
-                           clientIP === '::ffff:127.0.0.1' ||
-                           req.hostname === 'localhost' ||
-                           req.hostname === '127.0.0.1';
+    // Check if request is from localhost/127.0.0.1
+    const isLocalRequest = clientIP === '127.0.0.1' ||
+                          clientIP === '::1' ||
+                          clientIP === '::ffff:127.0.0.1' ||
+                          hostname === 'localhost' ||
+                          hostname === '127.0.0.1' ||
+                          host.includes('localhost') ||
+                          host.includes('127.0.0.1') ||
+                          forwardedHost.includes('localhost') ||
+                          forwardedHost.includes('127.0.0.1');
 
-     if (isLocalRequest) {
-       // Allow local requests without token
-       return next();
-     }
+    if (isLocalRequest) {
+      // Allow local requests without token
+      return next();
+    }
 
      // For external requests, check for token
      const authHeader = req.headers.authorization || req.headers['x-api-token'];
