@@ -134,6 +134,14 @@ class ExpressServer {
       res.status(200).json({ message: "pong" });
     });
 
+    // Token endpoint for external clients
+    this.app.get('/token', (req, res) => {
+      res.json({
+        token: this.apiToken,
+        message: 'Use this token in Authorization header: Bearer <token> or X-API-Token header'
+      });
+    });
+
      // Screenshot endpoint
      this.app.get('/screenshot', this.handleScreenshot.bind(this));
 
