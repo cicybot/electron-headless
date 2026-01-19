@@ -79,14 +79,38 @@ class ExpressServer {
   }
 
     /**
-     * Handle PyAutoGUI screenshot requests
-     */
-    async handlePyAutoGUIScreenshot(req, res) {
-      try {
-        const result = await this.rpcHandler.handleMethod('pyautoguiScreenshot', {});
-        if (!result.ok) {
-          return res.status(500).json({ error: result.result });
-        }
+      * Handle system screenshot requests
+      */
+     async handlePyAutoGUIScreenshot(req, res) {
+       try {
+         const screenshotCache = require('../services/screenshot-cache-service');
+         const isLive = req.query.live === '1';
+         
+         let imgBuffer;
+         
+         if (isLive) {
+           // Live capture
+           imgBuffer = await screenshotCache.captureLiveScreenshot('system');
+           console.log('[screen] Live screenshot captured');
+         } else {
+           // Cached version
+           imgBuffer = await screenshotCache.getCachedScreenshot('system');
+           if (!imgBuffer) {
+             // Fallback to live if cache not available
+             imgBuffer = await screenshotCache.captureLiveScreenshot('system');
+             console.log('[screen] Cache miss, using live capture');
+           } else {
+             console.log('[screen] Cached screenshot served');
+           }
+         }
+
+         res.set('Content-Type', 'image/png');
+         res.send(imgBuffer);
+       } catch (err) {
+         console.error('[screen]', err.stack);
+         res.status(500).json({ error: err.message });
+       }
+     }
 
         const { base64 } = result.result;
         const imgBuffer = Buffer.from(base64, 'base64');
