@@ -312,7 +312,7 @@ function showFloatDiv(options) {
             div.style.height = `${finalHeight}px`
             div.style.left = `${newLeft}px`
             div.style.top = `${newTop}px`
-            div.innerHTML = `Pos: ${newLeft},${newTop}<br>Size: ${finalWidth}x${finalHeight}`
+            textDisplay.innerHTML = `Pos: ${newLeft},${newTop}<br>Size: ${finalWidth}x${finalHeight}`
         }
     })
 
