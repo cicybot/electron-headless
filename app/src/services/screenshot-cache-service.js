@@ -112,7 +112,7 @@ class ScreenshotCacheService {
   async scheduleScreenshotCache() {
     if (!this.isRunning) return;
 
-    const windows = this.windowManager.getAllWindows();
+    const windows = this.windowManager.getAllWindows() || {};
     const tasks = [];
 
     // Add system screenshot task
