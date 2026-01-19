@@ -11,14 +11,20 @@
     body ,div{
         margin:0;padding:0
     }
+    #top{
+        height:44px;width:100vw
+    }
 </style>
-<div style="overflow: auto;width: 100vw;height:100vh">
+<div id="top">
+
+    <button onclick="location.reload()">reload</button><span id="position"></span>
+</div>
+<div id="img" style="overflow: auto;width: 100vw;height:calc(100vh - 44px)">
     <img src="https://ga-win-electron-3456-v1.cicy.de5.net/screen?t=1" alt="">
 </div>
 
 
 <script>
-
     const post_rpc = async ({method, params}) => {
         const url = `https://ga-win-electron-3456-v1.cicy.de5.net/rpc`
         // console.log(ELECTRON_BASE_API_URL,params)
@@ -32,31 +38,33 @@
         console.log(res.status)
         return res.json()
     }
-
-    document.querySelector("img").addEventListener("click",(e)=>{
+    const press = (e,type)=>{
         e.preventDefault();
         // 获取鼠标相对于图片的坐标
-        var x = parseInt(e.clientX + document.querySelector("div").scrollLeft);
-        var y = parseInt(e.clientY+ document.querySelector("div").scrollTop);
-        console.log(e)
+        var x = parseInt(e.clientX + document.querySelector("#img").scrollLeft) -44;
+        var y = parseInt(e.clientY+ document.querySelector("#img").scrollTop) -44;
         // 弹出显示坐标
-        alert('当前坐标: X=' + x + ', Y=' + y);
         post_rpc({
-            method: "pyautoguiClick",
+            method: type||"pyautoguiClick",
             params: {
                 win_id:1,
                 x,y
             }
         }).finally(()=>{
-            location.reload()
+            //location.reload()
         })
-
+    }
+    document.querySelector("img").addEventListener("click",press)
+    document.querySelector("img").addEventListener("dblclick",(e)=>{
+        press(e,"pyautoguiDBLClick")
     })
-    //
-    // document.querySelector("img").addEventListener("click",(e)=>{
-    //     e.preventDefault();
-    //     location.reload()
-    // })
+    document.querySelector("img").addEventListener("mousemove",(e)=>{
+        e.preventDefault();
+        // 获取鼠标相对于图片的坐标
+        var x = parseInt(e.clientX + document.querySelector("#img").scrollLeft)-44;
+        var y = parseInt(e.clientY+ document.querySelector("#img").scrollTop)-44;
+        document.getElementById("position").innerText = `x:${x},y:${y}`
+    })
 </script>
 </body>
 </html>

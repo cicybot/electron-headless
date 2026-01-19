@@ -1,4 +1,3 @@
-cd .. && git pull origin mcp && cd app && node backup.js
-
+w3c.offical@gmial.com
 ----
 cd d:\electron-mcp\app

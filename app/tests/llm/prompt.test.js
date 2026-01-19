@@ -46,6 +46,32 @@ setBaseApi("https://ga-win-electron-3456-v1.cicy.de5.net")
  pyautoguiMove: 'Move mouse to position'
  */
 describe('llm', () => {
+    it('openUrls', async () => {
+        const res = await openWindow("http://127.0.0.1:8888",{})
+        console.log(res)
+
+    });
+
+    it('openUrls1', async () => {
+        const res = await openWindow("https://gcs-8888.cicy.de5.net/lab?",{})
+        console.log(res)
+    });
+
+    it('google', async () => {
+        const res = await openWindow("https://www.google.com",{})
+        console.log(res)
+    });
+
+
+    it('colab', async () => {
+        const res = await openWindow("https://colab.research.google.com/",{})
+        console.log(res)
+    });
+
+    it('aistudio', async () => {
+        const res = await openWindow("https://aistudio.google.com/apps",{})
+        console.log(res)
+    });
     it('openRect', async () => {
         const res = await openWindow("https://www.google.com",{
             width:100,height:100,x:100,y:100
