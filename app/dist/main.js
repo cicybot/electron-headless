@@ -11369,7 +11369,7 @@ var require_storage_manager = __commonJS({
     var os2 = require("os");
     var StorageManager = class {
       constructor() {
-        this.storageDir = path4.join(os2.homedir(), ".electron-mcp");
+        this.storageDir = path4.join(os2.homedir(), "electron-mcp");
         this.windowStateFile = path4.join(this.storageDir, "window-states.json");
         this.appStateFile = path4.join(this.storageDir, "app-state.json");
       }
