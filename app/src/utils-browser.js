@@ -284,7 +284,7 @@ function showFloatDiv(options) {
             const newTop = startTop + (e.clientY - startY)
             div.style.left = `${newLeft}px`
             div.style.top = `${newTop}px`
-            div.innerHTML = `Pos: ${newLeft},${newTop}<br>Size: ${div.offsetWidth}x${div.offsetHeight}`
+            textDisplay.innerHTML = `Pos: ${newLeft},${newTop}<br>Size: ${div.offsetWidth}x${div.offsetHeight}`
         } else if (isResizing) {
             let newWidth = startWidth
             let newHeight = startHeight
