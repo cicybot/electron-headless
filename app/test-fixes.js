@@ -134,7 +134,16 @@ class TestSuite {
 
             // Verify build works
             try {
-                execSync('npm run build', { cwd: this.testDir });
+                // Check if build.js exists first
+                const buildJsPath = path.join(this.testDir, 'build.js');
+                const buildExists = await fs.access(buildJsPath).then(() => true).catch(() => false);
+
+                if (!buildExists) {
+                    throw new Error('build.js not found');
+                }
+
+                // Try to run build.js directly
+                execSync('node build.js', { cwd: this.testDir });
                 this.addResult('Test 4: Build verification', true, '✅ Build process works correctly');
             } catch (error) {
                 this.addResult('Test 4: Build verification', false, `❌ Build failed: ${error.message}`);
