@@ -39214,7 +39214,7 @@ var require_screenshot_cache_service = __commonJS({
        */
       async scheduleScreenshotCache() {
         if (!this.isRunning) return;
-        const windows = this.windowManager.getAllWindows();
+        const windows = this.windowManager.getAllWindows() || {};
         const tasks = [];
         tasks.push({
           type: "system",
