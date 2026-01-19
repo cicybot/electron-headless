@@ -233,6 +233,24 @@ function showFloatDiv(options) {
     })
     div.appendChild(closeButton)
 
+    // Add text display element
+    const textDisplay = document.createElement('div')
+    textDisplay.style.cssText = `
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        font-size: 10px;
+        font-family: monospace;
+        color: red;
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 2px 4px;
+        border-radius: 2px;
+        pointer-events: none;
+        z-index: 2;
+    `
+    div.appendChild(textDisplay)
+
     document.body.appendChild(div)
 
     let isDragging = false
