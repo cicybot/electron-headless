@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron --trace-warnings src/main.js",
+    "start": "npm run build && electron --trace-warnings src/main.js",
     "prod": "electron dist/main.js",
     "dev": "nodemon",
     "hot-reload": "npm run build && npm start & nodemon --watch src --exec \"node src/hot-reload.js\" --delay 1",
