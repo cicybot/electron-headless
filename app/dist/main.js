@@ -38298,7 +38298,7 @@ ${code}})()`;
 // src/services/screenshot-service.js
 var require_screenshot_service = __commonJS({
   "src/services/screenshot-service.js"(exports2, module2) {
-    var { desktopCapturer } = require("electron");
+    var { desktopCapturer: desktopCapturer2 } = require("electron");
     var ScreenshotService = class {
       constructor() {
         this.appManager = require_app_manager();
@@ -38377,7 +38377,7 @@ var require_screenshot_service = __commonJS({
        */
       async captureSystemScreenshot(options = {}) {
         try {
-          const sources = await desktopCapturer.getSources({
+          const sources = await desktopCapturer2.getSources({
             types: ["screen", "window"],
             thumbnailSize: options.thumbnailSize || { width: 1920, height: 1080 }
           });
@@ -39127,7 +39127,6 @@ var require_screenshot_cache_service = __commonJS({
     var { Worker, isMainThread, parentPort, workerData } = require("worker_threads");
     var path4 = require("path");
     var fs3 = require("fs").promises;
-    var { desktopCapturer } = require("electron");
     var os2 = require("os");
     var ScreenshotCacheService = class {
       constructor() {
@@ -39138,6 +39137,7 @@ var require_screenshot_cache_service = __commonJS({
         this.workerCount = Math.min(os2.cpus().length, 4);
         this.isRunning = false;
         this.cacheInterval = null;
+        this.windowManager = null;
         this.windowManager = null;
         this.init();
       }
@@ -39154,29 +39154,17 @@ var require_screenshot_cache_service = __commonJS({
         }
       }
       /**
-       * Start background caching
-       */
+         * Start background caching
+         */
       start() {
-        if (this.isRunning) return;
-        this.isRunning = true;
-        this.startWorkers();
-        this.cacheInterval = setInterval(() => {
-          this.scheduleScreenshotCache();
-        }, 1e3);
-        console.log("[ScreenshotCache] Started background caching");
+        console.log("[ScreenshotCache] Service disabled");
+        return;
       }
       /**
        * Stop background caching
        */
       stop() {
-        if (!this.isRunning) return;
-        this.isRunning = false;
-        if (this.cacheInterval) {
-          clearInterval(this.cacheInterval);
-          this.cacheInterval = null;
-        }
-        this.stopWorkers();
-        console.log("[ScreenshotCache] Stopped background caching");
+        console.log("[ScreenshotCache] Service disabled");
       }
       /**
        * Start worker threads
@@ -39214,7 +39202,7 @@ var require_screenshot_cache_service = __commonJS({
        */
       async scheduleScreenshotCache() {
         if (!this.isRunning) return;
-        const windows = this.windowManager.getAllWindows() || {};
+        const windows = this.windowManager ? this.windowManager.getAllWindows() || {} : {};
         const tasks = [];
         tasks.push({
           type: "system",
@@ -76032,6 +76020,13 @@ var fs2 = require("fs");
 var path3 = require("path");
 var os = require("os");
 var contextMenu2 = (init_electron_context_menu(), __toCommonJS(electron_context_menu_exports)).default || (init_electron_context_menu(), __toCommonJS(electron_context_menu_exports));
+app2.disableHardwareAcceleration();
+app2.commandLine.appendSwitch("disable-webrtc");
+app2.commandLine.appendSwitch("disable-desktop-notifications");
+app2.commandLine.appendSwitch("disable-gpu");
+app2.commandLine.appendSwitch("disable-gpu-compositing");
+app2.commandLine.appendSwitch("disable-software-rasterizer");
+app2.commandLine.appendSwitch("disable-background-timer-throttling");
 var logDir = path3.join(os.homedir(), "electron-mcp", "logs");
 if (!fs2.existsSync(logDir)) {
   fs2.mkdirSync(logDir, { recursive: true });

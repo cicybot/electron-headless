@@ -9,6 +9,17 @@ const path = require('path');
 const os = require('os');
 const contextMenu = require('electron-context-menu').default || require('electron-context-menu');
 
+// Disable hardware acceleration to fix DXGI duplication errors
+app.disableHardwareAcceleration();
+
+// Additional flags to prevent desktop capture issues
+app.commandLine.appendSwitch('disable-webrtc');
+app.commandLine.appendSwitch('disable-desktop-notifications');
+app.commandLine.appendSwitch('disable-gpu');
+app.commandLine.appendSwitch('disable-gpu-compositing');
+app.commandLine.appendSwitch('disable-software-rasterizer');
+app.commandLine.appendSwitch('disable-background-timer-throttling');
+
 // Set up logging to file
 const logDir = path.join(os.homedir(), 'electron-mcp', 'logs');
 if (!fs.existsSync(logDir)) {

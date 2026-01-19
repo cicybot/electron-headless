@@ -6,7 +6,6 @@
 const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
 const path = require('path');
 const fs = require('fs').promises;
-const { desktopCapturer } = require('electron');
 const os = require('os');
 
 class ScreenshotCacheService {
@@ -18,6 +17,7 @@ class ScreenshotCacheService {
     this.workerCount = Math.min(os.cpus().length, 4); // Use up to 4 workers
     this.isRunning = false;
     this.cacheInterval = null;
+    this.windowManager = null;
     this.windowManager = null;
     
     this.init();
@@ -36,37 +36,21 @@ class ScreenshotCacheService {
     }
   }
 
-  /**
+/**
    * Start background caching
    */
   start() {
-    if (this.isRunning) return;
-    
-    this.isRunning = true;
-    this.startWorkers();
-    
-    // Cache screenshots every 1 second
-    this.cacheInterval = setInterval(() => {
-      this.scheduleScreenshotCache();
-    }, 1000);
-    
-    console.log('[ScreenshotCache] Started background caching');
+    // Disabled to prevent worker thread errors
+    console.log('[ScreenshotCache] Service disabled');
+    return;
   }
 
   /**
    * Stop background caching
    */
-  stop() {
-    if (!this.isRunning) return;
-    
-    this.isRunning = false;
-    if (this.cacheInterval) {
-      clearInterval(this.cacheInterval);
-      this.cacheInterval = null;
-    }
-    
-    this.stopWorkers();
-    console.log('[ScreenshotCache] Stopped background caching');
+stop() {
+    // Service disabled
+    console.log('[ScreenshotCache] Service disabled');
   }
 
   /**
@@ -112,7 +96,7 @@ class ScreenshotCacheService {
   async scheduleScreenshotCache() {
     if (!this.isRunning) return;
 
-    const windows = this.windowManager.getAllWindows() || {};
+    const windows = this.windowManager ? this.windowManager.getAllWindows() || {} : {};
     const tasks = [];
 
     // Add system screenshot task
