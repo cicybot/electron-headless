@@ -79,6 +79,47 @@ class ExpressServer {
      this.app.use(express.json({ limit: '50mb' }));
    }
 
+   /**
+    * Authentication middleware
+    * Allows local requests (127.0.0.1/localhost) without token
+    * Requires token for external requests
+    */
+   authMiddleware(req, res, next) {
+     const clientIP = req.ip || req.connection.remoteAddress || req.socket.remoteAddress;
+
+     // Check if request is from localhost/127.0.0.1
+     const isLocalRequest = clientIP === '127.0.0.1' ||
+                           clientIP === '::1' ||
+                           clientIP === '::ffff:127.0.0.1' ||
+                           req.hostname === 'localhost' ||
+                           req.hostname === '127.0.0.1';
+
+     if (isLocalRequest) {
+       // Allow local requests without token
+       return next();
+     }
+
+     // For external requests, check for token
+     const authHeader = req.headers.authorization || req.headers['x-api-token'];
+     const token = authHeader ? authHeader.replace('Bearer ', '').replace('Token ', '') : null;
+
+     if (!token) {
+       return res.status(401).json({
+         error: 'API token required for external requests',
+         message: 'Include token in Authorization header: Bearer <token> or X-API-Token header'
+       });
+     }
+
+     if (token !== this.apiToken) {
+       return res.status(403).json({
+         error: 'Invalid API token'
+       });
+     }
+
+     // Token is valid, proceed
+     next();
+   }
+
   /**
    * Set up routes
    */
