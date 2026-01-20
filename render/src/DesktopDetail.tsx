@@ -12,6 +12,9 @@ export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
     }, []);
 
     const [screenshotUrl, setScreenshotUrl] = useState<string>('');
+    const [isAutoRefresh, setIsAutoRefresh] = useState(false);
+
+    const refreshScreenshot = () => setScreenshotUrl('');
 
     // Get screen size on mount
     useEffect(() => {
@@ -53,14 +56,21 @@ export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
             }
         };
 
-        // Initial fetch
-        fetchScreenshot();
+        // Initial fetch (only if not auto-refreshing)
+        if (!isAutoRefresh) {
+            fetchScreenshot();
+        }
 
-        // Set up interval for auto-refresh
-        const interval = setInterval(fetchScreenshot, 1000);
+        // Set up interval for auto-refresh only when enabled
+        let interval: NodeJS.Timeout | null = null;
+        if (isAutoRefresh) {
+            interval = setInterval(fetchScreenshot, 1000);
+        }
 
-        return () => clearInterval(interval);
-    }, [rpcBaseUrl, rpcToken]);
+        return () => {
+            if (interval) clearInterval(interval);
+        };
+    }, [rpcBaseUrl, rpcToken, isAutoRefresh]);
 
     const onClickImage = (e,type)=>{
         e.preventDefault();
@@ -91,10 +101,15 @@ export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
                         <button className="btn btn-icon" onClick={onBack} title="Back">
                             <IconArrowLeft />
                         </button>
-                        <div className="flex-1 flex gap-2">
-
-
-                        </div>
+                         <div className="flex-1 flex gap-2">
+                             <button className="btn" onClick={refreshScreenshot}>刷新截屏</button>
+                             <button
+                                 className={`btn ${isAutoRefresh ? 'btn-success' : 'btn-secondary'}`}
+                                 onClick={() => setIsAutoRefresh(!isAutoRefresh)}
+                             >
+                                 {isAutoRefresh ? '停止自动刷新' : '开启自动刷新'}
+                             </button>
+                         </div>
 
                     </div>
                 </View>

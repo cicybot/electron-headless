@@ -20,7 +20,6 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
 })()`);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [evalResult, setEvalResult] = useState<string>('');
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isAutoRefresh, setIsAutoRefresh] = useState(false);
 
     // Network State
@@ -184,8 +183,15 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
                                 onChange={e => setNavUrl(e.target.value)}
                                 onKeyDown={e => e.key === 'Enter' && handleNavigate()}
                             />
-                            <button className="btn" onClick={handleNavigate}>Go</button>
-                        </div>
+                             <button className="btn" onClick={handleNavigate}>Go</button>
+                             <button className="btn" onClick={refreshScreenshot}>刷新截屏</button>
+                             <button
+                                 className={`btn ${isAutoRefresh ? 'btn-success' : 'btn-secondary'}`}
+                                 onClick={() => setIsAutoRefresh(!isAutoRefresh)}
+                             >
+                                 {isAutoRefresh ? '停止自动刷新' : '开启自动刷新'}
+                             </button>
+                         </div>
 
                     </div>
                 </View>
