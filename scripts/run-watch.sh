@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-LOCAL_DIR="/Users/data/electron/electron-headless/src"
+LOCAL_DIR="/Users/data/electron/electron-mcp/src"
 DELAY=0.5
 ELECTRON_CMD="electron $LOCAL_DIR"
 

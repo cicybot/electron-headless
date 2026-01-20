@@ -1,37 +1,56 @@
 
 import React, { useState, useEffect } from 'react';
 
-interface WindowThumbnailProps { 
-    id: number; 
-    url: string; 
-    refreshKey: number; 
-    onClick: () => void; 
-    rpcBaseUrl: string; 
+interface WindowThumbnailProps {
+    id: number;
+    url: string;
+    refreshKey: number;
+    onClick: () => void;
+    rpcBaseUrl: string;
+    rpcToken?: string;
 }
 
-export const WindowThumbnail: React.FC<WindowThumbnailProps> = ({ id, url, refreshKey, onClick, rpcBaseUrl }) => {
+export const WindowThumbnail: React.FC<WindowThumbnailProps> = ({ id, url, refreshKey, onClick, rpcBaseUrl, rpcToken }) => {
     const hostname = new URL(url).hostname;
     // Construct the target URL with timestamp
-    const targetUrl = (rpcBaseUrl ? `${rpcBaseUrl}/screenshot` : '/screenshot') + `?id=${id}&t=${refreshKey}`;
+    const targetUrl = (rpcBaseUrl ? `${rpcBaseUrl}/windowScreenshot` : '/windowScreenshot') + `?id=${id}&t=${refreshKey}`;
     
     // State to hold the URL currently rendered in the DOM
     const [displayedUrl, setDisplayedUrl] = useState<string | null>(null);
 
-    // Preloader effect: Fetch the new image in background, update displayedUrl only when loaded.
+    // Preloader effect: Fetch the new image in background with auth headers, update displayedUrl only when loaded.
     useEffect(() => {
         let mounted = true;
-        const img = new Image();
-        img.src = targetUrl;
-        img.onload = () => {
-            if (mounted) setDisplayedUrl(targetUrl);
+
+        const loadImage = async () => {
+            try {
+                const headers: Record<string, string> = {};
+                if (rpcToken) {
+                    headers['Authorization'] = `Bearer ${rpcToken}`;
+                }
+
+                const response = await fetch(targetUrl, { headers });
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+
+                if (mounted) {
+                    setDisplayedUrl(objectUrl);
+                }
+            } catch (error) {
+                console.error('Failed to load screenshot:', error);
+                // On error, still update to show the broken state
+                if (mounted) setDisplayedUrl(targetUrl);
+            }
         };
-        img.onerror = () => {
-            // Even on error, update to targetUrl (could show broken image or retry)
-            // ensuring we don't get stuck on an old frame indefinitely.
-            if (mounted) setDisplayedUrl(targetUrl);
-        }
+
+        loadImage();
+
         return () => { mounted = false; };
-    }, [targetUrl]);
+    }, [targetUrl, rpcToken]);
 
     // Initial load check: displayedUrl is null until the first image loads
     const isReady = displayedUrl !== null;

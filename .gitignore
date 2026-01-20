@@ -5,3 +5,7 @@ node_modules
 .DS_Store
 .vite/
 run/
+*.js.map
+app/dist/
+render/dist/
+app/prompt

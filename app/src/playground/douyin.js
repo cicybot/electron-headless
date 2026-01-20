@@ -1,6 +1,6 @@
 const utils = require("../utils");
-const {getRequests,chatgptAsk} = require("../utils");
-const {Storage,getCleanHtml,regxHTML1} = require("../utils-browser");
+const {getRequests, chatgptAsk} = require("../utils");
+const {Storage, getCleanHtml, regxHTML1} = require("../utils-browser");
 
 function parseMeta() {
     const metas = document.querySelectorAll('meta[data-rh="true"]');
@@ -9,7 +9,7 @@ function parseMeta() {
     metas.forEach(meta => {
         const name = meta.getAttribute('name');
         const content = meta.getAttribute('content');
-        if(name && content) {
+        if (name && content) {
             result[name] = content;
         }
     });
@@ -17,33 +17,33 @@ function parseMeta() {
     return result;
 }
 
-async function parseHtml(){
+async function parseHtml() {
     // 调用解析函数
     const metaData = parseMeta();
-    const {description,keywords} = metaData
+    const {description, keywords} = metaData
     const video_cover_image_url = metaData['lark:url:video_cover_image_url']
     const video_title = metaData['lark:url:video_title']
 
     let videoInfoHtml = ""
     const ele = document.querySelector(".bm6Yr1Fm")
-    if(ele){
+    if (ele) {
         videoInfoHtml = getCleanHtml(ele)
     }
 
     let authorInfoHtml = ""
     const ele1 = document.querySelector(".cHwSTMd3")
-    if(ele1){
+    if (ele1) {
         authorInfoHtml = getCleanHtml(ele1)
     }
 
     const ele2 = document.querySelector(".comment-mainContent")
     let commentsHtml = ""
-    if(ele2){
+    if (ele2) {
         commentsHtml = regxHTML1(getCleanHtml(ele2))
     }
     const url = location.href
-    const videoId = url.replace("https://www.douyin.com/video/","")
-        const prompt = `
+    const videoId = url.replace("https://www.douyin.com/video/", "")
+    const prompt = `
 你是一个“JSON 解析器”，不是聊天助手。
 
 【强制输出规则】
@@ -96,64 +96,65 @@ ${commentsHtml}
     try {
 
         const res1 = await chatgptAsk(prompt);
-        if(res1 && res1.length > 0){
+        if (res1 && res1.length > 0) {
             aiParseInfo = JSON.parse(res1[0].text)
         }
-    }catch (e) {
+    } catch (e) {
         console.log(e)
     }
 
     const res = {
-        time:Date.now(),
-        id:videoId,
+        time: Date.now(),
+        id: videoId,
         url,
         aiParseInfo,
-        page:{
-            title:document.title,
-            description,keywords,
+        page: {
+            title: document.title,
+            description, keywords,
         },
-        html:{
-            videoInfo:videoInfoHtml,
-            authorInfo:authorInfoHtml,
-            comments:commentsHtml
+        html: {
+            videoInfo: videoInfoHtml,
+            authorInfo: authorInfoHtml,
+            comments: commentsHtml
         },
-        video:{
-            title:video_title,
-            thumb:video_cover_image_url
+        video: {
+            title: video_title,
+            thumb: video_cover_image_url
         }
     }
-    Storage.set("_video_"+videoId,res)
+    Storage.set("_video_" + videoId, res)
     return res
 }
-const main = async ({win_id})=>{
-    parseHtml()
-    const {waitForResult,getSubTitles,downloadMedia}= utils
 
-    const video = await waitForResult(async ()=>{
+const main = async ({win_id}) => {
+    parseHtml()
+    const {waitForResult, getSubTitles, downloadMedia} = utils
+
+    const video = await waitForResult(async () => {
         const res = await getRequests(win_id)
-        const {result}= res
+        const {result} = res
         const row = result.find(row => row.url.indexOf("__vid") > -1);
-        if(row){
+        if (row) {
             return row;
-        }else{
+        } else {
             return false
         }
-    },-1,1000)
+    }, -1, 1000)
 
-    if(video){
-        const {url:mediaUrl} = video
-        d("got mediaUrl:",mediaUrl)
+    if (video) {
+        const {url: mediaUrl} = video
+        d("got mediaUrl:", mediaUrl)
 
-        const videoId = location.href.replace("https://www.douyin.com/video/","")
+        const videoId = location.href.replace("https://www.douyin.com/video/", "")
         const downloadMediaRes = await downloadMedia({
             mediaUrl,
-            id:videoId,
-            basePath:"douyin",
-            genSubtitles:false
-        },win_id)
+            id: videoId,
+            basePath: "douyin",
+            genSubtitles: false
+        }, win_id)
         const {result} = downloadMediaRes
         const {audioPath} = result
-        d("audioPath",audioPath)
+        d("audioPath", audioPath)
         // let subTitles = Storage.get("subTitles_"+videoId)
         // if(!subTitles){
         //     d("fetch subTitles")
@@ -162,7 +163,7 @@ const main = async ({win_id})=>{
         //     Storage.set("subTitles_"+videoId,subTitles)
         // }
         // d("subTitles",subTitles)
-    }else{
+    } else {
         d("[ERR] fetch error video:")
     }
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-LOCAL_DIR="/Users/data/electron/electron-headless/"
-REMOTE_DIR="/Volumes/ai2/electron-headless/"
+LOCAL_DIR="/Users/data/electron/electron-mcp/"
+REMOTE_DIR="/Volumes/ai2/electron-mcp/"
 DELAY=1
 
 sync() {

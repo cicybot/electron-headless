@@ -1,4 +1,4 @@
-const { pool } = require('../db'); // your pool file
+const {pool} = require('../db'); // your pool file
 
 const userDB = {
     // Setup table
@@ -18,7 +18,7 @@ const userDB = {
             'INSERT INTO users (username, email) VALUES (?, ?)',
             [username, email]
         );
-        const [result]= res;
+        const [result] = res;
         return result.insertId;
     },
 

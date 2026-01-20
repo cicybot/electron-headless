@@ -1,28 +1,21 @@
 const cron = require("node-cron");
+const { exec } = require('child_process');
 
-const baseUrl = process.env.ELECTRON_BASE_URL || "http://127.0.0.1:3456"
-
-const post_rpc = async ({method,params})=>{
-    const res = await fetch(`${baseUrl}/rpc`,{
-        method:"POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body:JSON.stringify({method,params})
-    })
-    return res.json()
-}
-function reload(){
-    console.log("Retry 2 min...");
-    post_rpc({
-        method:"reload",
-        params:{
-            win_id:2,
+function gitSync() {
+    console.log("Running git sync...");
+    exec('cd /d/electron-mcp && git add . && git commit -m "not msg" && git push origin mcp', (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error: ${error.message}`);
+            return;
         }
-    })
-
+        if (stderr) {
+            console.error(`Stderr: ${stderr}`);
+        }
+        console.log(`Stdout: ${stdout}`);
+    });
 }
-reload()
-cron.schedule("*/2 * * * *", () => {
-    reload()
+
+gitSync();
+cron.schedule("* * * * *", () => {
+    gitSync();
 });

@@ -7,13 +7,21 @@ export interface RpcResponse<T> {
   error?: string;
 }
 
+export interface WindowBounds {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface WindowInfo {
   id: number;
   wcId: number;
   url: string; 
+  bounds?: WindowBounds;
 }
 
-export type WindowMap = Record<string, Record<string, { id: number; wcId: number }>>;
+export type WindowMap = Record<string, Record<string, { id: number; wcId: number; bounds?: WindowBounds }>>;
 
 export interface NetworkLog {
     id: string;

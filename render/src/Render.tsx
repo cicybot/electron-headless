@@ -1,6 +1,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import View from "./View"
+import { WindowDetail } from "./WindowDetail"
+import { DesktopDetail } from "./DesktopDetail"
+import { RpcProvider } from "./RpcContext"
+
 const baseUrl = "http://127.0.0.1:3456"
 
 const post_rpc = async ({ method, params }: any) => {
@@ -21,6 +25,35 @@ function Render() {
     const [comments, setComments] = useState<any>(null)
     const [title, setTitle] = useState("")
     const [currentUrl, setCurrentUrl] = useState("")
+    
+    // Parse URL parameters for win_id
+    const uri = new URL(location.href)
+    const desktop = uri.searchParams.get("desktop")
+    const winId = uri.searchParams.get("win_id")
+    const url = uri.searchParams.get("u")!
+    if(desktop){
+        return (
+            <RpcProvider>
+                <DesktopDetail
+                    onBack={() => window.close()}
+                />
+            </RpcProvider>
+        )
+    }
+    // If win_id is present, show WindowDetail component
+    if (winId) {
+        const initialUrl = uri.searchParams.get("url") || ""
+        return (
+            <RpcProvider>
+                <WindowDetail 
+                    windowId={parseInt(winId)} 
+                    initialUrl={initialUrl} 
+                    onBack={() => window.close()} 
+                />
+            </RpcProvider>
+        )
+    }
+    
     //@ts-ignore
     window.onMessage = ({ action, payload }: any) => {
         console.log("onMessage", action, payload)
@@ -32,8 +65,6 @@ function Render() {
         }
 
     }
-    const uri = new URL(location.href)
-    const url = uri.searchParams.get("u")!
     const webviewTag = useRef<null | any>(null)
     const [webContentsId, setWebContentId] = useState(null)
     useEffect(() => {

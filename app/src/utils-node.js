@@ -1,5 +1,5 @@
 const {spawn} = require("child_process");
-const { app, session } = require('electron');
+const {app, session} = require('electron');
 const path = require('path');
 const fs = require("fs");
 
@@ -9,6 +9,7 @@ class MapArray {
     constructor(id) {
         this.id = id
     }
+
     all() {
         let rows = []
         if (!__MapArray.has(this.id)) {
@@ -18,11 +19,13 @@ class MapArray {
         }
         return rows
     }
+
     push(entity) {
         let rows = this.all()
         rows.push(entity)
         __MapArray.set(this.id, rows)
     }
+
     clear() {
         __MapArray.set(this.id, [])
     }
@@ -57,7 +60,7 @@ function openTerminal(command, showWin) {
         const sizedCmd = `mode con: cols=${Math.floor(width / 8)} lines=${Math.floor(
             height / 16
         )} && ${command}`;
-        p = spawn('cmd.exe', ['/k', sizedCmd], { detached: true });
+        p = spawn('cmd.exe', ['/k', sizedCmd], {detached: true});
     } else if (process.platform === 'darwin') {
         const script = `
     tell application "Terminal"
@@ -65,20 +68,20 @@ function openTerminal(command, showWin) {
         set bounds of front window to {0, 0, ${width}, ${height}}
     end tell
     `;
-        p = spawn('osascript', ['-e', script], { detached: true });
+        p = spawn('osascript', ['-e', script], {detached: true});
     } else {
         // Linux - try different terminals
         try {
             p = spawn(
                 'gnome-terminal',
                 [`--geometry=${width}x${height}`, '--', 'bash', '-c', command],
-                { detached: true }
+                {detached: true}
             );
         } catch {
             p = spawn(
                 'xterm',
                 ['-geometry', `${Math.floor(width / 8)}x${Math.floor(height / 16)}`, '-e', command],
-                { detached: true }
+                {detached: true}
             );
         }
     }
@@ -87,10 +90,9 @@ function openTerminal(command, showWin) {
 }
 
 
-
 async function setCookies(wc, cookies) {
     for (const c of cookies) {
-        const cookie = { ...c }; // don't mutate original
+        const cookie = {...c}; // don't mutate original
         const isSecurePrefix = cookie.name.startsWith("__Secure-");
         const isHostPrefix = cookie.name.startsWith("__Host-");
 
@@ -142,7 +144,7 @@ async function setCookies(wc, cookies) {
 }
 
 function getAppInfo() {
-    const { defaultApp, platform, arch, pid, env, argv, execPath, versions } = process;
+    const {defaultApp, platform, arch, pid, env, argv, execPath, versions} = process;
     const getCPUUsage = process.getCPUUsage();
     const getHeapStatistics = process.getHeapStatistics();
     const getBlinkMemoryInfo = process.getBlinkMemoryInfo();
@@ -209,7 +211,7 @@ const extractAudio = (videoPath, audioPath) => {
 };
 
 const downloadMedia = (session, options, timeout = 300_000) => {
-    const {mediaUrl,basePath,id,MediaDir} = options
+    const {mediaUrl, basePath, id, MediaDir} = options
     return new Promise((resolve, reject) => {
         let timeoutId;
 
@@ -223,11 +225,11 @@ const downloadMedia = (session, options, timeout = 300_000) => {
                 const mime = item.getMimeType();
                 const ext = path.extname(original);
                 const newName = `${id}${ext}`;
-                const mediaPath = path.join(MediaDir, basePath,id,newName);
-                if(fs.existsSync(mediaPath)){
+                const mediaPath = path.join(MediaDir, basePath, id, newName);
+                if (fs.existsSync(mediaPath)) {
                     event.preventDefault()
                     item.cancel()
-                    console.log("exists",mediaPath)
+                    console.log("exists", mediaPath)
                     let finalAudioPath = "";
                     if (isVideo(mime, mediaPath)) {
                         finalAudioPath = mediaPath.replace(ext, '.mp3');
@@ -239,9 +241,9 @@ const downloadMedia = (session, options, timeout = 300_000) => {
                         mime,
                         original
                     });
-                }else{
-                    fs.mkdirSync(path.dirname(mediaPath),{recursive:true})
-                    console.log("download",mediaPath)
+                } else {
+                    fs.mkdirSync(path.dirname(mediaPath), {recursive: true})
+                    console.log("download", mediaPath)
                     item.setSavePath(mediaPath);
                     item.resume();
                     item.on('updated', (event, state) => {
@@ -301,24 +303,24 @@ const whisperTranscribe = (audioPath) => {
             if (code !== 0) return reject(new Error('Whisper request failed'));
             try {
                 resolve(JSON.parse(output));
-            }catch (e) {
+            } catch (e) {
                 reject(new Error('Whisper parse failed'))
             }
         });
     });
 };
-const executeJavaScript=(wc,code)=>{
-    let g =""
-    const p =  path.join(__dirname, "content.js")
-    if(fs.existsSync(p)){
-        g =  fs.readFileSync(path.join(__dirname, "content.js")).toString()
+const executeJavaScript = (wc, code) => {
+    let g = ""
+    const p = path.join(__dirname, "content.js")
+    if (fs.existsSync(p)) {
+        g = fs.readFileSync(path.join(__dirname, "content.js")).toString()
     }
     code = code.trim();
-    if(code.indexOf("(()") === 0){
-        code = "return "+code
+    if (code.indexOf("(()") === 0) {
+        code = "return " + code
     }
-    if(code.indexOf("(async ") === 0){
-        code = "return await "+code
+    if (code.indexOf("(async ") === 0) {
+        code = "return await " + code
     }
     code = `(async ()=>{${g}\n${code}})()`
 
@@ -326,5 +328,14 @@ const executeJavaScript=(wc,code)=>{
     return wc.executeJavaScript(`${code}`)
 }
 
-module.exports = { executeJavaScript,MapArray, whisperTranscribe, downloadMedia, getAppInfo, openTerminal, windowSitesToJSON, setCookies }
+module.exports = {
+    executeJavaScript,
+    MapArray,
+    whisperTranscribe,
+    downloadMedia,
+    getAppInfo,
+    openTerminal,
+    windowSitesToJSON,
+    setCookies
+}
 
