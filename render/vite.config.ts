@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3455,
       host: '0.0.0.0',
-      allowedHosts: ['gaw-3455.cicy.de5.net', 'localhost', '127.0.0.1'],
+      allowedHosts: ['.cicy.de5.net', 'localhost', '127.0.0.1'],
       strictPort: true, // Don't try other ports if 3455 is occupied
     },
     logLevel: 'info', // Enable verbose logging
