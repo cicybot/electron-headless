@@ -95,7 +95,6 @@ class ExpressServer {
         }
         next();
       });
-
      // Enable CORS for all origins
      this.app.use(cors({ origin: '*' }));
 
