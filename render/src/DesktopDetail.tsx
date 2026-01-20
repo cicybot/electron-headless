@@ -37,6 +37,8 @@ export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
 
     // Auto-fetch screenshot as blob URL
     useEffect(() => {
+        let timeoutId: NodeJS.Timeout | null = null;
+
         const fetchScreenshot = async () => {
             try {
                 const url = (rpcBaseUrl ? `${rpcBaseUrl}/displayScreenshot` : '/displayScreenshot') + `?t=${Date.now()}`;
@@ -56,16 +58,21 @@ export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
             }
         };
 
-        // No initial fetch - user must manually refresh or enable auto-refresh
+        const scheduleNextFetch = () => {
+            if (isAutoRefresh) {
+                timeoutId = setTimeout(() => {
+                    fetchScreenshot().then(scheduleNextFetch);
+                }, 1000);
+            }
+        };
 
-        // Set up interval for auto-refresh only when enabled
-        let interval: NodeJS.Timeout | null = null;
+        // No initial fetch - user must manually refresh or enable auto-refresh
         if (isAutoRefresh) {
-            interval = setInterval(fetchScreenshot, 1000);
+            scheduleNextFetch();
         }
 
         return () => {
-            if (interval) clearInterval(interval);
+            if (timeoutId) clearTimeout(timeoutId);
         };
     }, [rpcBaseUrl, rpcToken, isAutoRefresh]);
 

@@ -36,6 +36,8 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
 
     // Consolidated Refresh Loop
     useEffect(() => {
+        let timeoutId: NodeJS.Timeout | null = null;
+
         const tick = async () => {
             if (isAutoRefresh) refreshScreenshot();
 
@@ -57,13 +59,24 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
                     void e;
                 }
             }
+        };
 
-
+        const scheduleNextTick = () => {
+            if (isAutoRefresh) {
+                timeoutId = setTimeout(() => {
+                    tick().then(scheduleNextTick);
+                }, 1000);
+            }
         };
 
         // No initial fetch - only poll when auto-refresh is enabled
-        const interval = isAutoRefresh ? setInterval(tick, 1000) : null;
-        return () => clearInterval(interval);
+        if (isAutoRefresh) {
+            scheduleNextTick();
+        }
+
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+        };
     }, [isAutoRefresh, activeTab, windowId, urlFilter, rpc]);
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
