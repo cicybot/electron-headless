@@ -12,7 +12,7 @@ interface WindowThumbnailProps {
 export const WindowThumbnail: React.FC<WindowThumbnailProps> = ({ id, url, refreshKey, onClick, rpcBaseUrl }) => {
     const hostname = new URL(url).hostname;
     // Construct the target URL with timestamp
-    const targetUrl = (rpcBaseUrl ? `${rpcBaseUrl}/screenshot` : '/screenshot') + `?id=${id}&t=${refreshKey}`;
+    const targetUrl = (rpcBaseUrl ? `${rpcBaseUrl}/windowScreenshot` : '/windowScreenshot') + `?id=${id}&t=${refreshKey}`;
     
     // State to hold the URL currently rendered in the DOM
     const [displayedUrl, setDisplayedUrl] = useState<string | null>(null);

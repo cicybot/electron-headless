@@ -36,7 +36,7 @@ class StorageManager {
                 windows: windowStates
             };
             await fs.writeFile(this.windowStateFile, JSON.stringify(data, null, 2));
-            console.log('Window states saved successfully');
+            // console.log('Window states saved successfully');
         } catch (error) {
             console.error('Failed to save window states:', error);
         }

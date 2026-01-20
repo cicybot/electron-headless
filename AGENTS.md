@@ -4,52 +4,73 @@ This file contains guidelines and commands for coding agents working in this Ele
 
 ## Development Commands
 
-### Core Commands
-- `npm start` - Run Electron with trace warnings (production mode)
-- `npm run dev` - Run with nodemon for development with auto-restart
-- `npm run hot-reload` - Start with hot reloading enabled
-- `npm run build` - Build the application using esbuild
-- `npm run prod` - Run production build
-- `npm run hot-push` - Auto-commit and push changes (use with caution)
+### Electron Backend (app/)
+- `cd app && npm start` - Run Electron with trace warnings (production mode)
+- `cd app && npm run dev` - Run with nodemon for development with auto-restart
+- `cd app && npm run hot-reload` - Start with hot reloading enabled
+- `cd app && npm run build` - Build using esbuild
+- `cd app && npm run prod` - Run production build
+
+### React Frontend (render/)
+- `cd render && npm run dev` - Start Vite dev server with hot reload
+- `cd render && npm run build` - Build for production with TypeScript compilation
+- `cd render && npm run lint` - Run ESLint
+- `cd render && npm run preview` - Preview production build
 
 ### Testing
-- `npm test` - Run all Jest tests
-- `npm test -- --testNamePattern="test name"` - Run single test by name
-- `npm test -- tests/specific-file.test.js` - Run single test file
-- `npm test -- --watch` - Run tests in watch mode
+- `cd app && npm test` - Run all Jest tests
+- `cd app && npm test -- --testNamePattern="test name"` - Run single test by name
+- `cd app && npm test -- tests/specific-file.test.js` - Run single test file
+- `cd app && npm test -- --watch` - Run tests in watch mode
 
-**Note:** Jest is installed but uses minimal configuration. Tests are in the `tests/` directory.
+**Note:** Jest is installed in the backend. Tests are in `app/tests/` directory.
 
 ## Code Style Guidelines
 
 ### File Structure
 ```
-app/
+app/                          # Electron main process (Node.js)
 ├── src/
-│   ├── core/          # Core managers (app, window, account)
-│   ├── server/        # Express server and API handlers
-│   ├── services/      # Business logic services
-│   ├── utils/         # Shared utilities
-│   ├── py/           # Python automation scripts
-│   └── main.js       # Application entry point
-├── tests/            # Jest test files
-└── dist/             # Build output (generated)
+│   ├── core/                 # Core managers (app, window, account)
+│   ├── server/               # Express server and MCP handlers
+│   ├── services/             # Business logic services
+│   ├── utils/                # Shared utilities
+│   └── main.js               # Application entry point
+├── tests/                    # Jest test files
+└── dist/                     # Build output (generated)
+
+render/                       # React renderer process (TypeScript)
+├── src/
+│   ├── components/           # React components
+│   ├── types.ts              # TypeScript type definitions
+│   └── main.tsx              # React entry point
+├── public/                   # Static assets
+└── dist/                     # Vite build output (generated)
 ```
 
-### Module Patterns
+### Backend (Node.js/CommonJS)
 - **CommonJS modules** - Use `require()` and `module.exports`
-- **Singleton pattern** - Managers are exported as instances: `module.exports = new ClassName()`
+- **Singleton pattern** - Managers exported as instances: `module.exports = new ClassName()`
 - **Class-based architecture** - Use ES6 classes with constructor patterns
 - **Async/await** - All asynchronous operations must use async/await
+
+### Frontend (TypeScript/React)
+- **ES modules** - Use `import`/`export` syntax
+- **Functional components** - Prefer React functional components with hooks
+- **TypeScript strict** - Use strict TypeScript configuration
+- **Component naming** - PascalCase for components, camelCase for hooks/utilities
 
 ### Naming Conventions
 - **Variables and functions:** `camelCase`
 - **Classes:** `PascalCase`
-- **Files:** `kebab-case.js` for JavaScript, `snake_case.py` for Python
+- **Files:** `kebab-case.js` (backend), `PascalCase.tsx` (frontend), `snake_case.py` (Python)
 - **Constants:** `UPPER_SNAKE_CASE`
 - **Private methods:** Prefix with `_` (e.g., `_privateMethod()`)
+- **React hooks:** Prefix with `use` (e.g., `useCustomHook`)
 
 ### Import/Export Patterns
+
+**Backend (CommonJS):**
 ```javascript
 // Import
 const SomeService = require('../services/some-service');
@@ -62,6 +83,18 @@ class SomeManager {
   }
 }
 module.exports = new SomeManager();
+```
+
+**Frontend (ES modules):**
+```typescript
+// Import
+import React from 'react';
+import { SomeService } from '../services/some-service';
+import type { UserType } from '../types';
+
+// Export
+export const MyComponent: React.FC = () => { /* ... */ };
+export default MyComponent;
 ```
 
 ### Error Handling
@@ -80,8 +113,45 @@ try {
 }
 ```
 
+### TypeScript Guidelines
+- **Strict mode enabled** - All TypeScript files must pass strict checks
+- **Interface definitions** - Use interfaces for object shapes, types for unions
+- **Generic constraints** - Use generics for reusable components/utilities
+- **Type assertions** - Avoid `as` casts; prefer proper typing
+
+```typescript
+// Good: Proper interface definition
+interface User {
+  id: number;
+  name: string;
+  email?: string;
+}
+
+// Good: Generic component
+interface Props<T> {
+  data: T;
+  onSelect: (item: T) => void;
+}
+```
+
+### React Patterns
+- **Hooks over classes** - Use functional components with hooks
+- **Custom hooks** - Extract reusable logic into custom hooks
+- **Context for state** - Use React Context for app-wide state
+- **Memoization** - Use `React.memo`, `useMemo`, `useCallback` for performance
+
+```typescript
+// Custom hook example
+const useWindowState = (windowId: string) => {
+  const [isOpen, setIsOpen] = useState(false);
+  // ... hook logic
+  return { isOpen, toggle: () => setIsOpen(!isOpen) };
+};
+```
+
 ### Documentation
 - **JSDoc comments** required for all public methods and classes
+- **TSDoc for TypeScript** - Use TSDoc syntax in TypeScript files
 - **Document parameters** and return types
 - **Include usage examples** for complex methods
 
@@ -93,7 +163,7 @@ try {
  * @param {string} options.format - Image format ('png', 'jpeg')
  * @returns {Promise<Buffer>} Screenshot image buffer
  */
-async function captureScreenshot(windowId, options = {}) {
+async function captureScreenshot(windowId: string, options: ScreenshotOptions = {}): Promise<Buffer> {
   // implementation
 }
 ```
@@ -121,45 +191,11 @@ When creating new MCP tools:
 - **Parameterized queries** - prevent SQL injection
 - **Transaction support** - use transactions for multi-step operations
 
-### Window Management
-- **Account-based isolation** - each account gets separate browser session
-- **Partition management** - use Chrome partitions for session isolation
-- **Lifecycle management** - proper cleanup of windows and resources
-- **Network monitoring** - track requests per window/account
-
-## Python Integration
-
-### Python Scripts
-- Located in `src/py/` directory
-- Use **PyAutoGUI** for desktop automation
-- **Named with snake_case** (e.g., `automation_script.py`)
-- **Called via child_process** from Node.js
-
-### Integration Pattern
-```javascript
-const { execFile } = require('child_process');
-const path = require('path');
-
-async function runPythonScript(scriptName, args = []) {
-  return new Promise((resolve, reject) => {
-    const scriptPath = path.join(__dirname, '../py', scriptName);
-    execFile('python', [scriptPath, ...args], (error, stdout, stderr) => {
-      if (error) reject(error);
-      else resolve(stdout);
-    });
-  });
-}
-```
-
-## Testing Guidelines
-
-### Test Structure
+### Testing Guidelines
 - **Unit tests** for utility functions
 - **Integration tests** for service interactions
-- **End-to-end tests** for complete workflows
-- **Playground scripts** for manual testing
+- **Jest setup** with proper cleanup between tests
 
-### Test Patterns
 ```javascript
 describe('SomeService', () => {
   beforeEach(() => {
@@ -181,23 +217,23 @@ describe('SomeService', () => {
 ## Development Workflow
 
 ### Getting Started
-1. `npm install` - Install dependencies
-2. `npm run build` - Build the application
-3. `npm run dev` - Start development server
+1. `npm install` in both `app/` and `render/` directories
+2. `cd render && npm run dev` - Start frontend dev server
+3. `cd app && npm run dev` - Start Electron backend
 4. Open Electron DevTools for debugging
 
 ### Making Changes
 1. **Create feature branch** for significant changes
 2. **Write tests first** for new functionality
 3. **Follow code style** guidelines above
-4. **Run tests** to ensure nothing breaks
-5. **Build project** to verify compilation
+4. **Run lint/typecheck** - `npm run lint` (frontend), `npm test` (backend)
+5. **Build and test** both frontend and backend
 6. **Test manually** in Electron environment
 
 ### Hot Reload Development
-- Use `npm run hot-reload` for development
+- Frontend: Vite provides automatic hot reload
+- Backend: Use `npm run hot-reload` for development
 - Changes to core files may require full restart
-- Python scripts require manual restart
 
 ## Common Pitfalls
 
@@ -214,20 +250,6 @@ describe('SomeService', () => {
 - **Handle secrets properly** - never log sensitive data
 - **Use secure defaults** - disable dangerous features by default
 
-## Build and Deployment
-
-### Build Process
-- **esbuild** handles JavaScript bundling
-- **Targets:** Node.js environment
-- **Outputs:** `dist/main.js`, `dist/content.js`
-- **Cross-platform** compatibility maintained
-
-### Production Considerations
-- **Environment variables** for configuration
-- **Error logging** for production debugging
-- **Resource cleanup** on app shutdown
-- **Graceful shutdown** handling
-
 ## Framework-Specific Notes
 
 ### Electron
@@ -236,31 +258,17 @@ describe('SomeService', () => {
 - **Security** with context isolation enabled
 - **Native APIs** for system integration
 
-### Express.js
-- **Middleware pattern** for request processing
-- **CORS enabled** for cross-origin requests
-- **JSON parsing** for API communication
-- **Error handling** middleware
+### React/TypeScript
+- **Vite** for fast development and building
+- **ESLint** with React and TypeScript rules
+- **Strict TypeScript** configuration
+- **React hooks** for state management
 
-### MCP Integration
+### Express.js/MCP
+- **Middleware pattern** for request processing
+- **Zod schemas** for type safety and validation
 - **SSE for real-time** communication
 - **Tool-based architecture** with validation
-- **Account isolation** for multi-tenancy
-- **Zod schemas** for type safety
-
-## Debugging Tips
-
-### Electron DevTools
-- Use `Ctrl+Shift+I` (or `Cmd+Option+I`) to open DevTools
-- Console logging for runtime debugging
-- Network tab for HTTP request debugging
-- Sources tab for code stepping
-
-### Common Debugging Patterns
-- **Add console.log** statements for flow tracing
-- **Use debugger** statements for breakpoints
-- **Check error objects** for full stack traces
-- **Verify async operations** with proper await usage
 
 ---
 

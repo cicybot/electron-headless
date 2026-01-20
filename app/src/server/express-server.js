@@ -7,6 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
 const serveIndex = require('serve-index');
 
@@ -16,18 +17,36 @@ class ExpressServer {
     this.server = null;
     this.rpcHandler = require('./rpc-handler');
     this.appManager = require('../core/app-manager');
-    this.apiToken = this.generateToken();
+    this.apiToken = this.loadOrGenerateToken();
 
     // Print token on startup
     console.log(`[API Token] ${this.apiToken}`);
   }
 
   /**
-   * Generate a random API token
+   * Load or generate a random API token
    */
-  generateToken() {
-    const crypto = require('crypto');
-    return crypto.randomBytes(32).toString('hex');
+  loadOrGenerateToken() {
+    const tokenPath = path.join(os.homedir(), 'electron-mcp', 'token.txt');
+
+    // Ensure directory exists
+    const dir = path.dirname(tokenPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    if (fs.existsSync(tokenPath)) {
+      // Read existing token
+      return fs.readFileSync(tokenPath, 'utf8').trim();
+    } else {
+      // Generate new token
+      const crypto = require('crypto');
+      const token = crypto.randomBytes(32).toString('hex');
+
+      // Save to file
+      fs.writeFileSync(tokenPath, token, 'utf8');
+      return token;
+    }
   }
 
   /**
@@ -67,12 +86,14 @@ class ExpressServer {
      // API authentication middleware
      this.app.use(this.authMiddleware.bind(this));
 
-     // Request logging middleware
-     this.app.use((req, res, next) => {
-       const timestamp = new Date().toISOString();
-       console.log(`[${timestamp}] ${req.method} ${req.url}`);
-       next();
-     });
+      // Request logging middleware
+      this.app.use((req, res, next) => {
+        if (req.method !== 'OPTIONS') {
+          const timestamp = new Date().toISOString();
+          console.log(`[${timestamp}] ${req.method} ${req.url}`);
+        }
+        next();
+      });
 
      // Enable CORS for all origins
      this.app.use(cors());
@@ -108,9 +129,19 @@ class ExpressServer {
       return next();
     }
 
-     // For external requests, check for token
-     const authHeader = req.headers.authorization || req.headers['x-api-token'];
-     const token = authHeader ? authHeader.replace('Bearer ', '').replace('Token ', '') : null;
+      // For external requests, check for token
+      const authHeader = req.headers.authorization || req.headers['x-api-token'] || req.headers['token'];
+      let token = null;
+      if (authHeader) {
+        if (authHeader.startsWith('Bearer ')) {
+          token = authHeader.replace('Bearer ', '');
+        } else if (authHeader.startsWith('Token ')) {
+          token = authHeader.replace('Token ', '');
+        } else {
+          // Assume it's the raw token (for 'token' header)
+          token = authHeader;
+        }
+      }
 
      if (!token) {
        return res.status(401).json({
@@ -152,10 +183,10 @@ class ExpressServer {
     });
 
      // Screenshot endpoint
-     this.app.get('/screenshot', this.handleScreenshot.bind(this));
+     this.app.get('/windowScreenshot', this.handleScreenshot.bind(this));
 
-      // PyAutoGUI screenshot endpoint
-      this.app.get('/screen', this.handlePyAutoGUIScreenshot.bind(this));
+      // PyAutoGUI Desktop disply Screenshot endpoint
+      this.app.get('/displayScreenshot', this.handlePyAutoGUIScreenshot.bind(this));
 
 
 
@@ -246,16 +277,16 @@ class ExpressServer {
        if (isLive) {
          // Live capture
          imgBuffer = await screenshotCache.captureLiveScreenshot('window', winId);
-         console.log(`[screenshot] Live screenshot captured for window ${winId}`);
+         // console.log(`[screenshot] Live screenshot captured for window ${winId}`);
        } else {
          // Cached version
          imgBuffer = await screenshotCache.getCachedScreenshot('window', winId);
          if (!imgBuffer) {
            // Fallback to live if cache not available
            imgBuffer = await screenshotCache.captureLiveScreenshot('window', winId);
-           console.log(`[screenshot] Cache miss, using live capture for window ${winId}`);
+           // console.log(`[screenshot] Cache miss, using live capture for window ${winId}`);
          } else {
-           console.log(`[screenshot] Cached screenshot served for window ${winId}`);
+           // console.log(`[screenshot] Cached screenshot served for window ${winId}`);
          }
        }
 
@@ -325,7 +356,7 @@ class ExpressServer {
   /**
    * Generate screenshot from webContents
    */
-  async getScreenshot(wc) {
+  async getWindowScreenshot(wc) {
     const screenshotService = require('../services/screenshot-service');
     return await screenshotService.captureScreenshot(wc);
   }

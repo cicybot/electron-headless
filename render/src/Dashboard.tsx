@@ -9,10 +9,13 @@ import View from './View';
 export const Dashboard = () => {
   const { rpc } = useRpc();
 
-  // Dashboard State
-  const [windows, setWindows] = useState<WindowMap>({});
-  const [refreshTick, setRefreshTick] = useState(Date.now());
-  const [connectionError, setConnectionError] = useState<string | null>(null);
+  useEffect(() => {
+    document.title = "ElectronMcp";
+  }, []);
+
+   // Dashboard State
+   const [windows, setWindows] = useState<WindowMap>({});
+   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   // Create Window State
   const [newUrl, setNewUrl] = useState('https://www.google.com');
@@ -22,15 +25,15 @@ export const Dashboard = () => {
   const fetchWindows = useCallback(async () => {
     try {
       const data = await rpc<WindowMap>('getWindows');
-      setWindows(data || {});
-      setRefreshTick(Date.now()); // Update tick to refresh thumbnails
-      setConnectionError(null);
-    } catch (e: any) {
+       setWindows(data || {});
+       setConnectionError(null);
+    } catch (e: unknown) {
       // Only console error if it's NOT a known connection error to reduce noise
-      if (!e.message.includes("Connection failed") && !e.message.includes("Invalid Server Response")) {
+      const error = e instanceof Error ? e : new Error(String(e));
+      if (!error.message.includes("Connection failed") && !error.message.includes("Invalid Server Response")) {
         console.error(e);
       }
-      setConnectionError(e.message || "Failed to connect");
+      setConnectionError(error.message || "Failed to connect");
     }
   }, [rpc]);
 

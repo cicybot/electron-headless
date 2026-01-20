@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, createContext, useContext } fr
 import { DEFAULT_RPC_URL, RpcResponse } from './types';
 
 interface RpcContextType {
-    rpc: <T = any>(method: string, params?: any) => Promise<T>;
+    rpc: <T = unknown>(method: string, params?: Record<string, unknown>) => Promise<T>;
     rpcUrl: string;       // The full URL e.g. http://.../rpc
     rpcBaseUrl: string;   // The origin e.g. http://...
     availableUrls: string[];
@@ -79,9 +79,9 @@ export const RpcProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const newUrls = availableUrls.filter(u => u !== url);
         // Ensure at least one URL exists
         if (newUrls.length === 0) newUrls.push(DEFAULT_RPC_URL);
-        
+
         setAvailableUrls(newUrls);
-        
+
         // If we removed the active URL, switch to the first available one
         if (currentUrl === url) {
             setCurrentUrl(newUrls[0]);
@@ -98,20 +98,36 @@ export const RpcProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         if (currentUrl === oldUrl) setCurrentUrl(newUrl);
     };
 
-    const rpc = useCallback(async <T = any>(method: string, params: any = {}): Promise<T> => {
+    const rpc = useCallback(async <T = unknown>(method: string, params: Record<string, unknown> = {}): Promise<T> => {
         let response;
         try {
-            response = await fetch(currentUrl, {
+            // Parse URL and token from currentUrl
+            let fetchUrl = currentUrl;
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+
+            // Check if URL contains ?token= parameter
+            const tokenIndex = currentUrl.indexOf('?token=');
+            if (tokenIndex !== -1) {
+                // Split URL: first part is RPC URL, second part is token
+                fetchUrl = currentUrl.substring(0, tokenIndex);
+                const token = currentUrl.substring(tokenIndex + 7); // 7 = length of '?token='
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+            }
+
+            response = await fetch(fetchUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify({ method, params }),
             });
-        } catch (err: any) {
+        } catch (err: unknown) {
             // Handle network failures (server down, cors, etc)
-            if (err.name === 'TypeError' && err.message === 'Failed to fetch') {
+            const error = err instanceof Error ? err : new Error(String(err));
+            if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
                 throw new Error(`Connection failed. Is the server running at ${currentUrl}?`);
             }
-            throw err;
+            throw error;
         }
 
         // Check content type to prevent "Unexpected token <" error when server returns HTML (e.g. 404)
@@ -125,7 +141,7 @@ export const RpcProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         let data: RpcResponse<T>;
         try {
             data = await response.json();
-        } catch (e) {
+        } catch {
             throw new Error(`Failed to parse JSON response from ${currentUrl}.`);
         }
 
@@ -134,8 +150,8 @@ export const RpcProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, [currentUrl]);
 
     // Derived base URL for screenshots
-    const rpcBaseUrl = currentUrl.startsWith('http') 
-        ? new URL(currentUrl).origin 
+    const rpcBaseUrl = currentUrl.startsWith('http')
+        ? new URL(currentUrl).origin
         : '';
 
     return (
@@ -143,4 +159,4 @@ export const RpcProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             {children}
         </RpcContext.Provider>
     );
-};
+}

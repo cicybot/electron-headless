@@ -20,9 +20,9 @@ class AppManager {
     app.setName(this.appName);
   }
 
-  getScreenInfo() {
+  getDisplayScreenSize() {
     const primaryDisplay = screen.getPrimaryDisplay();
-    const { width, height } = primaryDisplay.workAreaSize;
+    const { width, height } = primaryDisplay.bounds;
     return { width, height };
   }
 

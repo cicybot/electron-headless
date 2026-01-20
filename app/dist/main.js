@@ -10750,7 +10750,7 @@ var init_electron_context_menu = __esm({
 // src/core/app-manager.js
 var require_app_manager = __commonJS({
   "src/core/app-manager.js"(exports2, module2) {
-    var { app: app3, screen } = require("electron");
+    var { app: app3, screen: screen2 } = require("electron");
     var path4 = require("path");
     var AppManager = class {
       constructor() {
@@ -10763,9 +10763,9 @@ var require_app_manager = __commonJS({
         console.log("IS_LOCAL", this.isLocal, process.env.IS_LOCAL === "true");
         app3.setName(this.appName);
       }
-      getScreenInfo() {
-        const primaryDisplay = screen.getPrimaryDisplay();
-        const { width, height } = primaryDisplay.workAreaSize;
+      getDisplayScreenSize() {
+        const primaryDisplay = screen2.getPrimaryDisplay();
+        const { width, height } = primaryDisplay.bounds;
         return { width, height };
       }
       getAppInfo() {
@@ -10794,23 +10794,35 @@ var require_utils = __commonJS({
   "src/utils.js"(exports2, module2) {
     var ELECTRON_BASE_API_URL = "http://127.0.0.1:3456";
     var AI_BASE_API_URL = "https://api.cicy.de5.net";
+    var TOKEN = "";
     function setBaseApi(url) {
       ELECTRON_BASE_API_URL = url;
     }
     function getBaseApi() {
       return ELECTRON_BASE_API_URL;
     }
+    function setToken(token) {
+      TOKEN = token;
+    }
+    function getToken() {
+      return TOKEN;
+    }
     var post_rpc = async ({ method, params }) => {
       const url = `${getBaseApi()}/rpc`;
+      const headers = {
+        "Content-Type": "application/json"
+      };
+      if (TOKEN) {
+        headers["token"] = TOKEN;
+      }
       const res = await fetch(url, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers,
         body: JSON.stringify({ method, params })
       });
-      console.log(res.status);
-      return res.json();
+      const json = await res.json();
+      console.debug(url, { method, params }, res.status, JSON.stringify(json, null, 2));
+      return json;
     };
     function openWindow(url, options, others) {
       console.log(url);
@@ -10818,19 +10830,393 @@ var require_utils = __commonJS({
         method: "openWindow",
         params: {
           url,
-          options: {
-            width: 1024,
-            height: 768,
-            ...options,
-            webPreferences: {
-              ...options?.webPreferences
-            }
-          },
+          options,
           others
         }
       });
     }
-    var loadURL = async (url, win_id) => {
+    function getWindows() {
+      return post_rpc({
+        method: "getWindows",
+        params: {}
+      });
+    }
+    function closeWindow(win_id) {
+      return post_rpc({
+        method: "closeWindow",
+        params: {
+          win_id
+        }
+      });
+    }
+    function showWindow(win_id) {
+      return post_rpc({
+        method: "showWindow",
+        params: {
+          win_id
+        }
+      });
+    }
+    function hideWindow(win_id) {
+      return post_rpc({
+        method: "hideWindow",
+        params: {
+          win_id
+        }
+      });
+    }
+    function reload(win_id) {
+      return post_rpc({
+        method: "reload",
+        params: {
+          win_id
+        }
+      });
+    }
+    function getBounds(win_id) {
+      return post_rpc({
+        method: "getBounds",
+        params: {
+          win_id
+        }
+      });
+    }
+    function getDisplayScreenSize() {
+      return post_rpc({
+        method: "getDisplayScreenSize",
+        params: {}
+      });
+    }
+    function displayScreenshot() {
+      return post_rpc({
+        method: "displayScreenshot",
+        params: {}
+      });
+    }
+    function getWindowScreenshot(win_id) {
+      return post_rpc({
+        method: "getWindowScreenshot",
+        params: {
+          win_id
+        }
+      });
+    }
+    function pyautoguiClick(x, y) {
+      return post_rpc({
+        method: "pyautoguiClick",
+        params: {
+          x,
+          y
+        }
+      });
+    }
+    function sendElectronClick(win_id, x, y) {
+      return post_rpc({
+        method: "sendElectronClick",
+        params: {
+          win_id,
+          x,
+          y
+        }
+      });
+    }
+    function openTerminal(command, showWin) {
+      return post_rpc({
+        method: "openTerminal",
+        params: {
+          command,
+          showWin
+        }
+      });
+    }
+    function ping() {
+      return post_rpc({
+        method: "ping",
+        params: {}
+      });
+    }
+    function info() {
+      return post_rpc({
+        method: "info",
+        params: {}
+      });
+    }
+    function getURL(win_id) {
+      return post_rpc({
+        method: "getURL",
+        params: {
+          win_id
+        }
+      });
+    }
+    function getTitle(win_id) {
+      return post_rpc({
+        method: "getTitle",
+        params: {
+          win_id
+        }
+      });
+    }
+    function getWindowSize(win_id) {
+      return post_rpc({
+        method: "getWindowSize",
+        params: {
+          win_id
+        }
+      });
+    }
+    function setBounds(win_id, bounds) {
+      return post_rpc({
+        method: "setBounds",
+        params: {
+          win_id,
+          bounds
+        }
+      });
+    }
+    function setWindowSize(win_id, width, height) {
+      return post_rpc({
+        method: "setWindowSize",
+        params: {
+          win_id,
+          width,
+          height
+        }
+      });
+    }
+    function setWindowWidth(win_id, width) {
+      return post_rpc({
+        method: "setWindowWidth",
+        params: {
+          win_id,
+          width
+        }
+      });
+    }
+    function setWindowPosition(win_id, x, y) {
+      return post_rpc({
+        method: "setWindowPosition",
+        params: {
+          win_id,
+          x,
+          y
+        }
+      });
+    }
+    function openDevTools(win_id) {
+      return post_rpc({
+        method: "openDevTools",
+        params: {
+          win_id
+        }
+      });
+    }
+    function sendElectronCtlV(win_id) {
+      return post_rpc({
+        method: "sendElectronCtlV",
+        params: {
+          win_id
+        }
+      });
+    }
+    function sendElectronPressEnter(win_id) {
+      return post_rpc({
+        method: "sendElectronPressEnter",
+        params: {
+          win_id
+        }
+      });
+    }
+    function writeClipboard(text) {
+      return post_rpc({
+        method: "writeClipboard",
+        params: {
+          text
+        }
+      });
+    }
+    function showFloatDiv(win_id, options) {
+      return post_rpc({
+        method: "showFloatDiv",
+        params: {
+          win_id,
+          options
+        }
+      });
+    }
+    function hideFloatDiv(win_id) {
+      return post_rpc({
+        method: "hideFloatDiv",
+        params: {
+          win_id
+        }
+      });
+    }
+    function exportCookies(win_id, options) {
+      return post_rpc({
+        method: "exportCookies",
+        params: {
+          win_id,
+          options
+        }
+      });
+    }
+    function setUserAgent(win_id, userAgent) {
+      return post_rpc({
+        method: "setUserAgent",
+        params: {
+          win_id,
+          userAgent
+        }
+      });
+    }
+    function captureScreenshot(win_id, options) {
+      return post_rpc({
+        method: "captureScreenshot",
+        params: {
+          win_id,
+          ...options
+        }
+      });
+    }
+    function saveScreenshot(win_id, filePath, options) {
+      return post_rpc({
+        method: "saveScreenshot",
+        params: {
+          win_id,
+          filePath,
+          ...options
+        }
+      });
+    }
+    function getScreenshotInfo(win_id) {
+      return post_rpc({
+        method: "getScreenshotInfo",
+        params: {
+          win_id
+        }
+      });
+    }
+    function captureSystemScreenshot(options) {
+      return post_rpc({
+        method: "captureSystemScreenshot",
+        params: {
+          ...options
+        }
+      });
+    }
+    function saveSystemScreenshot(filePath, options) {
+      return post_rpc({
+        method: "saveSystemScreenshot",
+        params: {
+          filePath,
+          ...options
+        }
+      });
+    }
+    function switchAccount(account_index) {
+      return post_rpc({
+        method: "switchAccount",
+        params: {
+          account_index
+        }
+      });
+    }
+    function getAccountInfo(win_id) {
+      return post_rpc({
+        method: "getAccountInfo",
+        params: {
+          win_id
+        }
+      });
+    }
+    function getAccountWindows(account_index) {
+      return post_rpc({
+        method: "getAccountWindows",
+        params: {
+          account_index
+        }
+      });
+    }
+    function pyautoguiType(text) {
+      return post_rpc({
+        method: "pyautoguiType",
+        params: {
+          text
+        }
+      });
+    }
+    function pyautoguiPress(key) {
+      return post_rpc({
+        method: "pyautoguiPress",
+        params: {
+          key
+        }
+      });
+    }
+    function pyautoguiPaste() {
+      return post_rpc({
+        method: "pyautoguiPaste",
+        params: {}
+      });
+    }
+    function pyautoguiMove(x, y) {
+      return post_rpc({
+        method: "pyautoguiMove",
+        params: {
+          x,
+          y
+        }
+      });
+    }
+    function pyautoguiPressEnter() {
+      return post_rpc({
+        method: "pyautoguiPressEnter",
+        params: {}
+      });
+    }
+    function pyautoguiPressBackspace() {
+      return post_rpc({
+        method: "pyautoguiPressBackspace",
+        params: {}
+      });
+    }
+    function pyautoguiPressSpace() {
+      return post_rpc({
+        method: "pyautoguiPressSpace",
+        params: {}
+      });
+    }
+    function pyautoguiPressEsc() {
+      return post_rpc({
+        method: "pyautoguiPressEsc",
+        params: {}
+      });
+    }
+    function pyautoguiScreenshot() {
+      return post_rpc({
+        method: "pyautoguiScreenshot",
+        params: {}
+      });
+    }
+    function pyautoguiWrite(text, interval) {
+      return post_rpc({
+        method: "pyautoguiWrite",
+        params: {
+          text,
+          interval
+        }
+      });
+    }
+    function pyautoguiText(text) {
+      return post_rpc({
+        method: "pyautoguiText",
+        params: {
+          text
+        }
+      });
+    }
+    function loadURL(url, win_id) {
       return post_rpc({
         method: "loadURL",
         params: {
@@ -10838,7 +11224,7 @@ var require_utils = __commonJS({
           url
         }
       });
-    };
+    }
     var sendInputEvent = async (inputEvent, win_id) => {
       return post_rpc({
         method: "sendInputEvent",
@@ -11037,6 +11423,8 @@ return {
     module2.exports = {
       setBaseApi,
       getBaseApi,
+      setToken,
+      getToken,
       chatgptAsk,
       sendKey,
       downloadMedia,
@@ -11054,7 +11442,55 @@ return {
       getElementRect,
       sendInputEvent,
       simulateClick,
-      getSubTitles
+      getSubTitles,
+      getWindows,
+      closeWindow,
+      showWindow,
+      hideWindow,
+      reload,
+      getBounds,
+      getDisplayScreenSize,
+      displayScreenshot,
+      getWindowScreenshot,
+      pyautoguiClick,
+      sendElectronClick,
+      openTerminal,
+      ping,
+      info,
+      getURL,
+      getTitle,
+      getWindowSize,
+      setBounds,
+      setWindowSize,
+      setWindowWidth,
+      setWindowPosition,
+      openDevTools,
+      sendElectronCtlV,
+      sendElectronPressEnter,
+      writeClipboard,
+      showFloatDiv,
+      hideFloatDiv,
+      exportCookies,
+      setUserAgent,
+      captureScreenshot,
+      saveScreenshot,
+      getScreenshotInfo,
+      captureSystemScreenshot,
+      saveSystemScreenshot,
+      switchAccount,
+      getAccountInfo,
+      getAccountWindows,
+      pyautoguiType,
+      pyautoguiPress,
+      pyautoguiPaste,
+      pyautoguiMove,
+      pyautoguiPressEnter,
+      pyautoguiPressBackspace,
+      pyautoguiPressSpace,
+      pyautoguiPressEsc,
+      pyautoguiScreenshot,
+      pyautoguiWrite,
+      pyautoguiText
     };
   }
 });
@@ -11395,7 +11831,6 @@ var require_storage_manager = __commonJS({
             windows: windowStates
           };
           await fs3.writeFile(this.windowStateFile, JSON.stringify(data, null, 2));
-          console.log("Window states saved successfully");
         } catch (error) {
           console.error("Failed to save window states:", error);
         }
@@ -38333,7 +38768,7 @@ var require_screenshot_service = __commonJS({
       /**
        * Get screenshot as buffer
        */
-      async getScreenshotBuffer(wc, format = "png", options = {}) {
+      async getWindowScreenshotBuffer(wc, format = "png", options = {}) {
         const image = await this.captureScreenshot(wc, options);
         switch (format.toLowerCase()) {
           case "png":
@@ -38349,7 +38784,7 @@ var require_screenshot_service = __commonJS({
        * Save screenshot to file
        */
       async saveScreenshot(wc, filePath, format = "png", options = {}) {
-        const buffer = await this.getScreenshotBuffer(wc, format, options);
+        const buffer = await this.getWindowScreenshotBuffer(wc, format, options);
         const fs3 = require("fs").promises;
         await fs3.writeFile(filePath, buffer);
         return {
@@ -38362,7 +38797,7 @@ var require_screenshot_service = __commonJS({
       /**
        * Get screenshot dimensions
        */
-      async getScreenshotInfo(wc) {
+      async getWindowScreenshotInfo(wc) {
         if (!wc) {
           return null;
         }
@@ -38692,11 +39127,11 @@ var require_rpc_handler = __commonJS({
             case "info":
               result = {
                 process: this.appManager.getAppInfo(),
-                screen: this.appManager.getScreenInfo()
+                displayScreen: this.appManager.getDisplayScreenSize()
               };
               break;
-            case "getScreenSize":
-              result = this.appManager.getScreenInfo();
+            case "getDisplayScreenSize":
+              result = this.appManager.getDisplayScreenSize();
               break;
             // Window management
             case "openWindow":
@@ -38913,7 +39348,7 @@ var require_rpc_handler = __commonJS({
             case "captureScreenshot":
               if (wc) {
                 const format = params?.format || "png";
-                const buffer = await screenshotService.getScreenshotBuffer(wc, format, {
+                const buffer = await screenshotService.getWindowScreenshotBuffer(wc, format, {
                   scaleFactor: params?.scaleFactor,
                   quality: params?.quality
                 });
@@ -38937,9 +39372,9 @@ var require_rpc_handler = __commonJS({
                 );
               }
               break;
-            case "getScreenshotInfo":
+            case "getWindowScreenshotInfo":
               if (wc) {
-                result = await screenshotService.getScreenshotInfo(wc);
+                result = await screenshotService.getWindowScreenshotInfo(wc);
               }
               break;
             case "captureSystemScreenshot":
@@ -39011,58 +39446,8 @@ var require_rpc_handler = __commonJS({
             case "pyautoguiText":
               await this._runPyAutoGUIScript("text", params);
               break;
-            case "methods":
-              result = {
-                ping: "Check if the server is responding",
-                info: "Get server information",
-                getScreenSize: "Get the screen size",
-                openWindow: "Open a new window",
-                closeWindow: "Close a window",
-                showWindow: "Show a window",
-                hideWindow: "Hide a window",
-                getWindows: "Get list of windows",
-                getWindowState: "Get window state",
-                loadURL: "Load a URL in window",
-                reload: "Reload the window",
-                getURL: "Get current URL",
-                getTitle: "Get window title",
-                getBounds: "Get window bounds",
-                getWindowSize: "Get window size",
-                setBounds: "Set window bounds",
-                setWindowSize: "Set window size",
-                setWindowWidth: "Set window width",
-                setWindowPosition: "Set window position",
-                executeJavaScript: "Execute JavaScript in window",
-                openDevTools: "Open developer tools",
-                sendInputEvent: "Send input event",
-                importCookies: "Import cookies",
-                exportCookies: "Export cookies",
-                setUserAgent: "Set user agent",
-                downloadMedia: "Download media",
-                getSubTitles: "Get subtitles",
-                getRequests: "Get requests",
-                clearRequests: "Clear requests",
-                captureScreenshot: "Capture screenshot",
-                saveScreenshot: "Save screenshot",
-                getScreenshotInfo: "Get screenshot info",
-                captureSystemScreenshot: "Capture system screenshot",
-                saveSystemScreenshot: "Save system screenshot",
-                switchAccount: "Switch account",
-                getAccountInfo: "Get account info",
-                getAccountWindows: "Get account windows",
-                pyautoguiClick: "Perform mouse click",
-                pyautoguiType: "Type text",
-                pyautoguiPress: "Press key",
-                pyautoguiPaste: "Paste content",
-                pyautoguiMove: "Move mouse to position",
-                pyautoguiPressEnter: "Press enter key",
-                pyautoguiPressBackspace: "Press backspace key",
-                pyautoguiPressSpace: "Press space key",
-                pyautoguiPressEsc: "Press escape key",
-                pyautoguiScreenshot: "Take screenshot with PyAutoGUI",
-                pyautoguiWrite: "Write text with interval",
-                pyautoguiText: "Type text using PyAutoGUI"
-              };
+            case "openTerminal":
+              result = require_utils_node().openTerminal(params?.command || "", params?.showWin !== false);
               break;
             default:
               result = "Unknown method";
@@ -39155,7 +39540,6 @@ var require_screenshot_cache_service = __commonJS({
         try {
           await fs3.mkdir(this.cacheDir, { recursive: true });
           this.windowManager = require_window_manager();
-          console.log(`[ScreenshotCache] Initialized with ${this.workerCount} workers`);
         } catch (error) {
           console.error("[ScreenshotCache] Init failed:", error);
         }
@@ -39164,14 +39548,12 @@ var require_screenshot_cache_service = __commonJS({
          * Start background caching
          */
       start() {
-        console.log("[ScreenshotCache] Service disabled");
         return;
       }
       /**
        * Stop background caching
        */
       stop() {
-        console.log("[ScreenshotCache] Service disabled");
       }
       /**
        * Start worker threads
@@ -39182,7 +39564,6 @@ var require_screenshot_cache_service = __commonJS({
             workerData: { workerId: i }
           });
           worker.on("message", (result) => {
-            console.log(`[ScreenshotCache] Worker ${i} message:`, result);
             this.handleWorkerMessage(result);
           });
           worker.on("error", (error) => {
@@ -39241,17 +39622,13 @@ var require_screenshot_cache_service = __commonJS({
             }
           });
         });
-        console.log(`[ScreenshotCache] Scheduling ${tasks.length} tasks (system + windows)`);
         const promises = tasks.map(async (task, index) => {
           try {
             let buffer;
             if (task.type === "system") {
               buffer = await this.captureSystemLive();
-              console.log(`[ScreenshotCache] Captured system screenshot, buffer size: ${buffer.length}`);
             } else if (task.type === "window") {
-              console.log(`[ScreenshotCache] Capturing window ${task.winId}...`);
               buffer = await this.captureWindowLive(task.winId);
-              console.log(`[ScreenshotCache] Captured window ${task.winId}, buffer size: ${buffer.length}`);
             }
             const workerIndex = index % this.workerCount;
             if (this.workers[workerIndex]) {
@@ -39260,7 +39637,6 @@ var require_screenshot_cache_service = __commonJS({
                 ...task,
                 workerId: workerIndex
               });
-              console.log(`[ScreenshotCache] Sent task to worker ${workerIndex}: ${task.type} ${task.winId || ""}`);
             } else {
               console.error(`[ScreenshotCache] Worker ${workerIndex} not available`);
             }
@@ -39277,7 +39653,6 @@ var require_screenshot_cache_service = __commonJS({
         if (result.error) {
           console.error(`[ScreenshotCache] Worker ${result.workerId} failed:`, result.error);
         } else {
-          console.log(`[ScreenshotCache] Cached ${result.type} screenshot (${result.size} bytes)`);
         }
       }
       /**
@@ -75210,31 +75585,31 @@ var require_mcp_integration = __commonJS({
        * Set up all MCP tools
        */
       setupTools() {
-        this.setupNavigationTools();
-        this.setupInputTools();
-        this.setupDebuggingTools();
-        this.setupNetworkTools();
-        this.setupPerformanceTools();
+        this.setupSystemTools();
+        this.setupWindowManagementTools();
+        this.setupInputEventTools();
+        this.setupCookieTools();
+        this.setupScreenshotTools();
         this.setupAccountTools();
+        this.setupPageTools();
+        this.setupPyAutoGUITools();
+        this.setupNetworkTools();
+        this.setupMediaTools();
       }
       /**
-       * Navigation tools
+       * Window management tools
        */
-      setupNavigationTools() {
-        this.registerTool("new_page", "Create a new browser window in specified account context", {
-          url: z.string().optional().describe("Initial URL"),
-          account_index: z.number().optional().describe("Account index for context isolation (default: 0)")
-        }, async ({ url = "about:blank", account_index = 0 }) => {
+      setupWindowManagementTools() {
+        this.registerTool("open_window", "Open a new browser window", {
+          url: z.string().describe("URL to open"),
+          account_index: z.number().optional().describe("Account index for the window"),
+          options: z.object({}).optional().describe("Window options"),
+          others: z.object({}).optional().describe("Additional options")
+        }, async ({ url, account_index, options, others }) => {
           try {
-            const result = await this.rpcHandler.handleMethod("openWindow", {
-              account_index,
-              url
-            });
+            const result = await this.rpcHandler.handleMethod("openWindow", { url, account_index, options, others });
             return {
-              content: [{
-                type: "text",
-                text: `Created new window (ID: ${result.result.id}) in account ${account_index}`
-              }]
+              content: [{ type: "text", text: `Opened window with ID: ${result.result.id}` }]
             };
           } catch (error) {
             return {
@@ -75243,41 +75618,7 @@ var require_mcp_integration = __commonJS({
             };
           }
         });
-        this.registerTool("close_page", "Close a browser window", {
-          win_id: z.number().describe("Window ID to close")
-        }, async ({ win_id }) => {
-          try {
-            const result = await this.rpcHandler.handleMethod("closeWindow", { win_id });
-            return {
-              content: [{
-                type: "text",
-                text: result.ok ? `Closed window ${win_id}` : result.result
-              }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("navigate_page", "Navigate to a URL", {
-          win_id: z.number().describe("Window ID"),
-          url: z.string().describe("URL to navigate to")
-        }, async ({ win_id, url }) => {
-          try {
-            await this.rpcHandler.handleMethod("loadURL", { win_id, url });
-            return {
-              content: [{ type: "text", text: `Navigated window ${win_id} to ${url}` }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("list_pages", "List all active browser windows across all accounts", {}, async () => {
+        this.registerTool("get_windows", "Get list of all windows", {}, async () => {
           try {
             const result = await this.rpcHandler.handleMethod("getWindows", {});
             return {
@@ -75290,17 +75631,211 @@ var require_mcp_integration = __commonJS({
             };
           }
         });
+        this.registerTool("close_window", "Close a window", {
+          win_id: z.number().describe("Window ID")
+        }, async ({ win_id }) => {
+          try {
+            await this.rpcHandler.handleMethod("closeWindow", { win_id });
+            return {
+              content: [{ type: "text", text: `Closed window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("show_window", "Show a hidden window", {
+          win_id: z.number().describe("Window ID")
+        }, async ({ win_id }) => {
+          try {
+            await this.rpcHandler.handleMethod("showWindow", { win_id });
+            return {
+              content: [{ type: "text", text: `Showed window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("hide_window", "Hide a window", {
+          win_id: z.number().describe("Window ID")
+        }, async ({ win_id }) => {
+          try {
+            await this.rpcHandler.handleMethod("hideWindow", { win_id });
+            return {
+              content: [{ type: "text", text: `Hid window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("reload_window", "Reload a window", {
+          win_id: z.number().describe("Window ID")
+        }, async ({ win_id }) => {
+          try {
+            await this.rpcHandler.handleMethod("reload", { win_id });
+            return {
+              content: [{ type: "text", text: `Reloaded window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_bounds", "Get window bounds", {
+          win_id: z.number().describe("Window ID")
+        }, async ({ win_id }) => {
+          try {
+            const result = await this.rpcHandler.handleMethod("getBounds", { win_id });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("set_bounds", "Set window bounds", {
+          win_id: z.number().describe("Window ID"),
+          bounds: z.object({
+            x: z.number().optional(),
+            y: z.number().optional(),
+            width: z.number().optional(),
+            height: z.number().optional()
+          }).describe("Window bounds")
+        }, async ({ win_id, bounds }) => {
+          try {
+            await this.rpcHandler.handleMethod("setBounds", { win_id, bounds });
+            return {
+              content: [{ type: "text", text: `Set bounds for window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_window_size", "Get window size", {
+          win_id: z.number().describe("Window ID")
+        }, async ({ win_id }) => {
+          try {
+            const result = await this.rpcHandler.handleMethod("getWindowSize", { win_id });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("set_window_size", "Set window size", {
+          win_id: z.number().describe("Window ID"),
+          width: z.number().describe("Window width"),
+          height: z.number().describe("Window height")
+        }, async ({ win_id, width, height }) => {
+          try {
+            await this.rpcHandler.handleMethod("setWindowSize", { win_id, width, height });
+            return {
+              content: [{ type: "text", text: `Set size for window ${win_id} to ${width}x${height}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("set_window_width", "Set window width", {
+          win_id: z.number().describe("Window ID"),
+          width: z.number().describe("Window width")
+        }, async ({ win_id, width }) => {
+          try {
+            await this.rpcHandler.handleMethod("setWindowWidth", { win_id, width });
+            return {
+              content: [{ type: "text", text: `Set width for window ${win_id} to ${width}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("set_window_position", "Set window position", {
+          win_id: z.number().describe("Window ID"),
+          x: z.number().describe("X coordinate"),
+          y: z.number().describe("Y coordinate")
+        }, async ({ win_id, x, y }) => {
+          try {
+            await this.rpcHandler.handleMethod("setWindowPosition", { win_id, x, y });
+            return {
+              content: [{ type: "text", text: `Set position for window ${win_id} to (${x}, ${y})` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
       }
       /**
-       * Input automation tools
+       * Input event tools
        */
-      setupInputTools() {
-        this.registerTool("click", "Click on an element at coordinates", {
+      setupInputEventTools() {
+        this.registerTool("send_input_event", "Send input event", {
+          win_id: z.number().describe("Window ID"),
+          inputEvent: z.object({
+            type: z.string().describe("Event type"),
+            x: z.number().optional().describe("X coordinate"),
+            y: z.number().optional().describe("Y coordinate"),
+            button: z.string().optional().describe("Mouse button"),
+            clickCount: z.number().optional().describe("Click count"),
+            keyCode: z.string().optional().describe("Key code"),
+            modifiers: z.array(z.string()).optional().describe("Key modifiers")
+          }).describe("Input event object"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, inputEvent, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("sendInputEvent", { win_id, inputEvent });
+            return {
+              content: [{ type: "text", text: `Sent input event to window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("send_electron_click", "Send electron click event", {
           win_id: z.number().describe("Window ID"),
           x: z.number().describe("X coordinate"),
           y: z.number().describe("Y coordinate"),
+          button: z.string().optional().describe("Mouse button"),
+          clickCount: z.number().optional().describe("Click count"),
           account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, x, y, account_index }) => {
+        }, async ({ win_id, x, y, button, clickCount, account_index }) => {
           try {
             if (account_index !== void 0) {
               const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
@@ -75308,16 +75843,9 @@ var require_mcp_integration = __commonJS({
                 throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
               }
             }
-            await this.rpcHandler.handleMethod("sendInputEvent", {
-              win_id,
-              inputEvent: { type: "mouseDown", x, y, button: "left", clickCount: 1 }
-            });
-            await this.rpcHandler.handleMethod("sendInputEvent", {
-              win_id,
-              inputEvent: { type: "mouseUp", x, y, button: "left", clickCount: 1 }
-            });
+            await this.rpcHandler.handleMethod("sendElectronClick", { win_id, x, y, button, clickCount });
             return {
-              content: [{ type: "text", text: `Clicked at (${x}, ${y}) in window ${win_id}` }]
+              content: [{ type: "text", text: `Sent click event to window ${win_id} at (${x}, ${y})` }]
             };
           } catch (error) {
             return {
@@ -75326,12 +75854,10 @@ var require_mcp_integration = __commonJS({
             };
           }
         });
-        this.registerTool("fill", "Fill an input field", {
+        this.registerTool("send_electron_press_enter", "Send enter key press event", {
           win_id: z.number().describe("Window ID"),
-          selector: z.string().describe("CSS selector"),
-          value: z.string().describe("Value to fill"),
           account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, selector, value, account_index }) => {
+        }, async ({ win_id, account_index }) => {
           try {
             if (account_index !== void 0) {
               const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
@@ -75339,10 +75865,9 @@ var require_mcp_integration = __commonJS({
                 throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
               }
             }
-            const code = `document.querySelector('${selector}').value = '${value}';`;
-            await this.rpcHandler.handleMethod("executeJavaScript", { win_id, code });
+            await this.rpcHandler.handleMethod("sendElectronPressEnter", { win_id });
             return {
-              content: [{ type: "text", text: `Filled ${selector} with "${value}"` }]
+              content: [{ type: "text", text: `Sent enter key press to window ${win_id}` }]
             };
           } catch (error) {
             return {
@@ -75351,75 +75876,13 @@ var require_mcp_integration = __commonJS({
             };
           }
         });
-        this.registerTool("press_key", "Press a keyboard key", {
-          win_id: z.number().describe("Window ID"),
-          key: z.string().describe("Key to press"),
-          account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, key, account_index }) => {
-          try {
-            if (account_index !== void 0) {
-              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
-              if (!isValid) {
-                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
-              }
-            }
-            await this.rpcHandler.handleMethod("sendInputEvent", {
-              win_id,
-              inputEvent: { type: "keyDown", keyCode: key }
-            });
-            await this.rpcHandler.handleMethod("sendInputEvent", {
-              win_id,
-              inputEvent: { type: "keyUp", keyCode: key }
-            });
-            return {
-              content: [{ type: "text", text: `Pressed key "${key}" in window ${win_id}` }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_click", "Perform mouse click at coordinates using PyAutoGUI", {
-          x: z.number().optional().describe("X coordinate (optional, clicks at current position if not specified)"),
-          y: z.number().optional().describe("Y coordinate (optional, clicks at current position if not specified)")
-        }, async ({ x, y }) => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiClick", { x, y });
-            return {
-              content: [{ type: "text", text: `PyAutoGUI clicked at (${x || "current"}, ${y || "current"})` }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_move", "Move mouse to coordinates using PyAutoGUI", {
-          x: z.number().describe("X coordinate"),
-          y: z.number().describe("Y coordinate")
-        }, async ({ x, y }) => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiMove", { x, y });
-            return {
-              content: [{ type: "text", text: `PyAutoGUI moved mouse to (${x}, ${y})` }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_type", "Type text using PyAutoGUI", {
-          text: z.string().describe("Text to type")
+        this.registerTool("write_clipboard", "Write text to clipboard", {
+          text: z.string().describe("Text to write to clipboard")
         }, async ({ text }) => {
           try {
-            await this.rpcHandler.handleMethod("pyautoguiType", { text });
+            await this.rpcHandler.handleMethod("writeClipboard", { text });
             return {
-              content: [{ type: "text", text: `PyAutoGUI typed: "${text}"` }]
+              content: [{ type: "text", text: `Wrote "${text}" to clipboard` }]
             };
           } catch (error) {
             return {
@@ -75428,114 +75891,11 @@ var require_mcp_integration = __commonJS({
             };
           }
         });
-        this.registerTool("pyautogui_press", "Press a single key using PyAutoGUI. Supports letters, numbers, special keys (enter, space, backspace, esc), function keys (f1-f24), modifier keys (ctrl, alt, shift), and many more.", {
-          key: z.string().describe('Key to press (e.g., "a", "enter", "f1", "ctrl", "space", "esc", "backspace", "tab", "up", "down", "left", "right")')
-        }, async ({ key }) => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiPress", { key });
-            return {
-              content: [{ type: "text", text: `PyAutoGUI pressed key: "${key}"` }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_paste", "Paste from clipboard using PyAutoGUI", {}, async () => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiPaste", {});
-            return {
-              content: [{ type: "text", text: "PyAutoGUI pasted from clipboard" }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_press_enter", "Press Enter key using PyAutoGUI", {}, async () => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiPressEnter", {});
-            return {
-              content: [{ type: "text", text: "PyAutoGUI pressed Enter" }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_press_backspace", "Press Backspace key using PyAutoGUI", {}, async () => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiPressBackspace", {});
-            return {
-              content: [{ type: "text", text: "PyAutoGUI pressed Backspace" }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_press_space", "Press Space key using PyAutoGUI", {}, async () => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiPressSpace", {});
-            return {
-              content: [{ type: "text", text: "PyAutoGUI pressed Space" }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_press_esc", "Press Escape key using PyAutoGUI", {}, async () => {
-          try {
-            await this.rpcHandler.handleMethod("pyautoguiPressEsc", {});
-            return {
-              content: [{ type: "text", text: "PyAutoGUI pressed Escape" }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("pyautogui_screenshot", "Take a screenshot using PyAutoGUI", {}, async () => {
-          try {
-            const result = await this.rpcHandler.handleMethod("pyautoguiScreenshot", {});
-            const { base64, format } = result.result;
-            return {
-              content: [{
-                type: "image",
-                data: `data:image/${format};base64,${base64}`,
-                mimeType: `image/${format}`
-              }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-      }
-      /**
-       * Debugging tools
-       */
-      setupDebuggingTools() {
-        this.registerTool("evaluate_script", "Execute JavaScript in a window", {
+        this.registerTool("show_float_div", "Show floating div overlay", {
           win_id: z.number().describe("Window ID"),
-          script: z.string().describe("JavaScript code to execute"),
+          options: z.object({}).optional().describe("Options for the floating div"),
           account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, script, account_index }) => {
+        }, async ({ win_id, options, account_index }) => {
           try {
             if (account_index !== void 0) {
               const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
@@ -75543,15 +75903,9 @@ var require_mcp_integration = __commonJS({
                 throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
               }
             }
-            const result = await this.rpcHandler.handleMethod("executeJavaScript", {
-              win_id,
-              code: script
-            });
+            await this.rpcHandler.handleMethod("showFloatDiv", { win_id, ...options });
             return {
-              content: [{
-                type: "text",
-                text: `Script result: ${JSON.stringify(result.result)}`
-              }]
+              content: [{ type: "text", text: `Showed floating div in window ${win_id}` }]
             };
           } catch (error) {
             return {
@@ -75560,66 +75914,7 @@ var require_mcp_integration = __commonJS({
             };
           }
         });
-        this.registerTool("take_screenshot", "Take a screenshot of a window", {
-          win_id: z.number().optional().describe("Window ID (uses main window if not specified)"),
-          account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, account_index }) => {
-          try {
-            if (account_index !== void 0 && win_id) {
-              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
-              if (!isValid) {
-                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
-              }
-            }
-            const appManager2 = require_app_manager();
-            const screenshotUrl = `http://127.0.0.1:3456/screenshot?id=${win_id || 1}`;
-            return {
-              content: [{
-                type: "text",
-                text: `Screenshot available at: ${screenshotUrl}`
-              }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-      }
-      /**
-       * Network tools
-       */
-      setupNetworkTools() {
-        this.registerTool("get_network_request", "Get network request details by index", {
-          win_id: z.number().describe("Window ID"),
-          index: z.number().describe("Request index"),
-          account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, index, account_index }) => {
-          try {
-            if (account_index !== void 0) {
-              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
-              if (!isValid) {
-                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
-              }
-            }
-            const result = await this.rpcHandler.handleMethod("getRequests", { win_id });
-            const requests = result.result || [];
-            const request = requests.find((r) => r.index === index);
-            if (!request) {
-              throw new Error(`Request with index ${index} not found`);
-            }
-            return {
-              content: [{ type: "text", text: JSON.stringify(request, null, 2) }]
-            };
-          } catch (error) {
-            return {
-              content: [{ type: "text", text: `Error: ${error.message}` }],
-              isError: true
-            };
-          }
-        });
-        this.registerTool("list_network_requests", "List all network requests for a window", {
+        this.registerTool("hide_float_div", "Hide floating div overlay", {
           win_id: z.number().describe("Window ID"),
           account_index: z.number().optional().describe("Account context verification")
         }, async ({ win_id, account_index }) => {
@@ -75630,14 +75925,31 @@ var require_mcp_integration = __commonJS({
                 throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
               }
             }
-            const result = await this.rpcHandler.handleMethod("getRequests", { win_id });
-            const requests = result.result || [];
+            await this.rpcHandler.handleMethod("hideFloatDiv", { win_id });
             return {
-              content: [{
-                type: "text",
-                text: `Found ${requests.length} requests:
-${JSON.stringify(requests, null, 2)}`
-              }]
+              content: [{ type: "text", text: `Hid floating div in window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("send_electron_ctl_v", "Send Ctrl+V paste event", {
+          win_id: z.number().describe("Window ID"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("sendElectronCtlV", { win_id });
+            return {
+              content: [{ type: "text", text: `Sent Ctrl+V to window ${win_id}` }]
             };
           } catch (error) {
             return {
@@ -75648,45 +75960,221 @@ ${JSON.stringify(requests, null, 2)}`
         });
       }
       /**
-       * Performance tools (placeholder implementations)
+       * Cookie tools
        */
-      setupPerformanceTools() {
-        this.registerTool("performance_start_trace", "Start performance tracing", {
+      setupCookieTools() {
+        this.registerTool("import_cookies", "Import cookies", {
           win_id: z.number().describe("Window ID"),
+          cookies: z.array(z.object({})).describe("Cookies to import"),
           account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, account_index }) => {
-          return {
-            content: [{ type: "text", text: "Performance tracing started (placeholder implementation)" }]
-          };
+        }, async ({ win_id, cookies, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("importCookies", { win_id, cookies });
+            return {
+              content: [{ type: "text", text: `Imported ${cookies.length} cookies to window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
         });
-        this.registerTool("performance_stop_trace", "Stop performance tracing and return results", {
+        this.registerTool("export_cookies", "Export cookies", {
           win_id: z.number().describe("Window ID"),
+          options: z.object({}).optional().describe("Export options"),
           account_index: z.number().optional().describe("Account context verification")
-        }, async ({ win_id, account_index }) => {
-          return {
-            content: [{ type: "text", text: "Performance trace results (placeholder implementation)" }]
-          };
+        }, async ({ win_id, options, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("exportCookies", { win_id, options });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
         });
-        this.registerTool("performance_analyze_insight", "Analyze performance data for insights", {
+      }
+      /**
+       * Screenshot tools
+       */
+      setupScreenshotTools() {
+        this.registerTool("capture_screenshot", "Capture screenshot of window", {
+          win_id: z.number().describe("Window ID"),
+          format: z.enum(["png", "jpeg"]).optional().describe("Image format"),
+          scaleFactor: z.number().optional().describe("Scale factor"),
+          quality: z.number().optional().describe("Quality (for jpeg)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, format, scaleFactor, quality, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("captureScreenshot", { win_id, format, scaleFactor, quality });
+            return {
+              content: [{ type: "text", text: `Captured screenshot (${result.result.format}, ${result.result.size} bytes)` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("save_screenshot", "Save screenshot to file", {
+          win_id: z.number().describe("Window ID"),
+          filePath: z.string().describe("File path to save screenshot"),
+          format: z.enum(["png", "jpeg"]).optional().describe("Image format"),
+          scaleFactor: z.number().optional().describe("Scale factor"),
+          quality: z.number().optional().describe("Quality (for jpeg)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, filePath, format, scaleFactor, quality, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("saveScreenshot", { win_id, filePath, format, scaleFactor, quality });
+            return {
+              content: [{ type: "text", text: `Saved screenshot to ${filePath}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_screenshot_info", "Get screenshot information", {
           win_id: z.number().describe("Window ID"),
           account_index: z.number().optional().describe("Account context verification")
         }, async ({ win_id, account_index }) => {
-          return {
-            content: [{ type: "text", text: "Performance insights (placeholder implementation)" }]
-          };
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("getScreenshotInfo", { win_id });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("capture_system_screenshot", "Capture system screenshot", {
+          format: z.enum(["png", "jpeg"]).optional().describe("Image format"),
+          scaleFactor: z.number().optional().describe("Scale factor"),
+          quality: z.number().optional().describe("Quality (for jpeg)")
+        }, async ({ format, scaleFactor, quality }) => {
+          try {
+            const result = await this.rpcHandler.handleMethod("captureSystemScreenshot", { format, scaleFactor, quality });
+            return {
+              content: [{ type: "text", text: `Captured system screenshot (${result.result.format}, ${result.result.size} bytes)` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("save_system_screenshot", "Save system screenshot to file", {
+          filePath: z.string().describe("File path to save screenshot"),
+          format: z.enum(["png", "jpeg"]).optional().describe("Image format"),
+          scaleFactor: z.number().optional().describe("Scale factor"),
+          quality: z.number().optional().describe("Quality (for jpeg)")
+        }, async ({ filePath, format, scaleFactor, quality }) => {
+          try {
+            await this.rpcHandler.handleMethod("saveSystemScreenshot", { filePath, format, scaleFactor, quality });
+            return {
+              content: [{ type: "text", text: `Saved system screenshot to ${filePath}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_display_screen_size", "Get display screen size", {}, async () => {
+          try {
+            const result = await this.rpcHandler.handleMethod("getDisplayScreenSize", {});
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("display_screenshot", "Take display screenshot (legacy)", {}, async () => {
+          try {
+            await this.rpcHandler.handleMethod("displayScreenshot", {});
+            return {
+              content: [{ type: "text", text: "Display screenshot captured" }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_window_screenshot", "Get window screenshot (legacy)", {
+          win_id: z.number().describe("Window ID")
+        }, async ({ win_id }) => {
+          try {
+            await this.rpcHandler.handleMethod("getWindowScreenshot", { win_id });
+            return {
+              content: [{ type: "text", text: `Window ${win_id} screenshot captured` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
         });
       }
       /**
        * Account management tools
        */
       setupAccountTools() {
-        this.registerTool("switch_account", "Switch active account context", {
-          account_index: z.number().describe("Account index to switch to")
+        this.registerTool("switch_account", "Switch to a different account", {
+          account_index: z.number().describe("Account index")
         }, async ({ account_index }) => {
           try {
-            const result = this.accountManager.switchAccount(account_index);
+            await this.rpcHandler.handleMethod("switchAccount", { account_index });
             return {
-              content: [{ type: "text", text: `Switched to account ${result}` }]
+              content: [{ type: "text", text: `Switched to account ${account_index}` }]
             };
           } catch (error) {
             return {
@@ -75699,12 +76187,523 @@ ${JSON.stringify(requests, null, 2)}`
           win_id: z.number().describe("Window ID")
         }, async ({ win_id }) => {
           try {
-            const accountInfo = this.accountManager.getWindowAccount(win_id);
+            const result = await this.rpcHandler.handleMethod("getAccountInfo", { win_id });
             return {
-              content: [{
-                type: "text",
-                text: `Window ${win_id} belongs to account ${accountInfo.accountIndex}`
-              }]
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_account_windows", "Get all windows for an account", {
+          account_index: z.number().describe("Account index")
+        }, async ({ account_index }) => {
+          try {
+            const result = await this.rpcHandler.handleMethod("getAccountWindows", { account_index });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+      }
+      /**
+       * Page operations tools
+       */
+      setupPageTools() {
+        this.registerTool("load_url", "Load URL in window", {
+          url: z.string().describe("URL to load"),
+          win_id: z.number().optional().describe("Window ID (defaults to 1)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ url, win_id, account_index }) => {
+          try {
+            const actualWinId = win_id || 1;
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(actualWinId, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${actualWinId} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("loadURL", { url, win_id: actualWinId });
+            return {
+              content: [{ type: "text", text: `Loaded URL ${url} in window ${actualWinId}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_url", "Get current URL", {
+          win_id: z.number().describe("Window ID"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("getURL", { win_id });
+            return {
+              content: [{ type: "text", text: result.result }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_title", "Get window title", {
+          win_id: z.number().describe("Window ID"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("getTitle", { win_id });
+            return {
+              content: [{ type: "text", text: result.result }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("execute_javascript", "Execute JavaScript in window", {
+          code: z.string().describe("JavaScript code to execute"),
+          win_id: z.number().optional().describe("Window ID (defaults to 1)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ code, win_id, account_index }) => {
+          try {
+            const actualWinId = win_id || 1;
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(actualWinId, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${actualWinId} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("executeJavaScript", { code, win_id: actualWinId });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("open_devtools", "Open developer tools for window", {
+          win_id: z.number().describe("Window ID"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("openDevTools", { win_id });
+            return {
+              content: [{ type: "text", text: `Opened DevTools for window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("set_user_agent", "Set user agent for window", {
+          win_id: z.number().describe("Window ID"),
+          userAgent: z.string().describe("User agent string"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, userAgent, account_index }) => {
+          try {
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(win_id, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("setUserAgent", { win_id, userAgent });
+            return {
+              content: [{ type: "text", text: `Set user agent for window ${win_id}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_window_state", "Get window state", {
+          win_id: z.number().optional().describe("Window ID (defaults to 1)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, account_index }) => {
+          try {
+            const actualWinId = win_id || 1;
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(actualWinId, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${actualWinId} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("getWindowState", { win_id: actualWinId });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+      }
+      /**
+       * PyAutoGUI automation tools
+       */
+      setupPyAutoGUITools() {
+        this.registerTool("pyautogui_click", "Perform mouse click with PyAutoGUI", {
+          x: z.number().describe("X coordinate"),
+          y: z.number().describe("Y coordinate")
+        }, async ({ x, y }) => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiClick", { x, y });
+            return {
+              content: [{ type: "text", text: `Clicked at (${x}, ${y})` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_type", "Type text with PyAutoGUI", {
+          text: z.string().describe("Text to type")
+        }, async ({ text }) => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiType", { text });
+            return {
+              content: [{ type: "text", text: `Typed: "${text}"` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_press", "Press key with PyAutoGUI", {
+          key: z.string().describe("Key to press")
+        }, async ({ key }) => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiPress", { key });
+            return {
+              content: [{ type: "text", text: `Pressed key: ${key}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_paste", "Paste content with PyAutoGUI", {}, async () => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiPaste", {});
+            return {
+              content: [{ type: "text", text: "Pasted content" }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_move", "Move mouse with PyAutoGUI", {
+          x: z.number().describe("X coordinate"),
+          y: z.number().describe("Y coordinate")
+        }, async ({ x, y }) => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiMove", { x, y });
+            return {
+              content: [{ type: "text", text: `Moved mouse to (${x}, ${y})` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_press_enter", "Press Enter key with PyAutoGUI", {}, async () => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiPressEnter", {});
+            return {
+              content: [{ type: "text", text: "Pressed Enter" }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_press_backspace", "Press Backspace key with PyAutoGUI", {}, async () => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiPressBackspace", {});
+            return {
+              content: [{ type: "text", text: "Pressed Backspace" }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_press_space", "Press Space key with PyAutoGUI", {}, async () => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiPressSpace", {});
+            return {
+              content: [{ type: "text", text: "Pressed Space" }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_press_esc", "Press Escape key with PyAutoGUI", {}, async () => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiPressEsc", {});
+            return {
+              content: [{ type: "text", text: "Pressed Escape" }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_screenshot", "Take screenshot with PyAutoGUI", {}, async () => {
+          try {
+            const result = await this.rpcHandler.handleMethod("pyautoguiScreenshot", {});
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_write", "Write text with interval with PyAutoGUI", {
+          text: z.string().describe("Text to write"),
+          interval: z.number().optional().describe("Interval between keystrokes")
+        }, async ({ text, interval }) => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiWrite", { text, interval });
+            return {
+              content: [{ type: "text", text: `Wrote: "${text}"` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("pyautogui_text", "Type text using PyAutoGUI", {
+          text: z.string().describe("Text to type")
+        }, async ({ text }) => {
+          try {
+            await this.rpcHandler.handleMethod("pyautoguiText", { text });
+            return {
+              content: [{ type: "text", text: `Typed: "${text}"` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+      }
+      /**
+       * Network monitoring tools
+       */
+      setupNetworkTools() {
+        this.registerTool("get_requests", "Get network requests for window", {
+          win_id: z.number().optional().describe("Window ID (defaults to 1)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, account_index }) => {
+          try {
+            const actualWinId = win_id || 1;
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(actualWinId, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${actualWinId} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("getRequests", { win_id: actualWinId });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("clear_requests", "Clear network requests for window", {
+          win_id: z.number().optional().describe("Window ID (defaults to 1)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ win_id, account_index }) => {
+          try {
+            const actualWinId = win_id || 1;
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(actualWinId, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${actualWinId} does not belong to account ${account_index}`);
+              }
+            }
+            await this.rpcHandler.handleMethod("clearRequests", { win_id: actualWinId });
+            return {
+              content: [{ type: "text", text: `Cleared requests for window ${actualWinId}` }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+      }
+      /**
+       * Media tools
+       */
+      setupMediaTools() {
+        this.registerTool("download_media", "Download media from URL", {
+          mediaUrl: z.string().describe("Media URL to download"),
+          genSubtitles: z.boolean().optional().describe("Generate subtitles"),
+          basePath: z.string().optional().describe("Base path for download"),
+          id: z.string().optional().describe("Media ID"),
+          win_id: z.number().optional().describe("Window ID (defaults to 1)"),
+          account_index: z.number().optional().describe("Account context verification")
+        }, async ({ mediaUrl, genSubtitles, basePath: basePath2, id, win_id, account_index }) => {
+          try {
+            const actualWinId = win_id || 1;
+            if (account_index !== void 0) {
+              const isValid = this.accountManager.validateWindowAccount(actualWinId, account_index);
+              if (!isValid) {
+                throw new Error(`Window ${actualWinId} does not belong to account ${account_index}`);
+              }
+            }
+            const result = await this.rpcHandler.handleMethod("downloadMedia", { mediaUrl, genSubtitles, basePath: basePath2, id, win_id: actualWinId });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_subtitles", "Get subtitles for media file", {
+          mediaPath: z.string().describe("Path to media file")
+        }, async ({ mediaPath }) => {
+          try {
+            const result = await this.rpcHandler.handleMethod("getSubTitles", { mediaPath });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+      }
+      /**
+       * System tools
+       */
+      setupSystemTools() {
+        this.registerTool("ping", "Check if server is responding", {}, async () => {
+          try {
+            const result = await this.rpcHandler.handleMethod("ping", {});
+            return {
+              content: [{ type: "text", text: result.result }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("info", "Get server information", {}, async () => {
+          try {
+            const result = await this.rpcHandler.handleMethod("info", {});
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("get_methods", "Get list of available RPC methods", {}, async () => {
+          try {
+            const result = await this.rpcHandler.handleMethod("methods", {});
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
+            };
+          } catch (error) {
+            return {
+              content: [{ type: "text", text: `Error: ${error.message}` }],
+              isError: true
+            };
+          }
+        });
+        this.registerTool("open_terminal", "Open a terminal and execute command", {
+          command: z.string().optional().describe("Command to execute"),
+          showWin: z.boolean().optional().describe("Show terminal window")
+        }, async ({ command, showWin }) => {
+          try {
+            const result = await this.rpcHandler.handleMethod("openTerminal", { command, showWin });
+            return {
+              content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }]
             };
           } catch (error) {
             return {
@@ -75760,6 +76759,7 @@ var require_express_server = __commonJS({
     var cors = require_lib3();
     var path4 = require("path");
     var fs3 = require("fs");
+    var os2 = require("os");
     var serveIndex = require_serve_index();
     var ExpressServer = class {
       constructor() {
@@ -75767,15 +76767,26 @@ var require_express_server = __commonJS({
         this.server = null;
         this.rpcHandler = require_rpc_handler();
         this.appManager = require_app_manager();
-        this.apiToken = this.generateToken();
+        this.apiToken = this.loadOrGenerateToken();
         console.log(`[API Token] ${this.apiToken}`);
       }
       /**
-       * Generate a random API token
+       * Load or generate a random API token
        */
-      generateToken() {
-        const crypto = require("crypto");
-        return crypto.randomBytes(32).toString("hex");
+      loadOrGenerateToken() {
+        const tokenPath = path4.join(os2.homedir(), "electron-mcp", "token.txt");
+        const dir = path4.dirname(tokenPath);
+        if (!fs3.existsSync(dir)) {
+          fs3.mkdirSync(dir, { recursive: true });
+        }
+        if (fs3.existsSync(tokenPath)) {
+          return fs3.readFileSync(tokenPath, "utf8").trim();
+        } else {
+          const crypto = require("crypto");
+          const token = crypto.randomBytes(32).toString("hex");
+          fs3.writeFileSync(tokenPath, token, "utf8");
+          return token;
+        }
       }
       /**
        * Initialize and start Express server
@@ -75807,8 +76818,10 @@ var require_express_server = __commonJS({
       setupMiddleware() {
         this.app.use(this.authMiddleware.bind(this));
         this.app.use((req, res, next) => {
-          const timestamp = (/* @__PURE__ */ new Date()).toISOString();
-          console.log(`[${timestamp}] ${req.method} ${req.url}`);
+          if (req.method !== "OPTIONS") {
+            const timestamp = (/* @__PURE__ */ new Date()).toISOString();
+            console.log(`[${timestamp}] ${req.method} ${req.url}`);
+          }
           next();
         });
         this.app.use(cors());
@@ -75828,8 +76841,17 @@ var require_express_server = __commonJS({
         if (isLocalRequest) {
           return next();
         }
-        const authHeader = req.headers.authorization || req.headers["x-api-token"];
-        const token = authHeader ? authHeader.replace("Bearer ", "").replace("Token ", "") : null;
+        const authHeader = req.headers.authorization || req.headers["x-api-token"] || req.headers["token"];
+        let token = null;
+        if (authHeader) {
+          if (authHeader.startsWith("Bearer ")) {
+            token = authHeader.replace("Bearer ", "");
+          } else if (authHeader.startsWith("Token ")) {
+            token = authHeader.replace("Token ", "");
+          } else {
+            token = authHeader;
+          }
+        }
         if (!token) {
           return res.status(401).json({
             error: "API token required for external requests",
@@ -75858,8 +76880,8 @@ var require_express_server = __commonJS({
             message: "Use this token in Authorization header: Bearer <token> or X-API-Token header"
           });
         });
-        this.app.get("/screenshot", this.handleScreenshot.bind(this));
-        this.app.get("/screen", this.handlePyAutoGUIScreenshot.bind(this));
+        this.app.get("/windowScreenshot", this.handleScreenshot.bind(this));
+        this.app.get("/displayScreenshot", this.handlePyAutoGUIScreenshot.bind(this));
         this.app.post("/rpc", this.handleRpc.bind(this));
         this.app.get("/mcp", this.handleMcpSSE.bind(this));
         this.app.post("/messages", this.handleMcp.bind(this));
@@ -75926,14 +76948,11 @@ var require_express_server = __commonJS({
           let imgBuffer;
           if (isLive) {
             imgBuffer = await screenshotCache.captureLiveScreenshot("window", winId);
-            console.log(`[screenshot] Live screenshot captured for window ${winId}`);
           } else {
             imgBuffer = await screenshotCache.getCachedScreenshot("window", winId);
             if (!imgBuffer) {
               imgBuffer = await screenshotCache.captureLiveScreenshot("window", winId);
-              console.log(`[screenshot] Cache miss, using live capture for window ${winId}`);
             } else {
-              console.log(`[screenshot] Cached screenshot served for window ${winId}`);
             }
           }
           res.setHeader("Content-Type", "image/png");
@@ -75994,7 +77013,7 @@ var require_express_server = __commonJS({
       /**
        * Generate screenshot from webContents
        */
-      async getScreenshot(wc) {
+      async getWindowScreenshot(wc) {
         const screenshotService = require_screenshot_service();
         return await screenshotService.captureScreenshot(wc);
       }
@@ -76037,7 +77056,7 @@ var require_express_server = __commonJS({
 });
 
 // src/main.js
-var { app: app2, session, BrowserWindow: BrowserWindow2 } = require("electron");
+var { app: app2, screen, session, BrowserWindow: BrowserWindow2 } = require("electron");
 var fs2 = require("fs");
 var path3 = require("path");
 var os = require("os");
@@ -76075,7 +77094,11 @@ contextMenu2({
 });
 app2.whenReady().then(async () => {
   console.log("Electron app ready");
-  console.log("session path:", session.defaultSession.getStoragePath());
+  console.log("Session path:", session.defaultSession.getStoragePath());
+  const t = screen.getAllDisplays();
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.bounds;
+  console.log("PrimaryDisplay Bounds:", width, height);
   await winManager.init();
   expressServer.start();
   if (BrowserWindow2.getAllWindows().length === 0) {

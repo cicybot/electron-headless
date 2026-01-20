@@ -38,7 +38,7 @@ class ScreenshotService {
   /**
    * Get screenshot as buffer
    */
-  async getScreenshotBuffer(wc, format = 'png', options = {}) {
+  async getWindowScreenshotBuffer(wc, format = 'png', options = {}) {
     const image = await this.captureScreenshot(wc, options);
 
     switch (format.toLowerCase()) {
@@ -56,7 +56,7 @@ class ScreenshotService {
    * Save screenshot to file
    */
   async saveScreenshot(wc, filePath, format = 'png', options = {}) {
-    const buffer = await this.getScreenshotBuffer(wc, format, options);
+    const buffer = await this.getWindowScreenshotBuffer(wc, format, options);
 
     const fs = require('fs').promises;
     await fs.writeFile(filePath, buffer);
@@ -72,7 +72,7 @@ class ScreenshotService {
   /**
    * Get screenshot dimensions
    */
-  async getScreenshotInfo(wc) {
+  async getWindowScreenshotInfo(wc) {
     if (!wc) {
       return null;
     }

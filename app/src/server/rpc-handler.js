@@ -54,12 +54,12 @@ class RPCHandler {
         case 'info':
           result = {
             process: this.appManager.getAppInfo(),
-            screen: this.appManager.getScreenInfo(),
+            displayScreen: this.appManager.getDisplayScreenSize(),
           };
           break;
 
-        case 'getScreenSize':
-          result = this.appManager.getScreenInfo();
+        case 'getDisplayScreenSize':
+          result = this.appManager.getDisplayScreenSize();
           break;
 
         // Window management
@@ -314,7 +314,7 @@ class RPCHandler {
         case 'captureScreenshot':
           if (wc) {
             const format = params?.format || 'png';
-            const buffer = await screenshotService.getScreenshotBuffer(wc, format, {
+            const buffer = await screenshotService.getWindowScreenshotBuffer(wc, format, {
               scaleFactor: params?.scaleFactor,
               quality: params?.quality
             });
@@ -340,9 +340,9 @@ class RPCHandler {
           }
           break;
 
-        case 'getScreenshotInfo':
+        case 'getWindowScreenshotInfo':
           if (wc) {
-            result = await screenshotService.getScreenshotInfo(wc);
+            result = await screenshotService.getWindowScreenshotInfo(wc);
           }
           break;
 
@@ -429,63 +429,12 @@ case 'pyautoguiWrite':
           break;
 
         case 'pyautoguiText':
-          await this._runPyAutoGUIScript('text', params);
-          break;
+           await this._runPyAutoGUIScript('text', params);
+           break;
 
-        case 'methods':
-          result = {
-            ping: "Check if the server is responding",
-            info: "Get server information",
-            getScreenSize: "Get the screen size",
-            openWindow: "Open a new window",
-            closeWindow: "Close a window",
-            showWindow: "Show a window",
-            hideWindow: "Hide a window",
-            getWindows: "Get list of windows",
-            getWindowState: "Get window state",
-            loadURL: "Load a URL in window",
-            reload: "Reload the window",
-            getURL: "Get current URL",
-            getTitle: "Get window title",
-            getBounds: "Get window bounds",
-            getWindowSize: "Get window size",
-            setBounds: "Set window bounds",
-            setWindowSize: "Set window size",
-            setWindowWidth: "Set window width",
-            setWindowPosition: "Set window position",
-            executeJavaScript: "Execute JavaScript in window",
-            openDevTools: "Open developer tools",
-            sendInputEvent: "Send input event",
-            importCookies: "Import cookies",
-            exportCookies: "Export cookies",
-            setUserAgent: "Set user agent",
-            downloadMedia: "Download media",
-            getSubTitles: "Get subtitles",
-            getRequests: "Get requests",
-            clearRequests: "Clear requests",
-            captureScreenshot: "Capture screenshot",
-            saveScreenshot: "Save screenshot",
-            getScreenshotInfo: "Get screenshot info",
-            captureSystemScreenshot: "Capture system screenshot",
-            saveSystemScreenshot: "Save system screenshot",
-            switchAccount: "Switch account",
-            getAccountInfo: "Get account info",
-            getAccountWindows: "Get account windows",
-            pyautoguiClick: "Perform mouse click",
-            pyautoguiType: "Type text",
-            pyautoguiPress: "Press key",
-            pyautoguiPaste: "Paste content",
-            pyautoguiMove: "Move mouse to position",
-            pyautoguiPressEnter: "Press enter key",
-            pyautoguiPressBackspace: "Press backspace key",
-            pyautoguiPressSpace: "Press space key",
-            pyautoguiPressEsc: "Press escape key",
-            pyautoguiScreenshot: "Take screenshot with PyAutoGUI",
-            pyautoguiWrite: "Write text with interval",
-            pyautoguiText: "Type text using PyAutoGUI"
-          };
-          break;
-
+        case 'openTerminal':
+           result = require('../utils-node').openTerminal(params?.command || '', params?.showWin !== false);
+           break;
         default:
           result = "Unknown method";
           ok = false;

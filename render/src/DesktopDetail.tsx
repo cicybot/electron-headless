@@ -1,23 +1,42 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRpc } from './RpcContext';
-import { NetworkLog } from './types';
-import { IconArrowLeft, IconRefresh, IconCamera, IconPlay, IconTrash } from './Icons';
+import { IconArrowLeft } from './Icons';
 import View from './View';
 
 export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
     const { rpc, rpcBaseUrl } = useRpc();
 
+    useEffect(() => {
+        document.title = "Desktop";
+    }, []);
+
     const [screenshotUrl, setScreenshotUrl] = useState<string>('');
 
+    // Get screen size on mount
+    useEffect(() => {
+        const fetchScreenSize = async () => {
+            try {
+                const screenInfo = await rpc<{ width: number; height: number }>('getDisplayScreenSize');
+                if (screenInfo) {
+                    const sizeElement = document.querySelector("#windowSize");
+                    if (sizeElement) {
+                        sizeElement.textContent = `${screenInfo.width}x${screenInfo.height}`;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to get screen size:', e);
+            }
+        };
+
+        fetchScreenSize();
+    }, [rpc]);
 
     // Auto-fetch screenshot as blob URL
     useEffect(() => {
-        let interval: any;
-
         const fetchScreenshot = async () => {
             try {
-                const url = (rpcBaseUrl ? `${rpcBaseUrl}/screen` : '/screen') + `?t=${Date.now()}`;
+                const url = (rpcBaseUrl ? `${rpcBaseUrl}/displayScreenshot` : '/displayScreenshot') + `?t=${Date.now()}`;
                 const response = await fetch(url);
                 if (response.ok) {
                     const arrayBuffer = await response.arrayBuffer();
@@ -34,18 +53,16 @@ export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
         fetchScreenshot();
 
         // Set up interval for auto-refresh
-        interval = setInterval(fetchScreenshot, 1000);
+        const interval = setInterval(fetchScreenshot, 1000);
 
-        return () => {
-            if (interval) clearInterval(interval);
-        };
+        return () => clearInterval(interval);
     }, [ rpcBaseUrl]);
 
     const onClickImage = (e,type)=>{
         e.preventDefault();
         // 获取鼠标相对于图片的坐标
-        var x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft) -64;
-        var y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
+        const x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft);
+        const y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
         // 弹出显示坐标
         rpc(type||"pyautoguiClick",{
             win_id:1,
@@ -57,9 +74,9 @@ export const DesktopDetail = ({  onBack }: { onBack: () => void }) => {
     const onMouseMoveImage = (e)=>{
         e.preventDefault();
         // 获取鼠标相对于图片的坐标
-        var x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft) -64;
-        var y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
-        document.querySelector("#position").textContent= `x::${y},y:${y}`
+        const x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft);
+        const y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
+        document.querySelector("#position").textContent= `x::${x},y:${y}`
     }
 
     return (

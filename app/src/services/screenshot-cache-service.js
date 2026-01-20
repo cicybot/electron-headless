@@ -30,7 +30,7 @@ class ScreenshotCacheService {
     try {
       await fs.mkdir(this.cacheDir, { recursive: true });
       this.windowManager = require('../core/window-manager');
-      console.log(`[ScreenshotCache] Initialized with ${this.workerCount} workers`);
+      // console.log(`[ScreenshotCache] Initialized with ${this.workerCount} workers`);
     } catch (error) {
       console.error('[ScreenshotCache] Init failed:', error);
     }
@@ -41,7 +41,7 @@ class ScreenshotCacheService {
    */
   start() {
     // Disabled to prevent worker thread errors
-    console.log('[ScreenshotCache] Service disabled');
+    // console.log('[ScreenshotCache] Service disabled');
     return;
   }
 
@@ -50,7 +50,7 @@ class ScreenshotCacheService {
    */
 stop() {
     // Service disabled
-    console.log('[ScreenshotCache] Service disabled');
+    // console.log('[ScreenshotCache] Service disabled');
   }
 
   /**
@@ -63,7 +63,7 @@ stop() {
       });
       
       worker.on('message', (result) => {
-        console.log(`[ScreenshotCache] Worker ${i} message:`, result);
+        // console.log(`[ScreenshotCache] Worker ${i} message:`, result);
         this.handleWorkerMessage(result);
       });
       
@@ -135,7 +135,7 @@ stop() {
       });
     });
 
-    console.log(`[ScreenshotCache] Scheduling ${tasks.length} tasks (system + windows)`);
+    // console.log(`[ScreenshotCache] Scheduling ${tasks.length} tasks (system + windows)`);
     
     // Process tasks asynchronously
     const promises = tasks.map(async (task, index) => {
@@ -143,11 +143,11 @@ stop() {
         let buffer;
         if (task.type === 'system') {
           buffer = await this.captureSystemLive();
-          console.log(`[ScreenshotCache] Captured system screenshot, buffer size: ${buffer.length}`);
+          // console.log(`[ScreenshotCache] Captured system screenshot, buffer size: ${buffer.length}`);
         } else if (task.type === 'window') {
-          console.log(`[ScreenshotCache] Capturing window ${task.winId}...`);
+          // console.log(`[ScreenshotCache] Capturing window ${task.winId}...`);
           buffer = await this.captureWindowLive(task.winId);
-          console.log(`[ScreenshotCache] Captured window ${task.winId}, buffer size: ${buffer.length}`);
+          // console.log(`[ScreenshotCache] Captured window ${task.winId}, buffer size: ${buffer.length}`);
         }
 
         const workerIndex = index % this.workerCount;
@@ -157,7 +157,7 @@ stop() {
             ...task,
             workerId: workerIndex
           });
-          console.log(`[ScreenshotCache] Sent task to worker ${workerIndex}: ${task.type} ${task.winId || ''}`);
+          // console.log(`[ScreenshotCache] Sent task to worker ${workerIndex}: ${task.type} ${task.winId || ''}`);
         } else {
           console.error(`[ScreenshotCache] Worker ${workerIndex} not available`);
         }
@@ -176,7 +176,7 @@ stop() {
     if (result.error) {
       console.error(`[ScreenshotCache] Worker ${result.workerId} failed:`, result.error);
     } else {
-      console.log(`[ScreenshotCache] Cached ${result.type} screenshot (${result.size} bytes)`);
+      // console.log(`[ScreenshotCache] Cached ${result.type} screenshot (${result.size} bytes)`);
     }
   }
 

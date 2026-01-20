@@ -2,34 +2,41 @@
 import React, { useState, useEffect } from 'react';
 import { useRpc } from './RpcContext';
 import { NetworkLog } from './types';
-import { IconArrowLeft, IconRefresh, IconCamera, IconPlay, IconTrash } from './Icons';
+import { IconArrowLeft } from './Icons';
 import View from './View';
 
 export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: number, initialUrl: string, onBack: () => void }) => {
     const { rpc, rpcBaseUrl } = useRpc();
     const [currentUrl, setCurrentUrl] = useState(initialUrl);
+
+    // Set initial title
+    document.title = `${windowId} - ${initialUrl}`;
     const [navUrl, setNavUrl] = useState(initialUrl);
     const [screenshotUrl, setScreenshotUrl] = useState<string>('');
 
     // JS Exec State
-    const [jsCode, setJsCode] = useState(`(() => { 
+    const [jsCode, setJsCode] = useState(`(() => {
     return document.title;
 })()`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [evalResult, setEvalResult] = useState<string>('');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [isAutoRefresh, setIsAutoRefresh] = useState(false);
 
     // Network State
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [requests, setRequests] = useState<NetworkLog[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [activeTab, setActiveTab] = useState<'console' | 'network'>('console');
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [expandedRequestId, setExpandedRequestId] = useState<string | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [urlFilter, setUrlFilter] = useState('');
 
     const refreshScreenshot = () => setScreenshotUrl('');
 
     // Consolidated Refresh Loop
     useEffect(() => {
-        let interval: any;
-
         const tick = async () => {
             if (isAutoRefresh) refreshScreenshot();
 
@@ -47,17 +54,22 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
                     }
                 } catch (e) {
                     // Silent catch for polling
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                    void e;
                 }
             }
+
+
         };
 
         // Initial fetch
         tick();
 
-        interval = setInterval(tick, 1000);
+        const interval = setInterval(tick, 1000);
         return () => clearInterval(interval);
-    }, [isAutoRefresh, activeTab, windowId, rpc, urlFilter]);
+    }, [isAutoRefresh, activeTab, windowId, urlFilter]);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleReload = async () => {
         await rpc('reload', { win_id: windowId });
         setTimeout(refreshScreenshot, 500); // Delay for render
@@ -69,16 +81,18 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
         setTimeout(refreshScreenshot, 1000);
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleEval = async () => {
         try {
             const res = await rpc('executeJavaScript', { win_id: windowId, code: jsCode });
             setEvalResult(JSON.stringify(res, null, 2));
             refreshScreenshot();
-        } catch (e: any) {
-            setEvalResult('Error: ' + e.message);
+        } catch (e: unknown) {
+            setEvalResult('Error: ' + (e instanceof Error ? e.message : String(e)));
         }
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const getMethodColor = (method: string) => {
         switch (method) {
             case 'GET': return 'text-success';
@@ -92,17 +106,28 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
 
     // Auto-fetch screenshot as blob URL
     useEffect(() => {
-        let interval: any;
-
         const fetchScreenshot = async () => {
             try {
-                const url = (rpcBaseUrl ? `${rpcBaseUrl}/screenshot` : '/screenshot') + `?id=${windowId}&t=${Date.now()}`;
+                const url = (rpcBaseUrl ? `${rpcBaseUrl}/windowScreenshot` : '/windowScreenshot') + `?id=${windowId}&t=${Date.now()}`;
                 const response = await fetch(url);
                 if (response.ok) {
                     const arrayBuffer = await response.arrayBuffer();
                     const blob = new Blob([arrayBuffer], { type: 'image/png' });
                     const blobUrl = URL.createObjectURL(blob);
                     setScreenshotUrl(blobUrl);
+
+                    // After screenshot is loaded, get bounds and display
+                    try {
+                        const bounds = await rpc<{ x: number; y: number; width: number; height: number }>('getBounds', { win_id: windowId });
+                        if (bounds) {
+                            const boundElement = document.querySelector("#bound");
+                            if (boundElement) {
+                                boundElement.textContent = `${bounds.width}x${bounds.height} (${bounds.x},${bounds.y})`;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Failed to get bounds:', e);
+                    }
                 }
             } catch (error) {
                 console.error('Failed to fetch screenshot:', error);
@@ -113,18 +138,16 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
         fetchScreenshot();
 
         // Set up interval for auto-refresh
-        interval = setInterval(fetchScreenshot, 1000);
+        const interval = setInterval(fetchScreenshot, 1000);
 
-        return () => {
-            if (interval) clearInterval(interval);
-        };
-    }, [windowId, rpcBaseUrl]);
+        return () => clearInterval(interval);
+    }, [windowId, rpcBaseUrl, rpc]);
 
     const onClickImage = (e,type)=>{
         e.preventDefault();
         // 获取鼠标相对于图片的坐标
-        var x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft) -64;
-        var y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
+        const x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft) -64;
+        const y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
         // 弹出显示坐标
         rpc(type||"sendElectronClick",{
             win_id:1,
@@ -136,9 +159,9 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
     const onMouseMoveImage = (e)=>{
         e.preventDefault();
         // 获取鼠标相对于图片的坐标
-        var x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft) -64;
-        var y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
-        document.querySelector("#position").textContent= `x::${y},y:${y}`
+        const x = parseInt(e.clientX + document.querySelector("#screen").scrollLeft) -64;
+        const y = parseInt(e.clientY+ document.querySelector("#screen").scrollTop) -64;
+        document.querySelector("#position").textContent= `x::${x},y:${y}`
     }
 
     return (

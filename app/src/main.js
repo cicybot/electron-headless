@@ -3,7 +3,7 @@
  * Refactored with modular architecture
  */
 
-const { app,session,BrowserWindow } = require('electron');
+const { app,screen,session,BrowserWindow } = require('electron');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -59,7 +59,11 @@ contextMenu({
  */
 app.whenReady().then(async () => {
   console.log('Electron app ready');
-  console.log("session path:",session.defaultSession.getStoragePath())
+  console.log("Session path:",session.defaultSession.getStoragePath())
+  const t = screen.getAllDisplays()
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.bounds;
+  console.log("PrimaryDisplay Bounds:",width, height)
 
   // Initialize window manager and restore previous session
   await winManager.init();

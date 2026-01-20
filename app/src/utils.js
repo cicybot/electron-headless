@@ -1,5 +1,6 @@
 let ELECTRON_BASE_API_URL = "http://127.0.0.1:3456"
 const AI_BASE_API_URL = "https://api.cicy.de5.net";
+let TOKEN = ""
 
 function setBaseApi(url){
     ELECTRON_BASE_API_URL = url
@@ -8,41 +9,486 @@ function setBaseApi(url){
 function getBaseApi(){
      return ELECTRON_BASE_API_URL
 }
+
+function setToken(token){
+    TOKEN = token
+}
+
+function getToken(){
+    return TOKEN
+}
 const post_rpc = async ({method, params}) => {
     const url = `${getBaseApi()}/rpc`
     // console.log(ELECTRON_BASE_API_URL,params)
+    const headers = {
+        "Content-Type": "application/json"
+    }
+    if (TOKEN) {
+        headers["token"] = TOKEN
+    }
     const res = await fetch(url, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers,
         body: JSON.stringify({method, params})
     })
-    console.log(res.status)
-    return res.json()
+
+    const json =  await res.json()
+    console.debug(url,{method,params},res.status,JSON.stringify(json,null,2))
+    return json
 }
 
 function openWindow(url, options, others) {
-    console.log(url)
+    console.log(url);
     return post_rpc({
         method: "openWindow",
         params: {
-            url,
-            options: {
-                width: 1024,
-                height: 768,
-                ...options,
-                webPreferences: {
-                    ...options?.webPreferences
-                }
-            },
-            others
+            url: url,
+            options: options,
+            others: others
         }
-    })
-
+    });
 }
 
-const loadURL = async (url, win_id) => {
+function getWindows() {
+    return post_rpc({
+        method: "getWindows",
+        params: {}
+    })
+}
+
+function closeWindow(win_id) {
+    return post_rpc({
+        method: "closeWindow",
+        params: {
+            win_id
+        }
+    })
+}
+
+function showWindow(win_id) {
+    return post_rpc({
+        method: "showWindow",
+        params: {
+            win_id
+        }
+    })
+}
+
+function hideWindow(win_id) {
+    return post_rpc({
+        method: "hideWindow",
+        params: {
+            win_id
+        }
+    })
+}
+
+function reload(win_id) {
+    return post_rpc({
+        method: "reload",
+        params: {
+            win_id
+        }
+    })
+}
+
+function getBounds(win_id) {
+    return post_rpc({
+        method: "getBounds",
+        params: {
+            win_id
+        }
+    })
+}
+
+function getDisplayScreenSize() {
+    return post_rpc({
+        method: "getDisplayScreenSize",
+        params: {}
+    })
+}
+
+function displayScreenshot() {
+    return post_rpc({
+        method: "displayScreenshot",
+        params: {}
+    })
+}
+
+function getWindowScreenshot(win_id) {
+    return post_rpc({
+        method: "getWindowScreenshot",
+        params: {
+            win_id
+        }
+    })
+}
+
+function pyautoguiClick(x, y) {
+    return post_rpc({
+        method: "pyautoguiClick",
+        params: {
+            x,
+            y
+        }
+    })
+}
+
+function sendElectronClick(win_id, x, y) {
+    return post_rpc({
+        method: "sendElectronClick",
+        params: {
+            win_id,
+            x,
+            y
+        }
+    })
+}
+
+function openTerminal(command, showWin) {
+    return post_rpc({
+        method: "openTerminal",
+        params: {
+            command,
+            showWin
+        }
+    })
+}
+
+// System methods
+function ping() {
+    return post_rpc({
+        method: "ping",
+        params: {}
+    })
+}
+
+function info() {
+    return post_rpc({
+        method: "info",
+        params: {}
+    })
+}
+
+// Page operations
+function getURL(win_id) {
+    return post_rpc({
+        method: "getURL",
+        params: {
+            win_id
+        }
+    })
+}
+
+function getTitle(win_id) {
+    return post_rpc({
+        method: "getTitle",
+        params: {
+            win_id
+        }
+    })
+}
+
+function getWindowSize(win_id) {
+    return post_rpc({
+        method: "getWindowSize",
+        params: {
+            win_id
+        }
+    })
+}
+
+function setBounds(win_id, bounds) {
+    return post_rpc({
+        method: "setBounds",
+        params: {
+            win_id,
+            bounds
+        }
+    })
+}
+
+function setWindowSize(win_id, width, height) {
+    return post_rpc({
+        method: "setWindowSize",
+        params: {
+            win_id,
+            width,
+            height
+        }
+    })
+}
+
+function setWindowWidth(win_id, width) {
+    return post_rpc({
+        method: "setWindowWidth",
+        params: {
+            win_id,
+            width
+        }
+    })
+}
+
+function setWindowPosition(win_id, x, y) {
+    return post_rpc({
+        method: "setWindowPosition",
+        params: {
+            win_id,
+            x,
+            y
+        }
+    })
+}
+
+// JavaScript execution
+function openDevTools(win_id) {
+    return post_rpc({
+        method: "openDevTools",
+        params: {
+            win_id
+        }
+    })
+}
+
+// Input events
+function sendElectronCtlV(win_id) {
+    return post_rpc({
+        method: "sendElectronCtlV",
+        params: {
+            win_id
+        }
+    })
+}
+
+function sendElectronPressEnter(win_id) {
+    return post_rpc({
+        method: "sendElectronPressEnter",
+        params: {
+            win_id
+        }
+    })
+}
+
+function writeClipboard(text) {
+    return post_rpc({
+        method: "writeClipboard",
+        params: {
+            text
+        }
+    })
+}
+
+function showFloatDiv(win_id, options) {
+    return post_rpc({
+        method: "showFloatDiv",
+        params: {
+            win_id,
+            options
+        }
+    })
+}
+
+function hideFloatDiv(win_id) {
+    return post_rpc({
+        method: "hideFloatDiv",
+        params: {
+            win_id
+        }
+    })
+}
+
+// Cookies
+function exportCookies(win_id, options) {
+    return post_rpc({
+        method: "exportCookies",
+        params: {
+            win_id,
+            options
+        }
+    })
+}
+
+// User agent
+function setUserAgent(win_id, userAgent) {
+    return post_rpc({
+        method: "setUserAgent",
+        params: {
+            win_id,
+            userAgent
+        }
+    })
+}
+
+// Screenshot operations
+function captureScreenshot(win_id, options) {
+    return post_rpc({
+        method: "captureScreenshot",
+        params: {
+            win_id,
+            ...options
+        }
+    })
+}
+
+function saveScreenshot(win_id, filePath, options) {
+    return post_rpc({
+        method: "saveScreenshot",
+        params: {
+            win_id,
+            filePath,
+            ...options
+        }
+    })
+}
+
+function getScreenshotInfo(win_id) {
+    return post_rpc({
+        method: "getScreenshotInfo",
+        params: {
+            win_id
+        }
+    })
+}
+
+function captureSystemScreenshot(options) {
+    return post_rpc({
+        method: "captureSystemScreenshot",
+        params: {
+            ...options
+        }
+    })
+}
+
+function saveSystemScreenshot(filePath, options) {
+    return post_rpc({
+        method: "saveSystemScreenshot",
+        params: {
+            filePath,
+            ...options
+        }
+    })
+}
+
+// Account management
+function switchAccount(account_index) {
+    return post_rpc({
+        method: "switchAccount",
+        params: {
+            account_index
+        }
+    })
+}
+
+function getAccountInfo(win_id) {
+    return post_rpc({
+        method: "getAccountInfo",
+        params: {
+            win_id
+        }
+    })
+}
+
+function getAccountWindows(account_index) {
+    return post_rpc({
+        method: "getAccountWindows",
+        params: {
+            account_index
+        }
+    })
+}
+
+// PyAutoGUI methods
+function pyautoguiType(text) {
+    return post_rpc({
+        method: "pyautoguiType",
+        params: {
+            text
+        }
+    })
+}
+
+function pyautoguiPress(key) {
+    return post_rpc({
+        method: "pyautoguiPress",
+        params: {
+            key
+        }
+    })
+}
+
+function pyautoguiPaste() {
+    return post_rpc({
+        method: "pyautoguiPaste",
+        params: {}
+    })
+}
+
+function pyautoguiMove(x, y) {
+    return post_rpc({
+        method: "pyautoguiMove",
+        params: {
+            x,
+            y
+        }
+    })
+}
+
+function pyautoguiPressEnter() {
+    return post_rpc({
+        method: "pyautoguiPressEnter",
+        params: {}
+    })
+}
+
+function pyautoguiPressBackspace() {
+    return post_rpc({
+        method: "pyautoguiPressBackspace",
+        params: {}
+    })
+}
+
+function pyautoguiPressSpace() {
+    return post_rpc({
+        method: "pyautoguiPressSpace",
+        params: {}
+    })
+}
+
+function pyautoguiPressEsc() {
+    return post_rpc({
+        method: "pyautoguiPressEsc",
+        params: {}
+    })
+}
+
+function pyautoguiScreenshot() {
+    return post_rpc({
+        method: "pyautoguiScreenshot",
+        params: {}
+    })
+}
+
+function pyautoguiWrite(text, interval) {
+    return post_rpc({
+        method: "pyautoguiWrite",
+        params: {
+            text,
+            interval
+        }
+    })
+}
+
+function pyautoguiText(text) {
+    return post_rpc({
+        method: "pyautoguiText",
+        params: {
+            text
+        }
+    })
+}
+
+
+function loadURL(url, win_id) {
     return post_rpc({
         method: "loadURL",
         params: {
@@ -51,7 +497,6 @@ const loadURL = async (url, win_id) => {
         }
     })
 }
-
 
 const sendInputEvent = async (inputEvent, win_id) => {
     return post_rpc({
@@ -63,12 +508,6 @@ const sendInputEvent = async (inputEvent, win_id) => {
     })
 }
 
-/**
- * Simulates a mouse click at specific coordinates
- * @param {Electron.WebContents} webContents
- * @param {number} x
- * @param {number} y
- */
 async function simulateClick(x, y, win_id) {
     // 1. Press the mouse button down
     await sendInputEvent({
@@ -211,6 +650,7 @@ const getSubTitles = async ({mediaPath}, win_id) => {
 }
 
 
+
 function waitForResult(cb, timeout = -1, interval = 100) {
     const startTime = Date.now();
     return new Promise(resolve => {
@@ -293,7 +733,7 @@ class MapArray {
 }
 
 module.exports = {
-    setBaseApi,getBaseApi,
+    setBaseApi,getBaseApi,setToken,getToken,
     chatgptAsk,
     sendKey,
     downloadMedia,
@@ -311,5 +751,53 @@ module.exports = {
     getElementRect,
     sendInputEvent,
     simulateClick,
-    getSubTitles
+    getSubTitles,
+    getWindows,
+    closeWindow,
+    showWindow,
+    hideWindow,
+    reload,
+    getBounds,
+    getDisplayScreenSize,
+    displayScreenshot,
+    getWindowScreenshot,
+    pyautoguiClick,
+    sendElectronClick,
+    openTerminal,
+    ping,
+    info,
+    getURL,
+    getTitle,
+    getWindowSize,
+    setBounds,
+    setWindowSize,
+    setWindowWidth,
+    setWindowPosition,
+    openDevTools,
+    sendElectronCtlV,
+    sendElectronPressEnter,
+    writeClipboard,
+    showFloatDiv,
+    hideFloatDiv,
+    exportCookies,
+    setUserAgent,
+    captureScreenshot,
+    saveScreenshot,
+    getScreenshotInfo,
+    captureSystemScreenshot,
+    saveSystemScreenshot,
+    switchAccount,
+    getAccountInfo,
+    getAccountWindows,
+    pyautoguiType,
+    pyautoguiPress,
+    pyautoguiPaste,
+    pyautoguiMove,
+    pyautoguiPressEnter,
+    pyautoguiPressBackspace,
+    pyautoguiPressSpace,
+    pyautoguiPressEsc,
+    pyautoguiScreenshot,
+    pyautoguiWrite,
+    pyautoguiText,
 };
