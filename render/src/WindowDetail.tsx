@@ -32,15 +32,30 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [urlFilter, setUrlFilter] = useState('');
 
-    const refreshScreenshot = () => setScreenshotUrl('');
+    const refreshScreenshot = async () => {
+        try {
+            const url = (rpcBaseUrl ? `${rpcBaseUrl}/windowScreenshot` : '/windowScreenshot') + `?id=${windowId}&t=${Date.now()}`;
+            const headers: Record<string, string> = {};
+            if (rpcToken) {
+                headers['Authorization'] = `Bearer ${rpcToken}`;
+            }
+            const response = await fetch(url, { headers });
+            if (response.ok) {
+                const arrayBuffer = await response.arrayBuffer();
+                const blob = new Blob([arrayBuffer], { type: 'image/png' });
+                const blobUrl = URL.createObjectURL(blob);
+                setScreenshotUrl(blobUrl);
+            }
+        } catch (error) {
+            console.error('Failed to fetch screenshot:', error);
+        }
+    };
 
     // Consolidated Refresh Loop
     useEffect(() => {
         let timeoutId: NodeJS.Timeout | null = null;
 
         const tick = async () => {
-            if (isAutoRefresh) refreshScreenshot();
-
             // Poll Network requests
             if (activeTab === 'network') {
                 try {
@@ -63,8 +78,13 @@ export const WindowDetail = ({ windowId, initialUrl, onBack }: { windowId: numbe
 
         const scheduleNextTick = () => {
             if (isAutoRefresh) {
-                timeoutId = setTimeout(() => {
-                    tick().then(scheduleNextTick);
+                timeoutId = setTimeout(async () => {
+                    // Auto-refresh screenshot
+                    await refreshScreenshot();
+                    // Poll network requests
+                    await tick();
+                    // Schedule next iteration
+                    scheduleNextTick();
                 }, 1000);
             }
         };
