@@ -140,14 +140,23 @@ describe('SomeService', () => {
 ## Changelog Workflow
 
 ### 📝 **Changelog Management**
-- **Directories**: `app/changelog/` and `render/changelog/`
-- **File Format**: Each change gets its own `.md` file with timestamp
-- **Content**: Include what was changed, why, and any breaking changes
+- **Directory**: `app/changelog/`
+- **Current Development**: `app/changelog/current.md` - Records ongoing work
+- **Final Entries**: `app/changelog/YYYY-MM-DD_HH-MM-SS_changelog.md` - After commit
 
-### 🔄 **Code Change Process**
-1. **When you request code changes/fixes**: Create changelog entry automatically
-2. **File naming**: `YYYY-MM-DD_HH-MM-SS_description.md`
-3. **When you say "提交"**: Commit all changes to `origin mcp` branch using changelog entries
+### 🔄 **Development Process**
+1. **For each request/bugfix**: Update `app/changelog/current.md` with:
+   - Issue description
+   - Solution implemented
+   - Technical changes
+   - Component affected (render/app)
+   - Status updates
+
+2. **When you say "提交代码"**: I will:
+   - Run `node app/commit-changes.js` which will:
+     - Move `current.md` to dated filename in `app/changelog/`
+     - Create new empty `current.md`
+     - Git add, commit, and push to `origin mcp`
 
 ### 📊 **Watch Script**
 - **Command**: `npm run watch-changelog` watches `app/changelog/*.md` changes
