@@ -22,8 +22,22 @@ class ScreenshotService {
       // Get the full page content size (including scrollable area)
       const contentSize = await wc.executeJavaScript(`
         ({
-          width: Math.max(document.body.scrollWidth, document.body.offsetWidth, document.documentElement.clientWidth, document.documentElement.scrollWidth, document.documentElement.offsetWidth),
-          height: Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight)
+          width: Math.max(
+            document.body.scrollWidth || 0,
+            document.body.offsetWidth || 0,
+            document.documentElement.clientWidth || 0,
+            document.documentElement.scrollWidth || 0,
+            document.documentElement.offsetWidth || 0,
+            window.innerWidth || 0
+          ),
+          height: Math.max(
+            document.body.scrollHeight || 0,
+            document.body.offsetHeight || 0,
+            document.documentElement.clientHeight || 0,
+            document.documentElement.scrollHeight || 0,
+            document.documentElement.offsetHeight || 0,
+            window.innerHeight || 0
+          )
         })
       `);
 
