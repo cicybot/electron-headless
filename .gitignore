@@ -8,3 +8,4 @@ run/
 *.js.map
 app/dist/
 render/dist/
+app/prompt
