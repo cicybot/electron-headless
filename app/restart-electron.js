@@ -87,7 +87,11 @@ async function main() {
 
   if (success) {
     console.log('Starting Electron...');
-    exec('electron --trace-warnings src/main.js', (error, stdout, stderr) => {
+    let cmd = "electron --trace-warnings src/main.js"
+    if(platform === 'linux'){
+      cmd = "electron --disable-features=UseDBus --enable-unsafe-swiftshader  --no-sandbox --disable-gpu --trace-warnings src/main.js"
+    }
+    exec(cmd, (error, stdout, stderr) => {
       if (error) {
         console.error('Error starting Electron:', error);
         process.exit(1);
