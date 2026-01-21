@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/main.js",
   "scripts": {
-    "start": "node restart-electron.js",
+    "start": "node start-electron.js",
     "prod": "electron dist/main.js",
     "dev": "nodemon",
     "build": "node build.js",

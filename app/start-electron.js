@@ -73,19 +73,19 @@ async function waitForNoElectron(maxAttempts = 5, delay = 1000) {
 async function main() {
   console.log(`Stopping all Electron processes on ${platform}...`);
 
-  // First attempt to kill
-  await killElectronProcesses();
+  // // First attempt to kill
+  // await killElectronProcesses();
 
-  // Block until no processes remain
-  const success = await waitForNoElectron();
+  // // Block until no processes remain
+  // const success = await waitForNoElectron();
 
-  if (success) {
-    console.log('All Electron processes stopped successfully');
-  } else {
-    console.log('Some Electron processes may still be running');
-  }
+  // if (success) {
+  //   console.log('All Electron processes stopped successfully');
+  // } else {
+  //   console.log('Some Electron processes may still be running');
+  // }
 
-  if (success) {
+  if (true) {
     console.log('Starting Electron...');
     let cmd = "electron --trace-warnings src/main.js"
     if(platform === 'linux'){
