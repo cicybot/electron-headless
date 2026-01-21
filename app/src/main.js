@@ -12,6 +12,9 @@ const platform = process.platform;
 
 if(platform === 'linux'){
   app.commandLine.appendSwitch('no-sandbox')
+  app.commandLine.appendSwitch('disable-dev-shm-usage')
+  app.commandLine.appendSwitch('enable-unsafe-swiftshader')
+  app.commandLine.appendSwitch('disable-features=UseDBus')
 }
 
 app.commandLine.appendSwitch('trace-warnings')
@@ -22,7 +25,10 @@ app.commandLine.appendSwitch('trace-warnings')
 // Disable hardware acceleration to fix DXGI duplication errors
 app.disableHardwareAcceleration();
 
+
+
 // Additional flags to prevent desktop capture issues
+app.commandLine.appendSwitch('disable-dev-shm-usage');
 app.commandLine.appendSwitch('disable-webrtc');
 app.commandLine.appendSwitch('disable-desktop-notifications');
 app.commandLine.appendSwitch('disable-gpu');
