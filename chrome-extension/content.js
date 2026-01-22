@@ -1162,11 +1162,19 @@ var require_utils_extension = __commonJS({
       window.regVncEvent__ = true;
       document.addEventListener("keydown", async (e) => {
         const url = location.href;
-        if (url.indexOf("-6080.") === -1) return;
-        const api = url.replace("-6090.", "-3456.");
+        const vnc_port = "-6080.";
+        if (url.indexOf(vnc_port) === -1) return;
+        const api = url.replace(vnc_port, "-3456.");
         const uri = new URL(api);
-        utils.setBaseApi(`${uri.origin}/rpc`);
+        utils.setBaseApi(`${uri.origin}`);
         utils.setToken("www");
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s") {
+          if (!localStorage.getItem("__username")) {
+            alert("__username is null");
+          } else {
+            document.querySelector("#noVNC_password_input").value = localStorage.getItem("__username");
+          }
+        }
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "v") {
           try {
             const clipboardData = await navigator.clipboard.readText();
@@ -1192,7 +1200,7 @@ var require_utils_extension = __commonJS({
             }
           });
         }
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "c") {
           await utils.post_rpc({
             method: "pyautoguiHotkey",
             params: {
