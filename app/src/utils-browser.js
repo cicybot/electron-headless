@@ -430,6 +430,7 @@ const getTitle = () => {
 
 
 const init = () => {
+    console.log("_G init")
     if (window._G.preload) {
         window._G.preload({win_id: window._G.win_id})
     }
@@ -441,6 +442,7 @@ const init = () => {
 }
 
 const preload = async ({win_id}) => {
+    console.log("_G preload")
     window.addEventListener('keydown', async (e) => {
         const cmdKeyPressed = (k) => {
             return (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === k

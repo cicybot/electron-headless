@@ -174,15 +174,15 @@ class WindowManager {
     // Handle window state changes
     win.on('resize', () => {
       this._saveWindowState(winId, win, accountIndex);
-      if (winId === 1) {
-        win.webContents.executeJavaScript(`window.__setBounds(${JSON.stringify(win.getBounds())});`);
+      if (win.webContents.getURL().indexOf("initWindow") > -1) {
+        win.webContents.executeJavaScript(`window.__setBounds && window.__setBounds(${JSON.stringify(win.getBounds())});`);
       }
     });
 
     win.on('move', () => {
       this._saveWindowState(winId, win, accountIndex);
-      if (winId === 1) {
-        win.webContents.executeJavaScript(`window.__setBounds(${JSON.stringify(win.getBounds())});`);
+      if (win.webContents.getURL().indexOf("initWindow") > -1) {
+        win.webContents.executeJavaScript(`window.__setBounds && window.__setBounds(${JSON.stringify(win.getBounds())});`);
       }
     });
 
@@ -206,23 +206,24 @@ class WindowManager {
       this.windowState.set(winId, { ready: true });
       const globalCode = getGlobalJsCode()
       // Inject initialization script
-      const { executeJavaScript } = require("../helpers");
       let initScript = `
       ${globalCode}
       window.__win_id = ${winId};
-      window._G.init()
-      window._G.win_id = ${winId};
-      window._G._l("dom-ready")
-      `;
-      
-      if (winId === 1) {
-        initScript += `
-        window.__setBounds(${JSON.stringify(win.getBounds())});
-        `;
-      }
-      
-      executeJavaScript(win.webContents, initScript);
-      
+      console.log("dom-ready")
+      if(window._G){
+        console.log("_G init")
+        window._G.init()
+        
+        window._G.utilsExtension.onReady()
+        window._G.win_id = ${winId};
+        window._G._l("dom-ready")
+      }`;
+
+
+      console.log(initScript)
+      win.webContents.executeJavaScript(globalCode + `;(()=>{${initScript}})();`)
+
+
       // Update window title with win_id prefix
       this._updateWindowTitle(winId, win);
     });
