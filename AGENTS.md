@@ -137,6 +137,54 @@ describe('SomeService', () => {
 3. `cd app && npm run dev` - Start Electron backend
 4. Follow code style guidelines and run lint/test commands before committing
 
+## 🌳 Branch-Based Development Workflow
+
+### 🚀 **New Feature/Bugfix Workflow**
+1. **Create Branch**: `cd app && npm run branch feature <name> <description>`
+2. **Make Changes**: Implement your feature/bugfix
+3. **Update Changelog**: Edit `app/changelog/current.md` with details
+4. **Run Inspection**: `cd app && npm run inspect` (validates code quality)
+5. **Commit Changes**: `cd app && npm run commit` (runs tests, creates PR)
+6. **Review & Merge**: PR is auto-validated and merged to main
+
+### 📋 **Available Commands**
+```bash
+# Branch Management
+npm run branch feature user-auth "Add user authentication"
+npm run branch bugfix memory-leak "Fix memory leak issue"
+npm run branch hotfix security-patch "Critical security update"
+
+# Code Quality & Testing
+npm run inspect          # Run all tests and code quality checks
+npm test                 # Run backend tests
+npm run test:watch       # Run tests in watch mode
+npm run test:coverage    # Run tests with coverage
+
+# Frontend (in render/ directory)
+npm run lint             # ESLint validation
+npm run build            # TypeScript build test
+
+# Commit & PR
+npm run commit           # Commit changes and create PR
+```
+
+### 🔒 **Branch Protection Rules**
+- **No direct commits to main** - Must use feature/bugfix branches
+- **All PRs require validation** - Tests, linting, formatting must pass
+- **Changelog required** - Must update `app/changelog/current.md`
+- **Auto-merge enabled** - For bot/agent commits when all checks pass
+
+### 🤖 **GitHub Actions Integration**
+- **PR Validation**: Automated testing, linting, security scans
+- **Auto-Approve**: Bots can auto-approve their own PRs
+- **Auto-Merge**: Validated PRs auto-merged to main
+- **Branch Protection**: Prevents direct main commits
+- **Status Notifications**: PR comments with validation results
+
+### 🎯 **Environment Variables**
+- `GH_CICYBOT_TOKEN`: GitHub token for PR automation and API access
+- Used by: commit script, GitHub Actions, PR creation/merging
+
 ## Changelog Workflow
 
 ### 📝 **Changelog Management**
@@ -162,6 +210,12 @@ describe('SomeService', () => {
 - **Command**: `npm run watch-changelog` watches `app/changelog/*.md` changes
 - **Action**: Runs `npm start` when changelog files are modified
 - **Purpose**: Auto-restart development server on changelog updates
+
+### 🔄 **Branch Workflow Integration**
+- **Auto-created**: When you create a branch with `npm run branch`, a changelog entry is automatically created
+- **Validated**: GitHub Actions validate changelog is updated in PRs
+- **Archived**: Changelog entries are timestamped and archived during commit
+- **Template**: New `current.md` is created with template after each commit
 
 ---
 

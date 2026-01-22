@@ -47,7 +47,6 @@ class MenuManager {
   createMenu() {
 
     const menus = processMenuItems(storageManager.loadMenu())
-    console.log(menus)
     const template = [
       ...(process.platform === 'darwin'
           ? [{ role: 'appMenu' }]

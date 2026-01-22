@@ -4,12 +4,19 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron --no-sandbox src/main.js",
+    "dev": "nodemon start-electron.js",
+    "hot-reload": "nodemon --watch src --ext js --exec \"npm start\"",
     "prod": "electron dist/main.js",
-    "build-ext": "nodemon",
     "build": "node build.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "format": "prettier --write \"src/**/*.js\"",
     "format:check": "prettier --check \"src/**/*.js\"",
-    "watch-changelog": "node watch-changelog.js"
+    "watch-changelog": "node watch-changelog.js",
+    "inspect": "node code-inspection.js",
+    "branch": "node branch-manager.js",
+    "commit": "node commit-changes.js"
   },
   "keywords": [],
   "author": "",

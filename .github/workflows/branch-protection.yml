@@ -1,0 +1,55 @@
+name: Branch Protection
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  protect-main:
+    name: Protect Main Branch
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Check for direct commits to main
+      run: |
+        # Get the commit message
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        
+        # Check if this is an automated commit from our workflow
+        if [[ $COMMIT_MSG == *"feat: "*"- Development updates"* ]]; then
+          echo "✅ Automated development update detected"
+          exit 0
+        fi
+        
+        # Check if commit was made by a bot
+        if [[ "${{ github.actor }}" == "opencode" ]] || [[ "${{ github.actor }}" == "github-actions[bot]" ]]; then
+          echo "✅ Bot commit detected"
+          exit 0
+        fi
+        
+        echo "❌ Direct commit to main detected"
+        echo "Please use the branch workflow:"
+        echo "1. Create a feature/bugfix branch"
+        echo "2. Make changes and update changelog"
+        echo "3. Run tests and commit changes"
+        echo "4. Create a pull request"
+        exit 1
+        
+    - name: Validate changelog exists
+      run: |
+        if [ ! -d "app/changelog" ]; then
+          echo "❌ Changelog directory not found"
+          exit 1
+        fi
+        
+        if [ ! -f "app/changelog/current.md" ]; then
+          echo "❌ Current changelog file not found"
+          exit 1
+        fi
+        
+        echo "✅ Changelog structure validated"
