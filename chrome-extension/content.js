@@ -1201,12 +1201,12 @@ var require_utils_extension = __commonJS({
             }
           });
         }
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "c") {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
           await utils.post_rpc({
             method: "pyautoguiHotkey",
             params: {
               hot: "ctrl",
-              key: "c"
+              key: "a"
             }
           });
         }
