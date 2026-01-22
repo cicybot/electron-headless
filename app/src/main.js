@@ -65,6 +65,25 @@ const winManager = require('./core/window-manager');
 const menuManager = require('./core/menu-manager');
 const expressServer = require('./server/express-server');
 
+/**
+ * Load default cookies from ~/electron-mcp/cookies.json if it exists
+ */
+async function loadDefaultCookies() {
+  try {
+    const cookiesPath = path.join(os.homedir(), 'electron-mcp', 'cookies.json');
+    if (fs.existsSync(cookiesPath)) {
+      const cookiesData = fs.readFileSync(cookiesPath, 'utf8');
+      const cookies = JSON.parse(cookiesData);
+      console.log(`Loading ${cookies.length} cookies from ${cookiesPath}`);
+
+      // Store default cookies globally for use in window creation
+      global.defaultCookies = cookies;
+    }
+  } catch (error) {
+    console.error('Failed to load default cookies:', error);
+  }
+}
+
 // Initialize context menu
 contextMenu({
   showSaveImageAs: true
@@ -83,6 +102,9 @@ app.whenReady().then(async () => {
 
   // Initialize window manager and restore previous session
   await winManager.init();
+
+  // Load cookies if they exist
+  await loadDefaultCookies();
 
   // Create application menu
   menuManager.createMenu();
@@ -123,4 +145,4 @@ app.on('window-all-closed', () => {
 });
 
 // Export for testing
-module.exports = { appManager, expressServer };
+module.exports = { appManager, expressServer, loadDefaultCookies };

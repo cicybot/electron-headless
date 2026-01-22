@@ -70,6 +70,24 @@ class MenuManager {
             click: () => {
               this.goForward();
             }
+          },
+          { type: 'separator' },
+          {
+            label: 'Cookies',
+            submenu: [
+              {
+                label: 'Export Cookies',
+                click: () => {
+                  this.exportCookies();
+                }
+              },
+              {
+                label: 'Import Cookies',
+                click: () => {
+                  this.importCookies();
+                }
+              }
+            ]
           }
         ]
       },
@@ -136,6 +154,72 @@ class MenuManager {
     const focusedWindow = BrowserWindow.getFocusedWindow();
     if (focusedWindow && !focusedWindow.isDestroyed()) {
       focusedWindow.webContents.reloadIgnoringCache();
+    }
+  }
+
+  /**
+   * Export cookies from the focused window's session
+   */
+  async exportCookies() {
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    if (!focusedWindow || focusedWindow.isDestroyed()) {
+      console.log('No focused window to export cookies from');
+      return;
+    }
+
+    try {
+      const cookies = await focusedWindow.webContents.session.cookies.get({});
+      const fs = require('fs').promises;
+      const path = require('path');
+      const os = require('os');
+
+      const exportPath = path.join(os.homedir(), 'electron-mcp', 'cookies.json');
+      await fs.mkdir(path.dirname(exportPath), { recursive: true });
+      await fs.writeFile(exportPath, JSON.stringify(cookies, null, 2));
+      console.log(`Cookies exported to ${exportPath}`);
+    } catch (error) {
+      console.error('Failed to export cookies:', error);
+    }
+  }
+
+  /**
+   * Import cookies to the focused window's session
+   */
+  async importCookies() {
+    const { dialog } = require('electron');
+    const focusedWindow = BrowserWindow.getFocusedWindow();
+    if (!focusedWindow || focusedWindow.isDestroyed()) {
+      console.log('No focused window to import cookies to');
+      return;
+    }
+
+    const result = await dialog.showOpenDialog(focusedWindow, {
+      properties: ['openFile'],
+      filters: [
+        { name: 'JSON Files', extensions: ['json'] },
+        { name: 'All Files', extensions: ['*'] }
+      ]
+    });
+
+    if (result.canceled || result.filePaths.length === 0) {
+      return;
+    }
+
+    const filePath = result.filePaths[0];
+
+    try {
+      const fs = require('fs').promises;
+      const cookiesData = await fs.readFile(filePath, 'utf8');
+      const cookies = JSON.parse(cookiesData);
+
+      const { setCookies } = require('../helpers');
+      await setCookies(focusedWindow.webContents, cookies);
+      console.log(`Cookies imported from ${filePath}`);
+
+      // Reload the window to apply cookies
+      focusedWindow.webContents.reload();
+    } catch (error) {
+      console.error('Failed to import cookies:', error);
     }
   }
 }

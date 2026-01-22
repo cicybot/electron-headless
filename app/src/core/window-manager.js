@@ -90,9 +90,10 @@ class WindowManager {
       console.log(`[${partition}] Proxy set to: ${proxy}`);
     }
 
-    // Set cookies if provided
-    if (cookies) {
-      await setCookies(wc, cookies);
+    // Set cookies if provided, otherwise use default cookies
+    const cookiesToSet = cookies || global.defaultCookies;
+    if (cookiesToSet) {
+      await setCookies(wc, cookiesToSet);
     }
 
     // Open dev tools if requested
