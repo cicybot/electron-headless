@@ -49,6 +49,9 @@ class MenuManager {
     const menus = processMenuItems(storageManager.loadMenu())
     console.log(menus)
     const template = [
+      ...(process.platform === 'darwin'
+          ? [{ role: 'appMenu' }]
+          : []),
         ...menus,
       {
 
@@ -67,112 +70,26 @@ class MenuManager {
             click: () => {
               this.goForward();
             }
-          },
-          { type: 'separator' },
-          {
-            label: 'Reload',
-            accelerator: 'CmdOrCtrl+R',
-            click: () => {
-              this.reload();
-            }
-          },
-          {
-            label: 'Force Reload',
-            accelerator: 'CmdOrCtrl+Shift+R',
-            click: () => {
-              this.forceReload();
-            }
           }
         ]
       },
+      { role: 'fileMenu' },
+      { role: 'editMenu' },
+      { role: 'viewMenu' },
+      { role: 'windowMenu' },
       {
-        label: 'Edit',
+        role: 'help',
         submenu: [
-          { role: 'toggleDevTools' },
-          { type: 'separator' },
-          { role: 'resetZoom' },
-          { role: 'zoomIn' },
-          { role: 'zoomOut' },
-          { type: 'separator' },
-          { role: 'togglefullscreen' }
-        ]
-      },{
-        label: 'Edit',
-        submenu: [
-          { role: 'undo' },
-          { role: 'redo' },
-          { type: 'separator' },
-          { role: 'cut' },
-          { role: 'copy' },
-          { role: 'paste' },
-          ...(isMac
-              ? [
-                { role: 'pasteAndMatchStyle' },
-                { role: 'delete' },
-                { role: 'selectAll' },
-                { type: 'separator' },
-                {
-                  label: 'Speech',
-                  submenu: [
-                    { role: 'startSpeaking' },
-                    { role: 'stopSpeaking' }
-                  ]
-                }
-              ]
-              : [
-                { role: 'delete' },
-                { type: 'separator' },
-                { role: 'selectAll' }
-              ])
-        ]
-      },
-      {
-        label: 'View',
-        submenu: [
-          { role: 'toggleDevTools' },
-          { type: 'separator' },
-          { role: 'resetZoom' },
-          { role: 'zoomIn' },
-          { role: 'zoomOut' },
-          { type: 'separator' },
-          { role: 'togglefullscreen' }
-        ]
-      },
-      {
-        label: 'Window',
-        submenu: [
-          { role: 'minimize' },
-          { role: 'close' }
+          {
+            label: 'Learn More',
+            click: async () => {
+              const { shell } = require('electron')
+              await shell.openExternal('https://electronjs.org')
+            }
+          }
         ]
       }
     ];
-
-    // Add macOS-specific menu items
-    if (process.platform === 'darwin') {
-      const { app } = require('electron');
-      template.unshift({
-        label: app.getName(),
-        submenu: [
-          { role: 'about' },
-          { type: 'separator' },
-          { role: 'services' },
-          { type: 'separator' },
-          { role: 'hide' },
-          { role: 'hideothers' },
-          { role: 'unhide' },
-          { type: 'separator' },
-          { role: 'quit' }
-        ]
-      });
-
-      // Window menu
-      template[4].submenu.push(
-        { type: 'separator' },
-        { role: 'front' },
-        { type: 'separator' },
-        { role: 'window' }
-      );
-    }
 
     this.menu = Menu.buildFromTemplate(template);
     Menu.setApplicationMenu(this.menu);

@@ -10,7 +10,7 @@ class AppManager {
   constructor() {
     this.isLocal = process.env.IS_LOCAL === "true";
     this.mediaDir = path.join(app.getPath('home'), "assets");
-    this.appName = process.env.APP_NAME || "Electron";
+    this.appName = process.env.APP_NAME || "Electron Mcp";
 
     this.init();
   }
