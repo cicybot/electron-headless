@@ -35,20 +35,20 @@ function onReady() {
             }
         }
     }, 20000)
-    regEvent()
+    regVncEvent()
 }
 
-window.__regEvent = false
+window.regVncEvent__ = false
 
-function regEvent(){
-    if(window.__regEvent){
+function regVncEvent(){
+    if(window.regVncEvent__){
         return
     }
-    window.__regEvent = true
+    window.regVncEvent__ = true
     document.addEventListener('keydown', async (e) => {
         const url = location.href
-
-        const api = url.replace("-6090","-3456")
+        if(url.indexOf("-6080.") === -1) return;
+        const api = url.replace("-6090.","-3456.")
         const uri = new URL(api)
         utils.setBaseApi(`${uri.origin}/rpc`)
         utils.setToken("www")
@@ -79,6 +79,16 @@ function regEvent(){
                 }
             })
 
+        }
+
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'a') {
+            await utils.post_rpc({
+                method:"pyautoguiHotkey",
+                params:{
+                    hot:"ctrl",
+                    key:"c",
+                }
+            })
         }
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'c') {
             await utils.post_rpc({

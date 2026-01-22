@@ -1152,17 +1152,18 @@ var require_utils_extension = __commonJS({
           }
         }
       }, 2e4);
-      regEvent();
+      regVncEvent();
     }
-    window.__regEvent = false;
-    function regEvent() {
-      if (window.__regEvent) {
+    window.regVncEvent__ = false;
+    function regVncEvent() {
+      if (window.regVncEvent__) {
         return;
       }
-      window.__regEvent = true;
+      window.regVncEvent__ = true;
       document.addEventListener("keydown", async (e) => {
         const url = location.href;
-        const api = url.replace("-6090", "-3456");
+        if (url.indexOf("-6080.") === -1) return;
+        const api = url.replace("-6090.", "-3456.");
         const uri = new URL(api);
         utils.setBaseApi(`${uri.origin}/rpc`);
         utils.setToken("www");
@@ -1188,6 +1189,15 @@ var require_utils_extension = __commonJS({
             params: {
               hot: "ctrl",
               key: "v"
+            }
+          });
+        }
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
+          await utils.post_rpc({
+            method: "pyautoguiHotkey",
+            params: {
+              hot: "ctrl",
+              key: "c"
             }
           });
         }
