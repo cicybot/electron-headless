@@ -7,7 +7,6 @@ const { executeJavaScript, downloadMedia, getAppInfo, setCookies } = require("..
 const { whisperTranscribe } = require("../utils-node");
 
 const screenshotCacheService = require("../services/screenshot-cache-service");
-const pyautoguiService = require("../services/pyautogui-service");
 
 class RPCHandler {
   constructor() {
@@ -175,9 +174,18 @@ class RPCHandler {
             await wc.sendInputEvent(params?.inputEvent);
           }
           break;
-
         case "sendElectronClick":
-          if (wc && params?.x !== undefined && params?.y !== undefined) {
+          wc.focus();
+          // 2. 鼠标按下
+          await wc.sendInputEvent({
+            type: "mouseDown",
+            x: params.x,
+            y: params.y,
+            button: params.button || "left",
+            clickCount: params.clickCount || 1,
+          });
+
+          setTimeout(async () => {
             await wc.sendInputEvent({
               type: "mouseDown",
               x: params.x,
@@ -186,17 +194,7 @@ class RPCHandler {
               clickCount: params.clickCount || 1,
             });
 
-            // Wait 300ms then send mouse up
-            setTimeout(async () => {
-              await wc.sendInputEvent({
-                type: "mouseUp",
-                x: params.x,
-                y: params.y,
-                button: params.button || "left",
-                clickCount: params.clickCount || 1,
-              });
-            }, 300);
-          }
+          }, 100); // 调整延迟为100ms
           break;
 
         case "sendElectronPressEnter":
@@ -210,6 +208,22 @@ class RPCHandler {
             await wc.sendInputEvent({
               type: "keyUp",
               keyCode: "Enter",
+            });
+
+          }
+          break;
+
+        case "sendElectronPressEsc":
+          if (wc) {
+            await wc.sendInputEvent({
+              type: "rawKeyDown",
+              keyCode: "Esc",
+            });
+
+            // Key up
+            await wc.sendInputEvent({
+              type: "keyUp",
+              keyCode: "Esc",
             });
 
           }
@@ -383,58 +397,7 @@ class RPCHandler {
           result = this.accountManager.getAccountWindows(params?.account_index);
           break;
 
-        // PyAutoGUI methods
-        case "pyautoguiClick":
-          await pyautoguiService.click(params);
-          break;
-
-        case "pyautoguiType":
-          await pyautoguiService.type(params);
-          break;
-
-        case "pyautoguiHotkey":
-          await pyautoguiService.hotkey(params);
-          break;
-
-        case "pyautoguiPress":
-          await pyautoguiService.press(params);
-          break;
-
-        case "pyautoguiPaste":
-          await pyautoguiService.paste(params);
-          break;
-
-        case "pyautoguiMove":
-          await pyautoguiService.move(params);
-          break;
-
-        case "pyautoguiPressEnter":
-          await pyautoguiService.pressEnter(params);
-          break;
-
-        case "pyautoguiPressBackspace":
-          await pyautoguiService.pressBackspace(params);
-          break;
-
-        case "pyautoguiPressSpace":
-          await pyautoguiService.pressSpace(params);
-          break;
-
-        case "pyautoguiPressEsc":
-          await pyautoguiService.pressEsc(params);
-          break;
-
-        case "pyautoguiScreenshot":
-          result = await pyautoguiService.screenshot(params);
-          break;
-
-        case "pyautoguiWrite":
-          await pyautoguiService.write(params);
-          break;
-
-        case "pyautoguiText":
-          await pyautoguiService.text(params);
-          break;
+        
 
         case "openTerminal":
           result = require("../utils-node").openTerminal(

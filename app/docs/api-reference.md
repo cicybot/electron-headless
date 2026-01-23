@@ -169,13 +169,10 @@ console.log('页面数据:', result.result);
 
 ### 👆 鼠标点击
 ```javascript
-const { pyautoguiClick } = require('./src/utils');
 
 // 点击当前鼠标位置
-await pyautoguiClick();
 
 // 点击指定坐标
-await pyautoguiClick(300, 400);
 
 // 批量点击
 const clickPoints = [
@@ -183,35 +180,24 @@ const clickPoints = [
 ];
 
 for (const [x, y] of clickPoints) {
-  await pyautoguiClick(x, y);
   await sleep(500); // 延迟500ms
 }
 ```
 
 ### ⌨️ 键盘输入
 ```javascript
-const { pyautoguiType, pyautoguiPress } = require('./src/utils');
 
 // 输入文本
-await pyautoguiType('Hello World!');
 
 // 按单个键
-await pyautoguiPress('enter');    // 回车
-await pyautoguiPress('tab');      // Tab键
-await pyautoguiPress('escape');   // Esc键
 
 // 组合键（需要新增函数）
-await pyautoguiHotkey(['ctrl', 'c']);  // 复制
-await pyautoguiHotkey(['ctrl', 'v']);  // 粘贴
-await pyautoguiHotkey(['ctrl', 'a']);  // 全选
 ```
 
 ### 🖱️ 鼠标移动
 ```javascript
-const { pyautoguiMove } = require('./src/utils');
 
 // 移动到指定位置
-await pyautoguiMove(500, 500);
 
 // 绘制矩形轨迹
 const rectangle = [
@@ -219,21 +205,18 @@ const rectangle = [
 ];
 
 for (const [x, y] of rectangle) {
-  await pyautoguiMove(x, y);
   await sleep(1000); // 每个点停留1秒
 }
 ```
 
 ### 📸 截图操作
 ```javascript
-const { captureScreenshot, pyautoguiScreenshot } = require('./src/utils');
 
 // 截取指定窗口
 const screenshot = await captureScreenshot(windowId);
 fs.writeFileSync('window.png', Buffer.from(screenshot.result.base64, 'base64'));
 
 // 全屏截图
-const fullScreenshot = await pyautoguiScreenshot();
 fs.writeFileSync('fullscreen.png', Buffer.from(fullScreenshot.result.base64, 'base64'));
 ```
 
@@ -472,7 +455,6 @@ if (result) {
 
 ### 🏗️ 基础模板
 ```javascript
-const { openWindow, pyautoguiClick, captureScreenshot } = require('./src/utils');
 
 async function basicTemplate() {
   try {
@@ -483,7 +465,6 @@ async function basicTemplate() {
     await sleep(2000);
     
     // 3. 执行操作
-    await pyautoguiClick(300, 400);
     
     // 4. 截图记录
     const screenshot = await captureScreenshot(win.result.id);
@@ -521,7 +502,6 @@ async function interactiveTemplate() {
   await sleep(2000);
   
   for (let i = 0; i < clicks; i++) {
-    await pyautoguiClick(200 + i * 50, 300);
     await sleep(500);
   }
   

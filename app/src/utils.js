@@ -126,15 +126,7 @@ function getWindowScreenshot(win_id) {
   });
 }
 
-function pyautoguiClick(x, y) {
-  return post_rpc({
-    method: "pyautoguiClick",
-    params: {
-      x,
-      y,
-    },
-  });
-}
+
 
 function sendElectronClick(win_id, x, y) {
   return post_rpc({
@@ -262,6 +254,15 @@ function sendElectronCtlV(win_id) {
   });
 }
 
+function sendElectronPaste(win_id) {
+  return post_rpc({
+    method: "sendElectronPaste",
+    params: {
+      win_id,
+    },
+  });
+}
+
 function sendElectronPressEnter(win_id) {
   return post_rpc({
     method: "sendElectronPressEnter",
@@ -298,6 +299,164 @@ function hideFloatDiv(win_id) {
     },
   });
 }
+
+// Window state methods
+function getWindowState(win_id) {
+  return post_rpc({
+    method: "getWindowState",
+    params: {
+      win_id,
+    },
+  });
+}
+
+// Page operations
+function loadURL(win_id, url) {
+  return post_rpc({
+    method: "loadURL",
+    params: {
+      win_id,
+      url,
+    },
+  });
+}
+
+// Input events
+function sendInputEvent(win_id, inputEvent) {
+  return post_rpc({
+    method: "sendInputEvent",
+    params: {
+      win_id,
+      inputEvent,
+    },
+  });
+}
+
+function sendElectronSelectAll(win_id) {
+  return post_rpc({
+    method: "sendElectronSelectAll",
+    params: {
+      win_id,
+    },
+  });
+}
+
+function sendElectronCopy(win_id) {
+  return post_rpc({
+    method: "sendElectronCopy",
+    params: {
+      win_id,
+    },
+  });
+}
+
+function sendElectronCut(win_id) {
+  return post_rpc({
+    method: "sendElectronCut",
+    params: {
+      win_id,
+    },
+  });
+}
+
+// Media operations
+function downloadMedia(win_id, mediaUrl, options = {}) {
+  return post_rpc({
+    method: "downloadMedia",
+    params: {
+      win_id,
+      mediaUrl,
+      ...options,
+    },
+  });
+}
+
+function getSubTitles(mediaPath) {
+  return post_rpc({
+    method: "getSubTitles",
+    params: {
+      mediaPath,
+    },
+  });
+}
+
+// Network monitoring
+function getRequests(win_id) {
+  return post_rpc({
+    method: "getRequests",
+    params: {
+      win_id,
+    },
+  });
+}
+
+function clearRequests(win_id) {
+  return post_rpc({
+    method: "clearRequests",
+    params: {
+      win_id,
+    },
+  });
+}
+
+// Screenshot operations - extended
+function getScreenshotInfo(win_id) {
+  return post_rpc({
+    method: "getWindowScreenshotInfo",
+    params: {
+      win_id,
+    },
+  });
+}
+
+function captureSystemScreenshot(options = {}) {
+  return post_rpc({
+    method: "captureSystemScreenshot",
+    params: {
+      ...options,
+    },
+  });
+}
+
+function saveSystemScreenshot(filePath, options = {}) {
+  return post_rpc({
+    method: "saveSystemScreenshot",
+    params: {
+      filePath,
+      ...options,
+    },
+  });
+}
+
+// Account management
+function switchAccount(account_index) {
+  return post_rpc({
+    method: "switchAccount",
+    params: {
+      account_index,
+    },
+  });
+}
+
+function getAccountInfo(win_id) {
+  return post_rpc({
+    method: "getAccountInfo",
+    params: {
+      win_id,
+    },
+  });
+}
+
+function getAccountWindows(account_index) {
+  return post_rpc({
+    method: "getAccountWindows",
+    params: {
+      account_index,
+    },
+  });
+}
+
+
 
 // Cookies
 function exportCookies(win_id, options) {
@@ -400,103 +559,9 @@ function getAccountWindows(account_index) {
 }
 
 // PyAutoGUI methods
-function pyautoguiType(text) {
-  return post_rpc({
-    method: "pyautoguiType",
-    params: {
-      text,
-    },
-  });
-}
 
-function pyautoguiPress(key) {
-  return post_rpc({
-    method: "pyautoguiPress",
-    params: {
-      key,
-    },
-  });
-}
 
-function pyautoguiHotkey(keys) {
-  return post_rpc({
-    method: "pyautoguiHotkey",
-    params: {
-      keys,
-    },
-  });
-}
 
-function pyautoguiPaste() {
-  return post_rpc({
-    method: "pyautoguiPaste",
-    params: {},
-  });
-}
-
-function pyautoguiMove(x, y) {
-  return post_rpc({
-    method: "pyautoguiMove",
-    params: {
-      x,
-      y,
-    },
-  });
-}
-
-function pyautoguiPressEnter() {
-  return post_rpc({
-    method: "pyautoguiPressEnter",
-    params: {},
-  });
-}
-
-function pyautoguiPressBackspace() {
-  return post_rpc({
-    method: "pyautoguiPressBackspace",
-    params: {},
-  });
-}
-
-function pyautoguiPressSpace() {
-  return post_rpc({
-    method: "pyautoguiPressSpace",
-    params: {},
-  });
-}
-
-function pyautoguiPressEsc() {
-  return post_rpc({
-    method: "pyautoguiPressEsc",
-    params: {},
-  });
-}
-
-function pyautoguiScreenshot() {
-  return post_rpc({
-    method: "pyautoguiScreenshot",
-    params: {},
-  });
-}
-
-function pyautoguiWrite(text, interval) {
-  return post_rpc({
-    method: "pyautoguiWrite",
-    params: {
-      text,
-      interval,
-    },
-  });
-}
-
-function pyautoguiText(text) {
-  return post_rpc({
-    method: "pyautoguiText",
-    params: {
-      text,
-    },
-  });
-}
 
 function loadURL(url, win_id) {
   return post_rpc({
@@ -508,15 +573,6 @@ function loadURL(url, win_id) {
   });
 }
 
-const sendInputEvent = async (inputEvent, win_id) => {
-  return post_rpc({
-    method: "sendInputEvent",
-    params: {
-      win_id: win_id || 1,
-      inputEvent,
-    },
-  });
-};
 
 async function simulateClick(x, y, win_id) {
   // 1. Press the mouse button down
@@ -617,51 +673,7 @@ const getHtmlPageInfo = async (win_id) => {
   });
 };
 
-const clearRequests = async (win_id) => {
-  return post_rpc({
-    method: "clearRequests",
-    params: {
-      win_id: win_id || 1,
-    },
-  });
-};
 
-const getWindowState = async (win_id) => {
-  return post_rpc({
-    method: "getWindowState",
-    params: {
-      win_id: win_id || 1,
-    },
-  });
-};
-const getRequests = async (win_id) => {
-  return post_rpc({
-    method: "getRequests",
-    params: {
-      win_id: win_id || 1,
-    },
-  });
-};
-
-const downloadMedia = async (params, win_id) => {
-  return post_rpc({
-    method: "downloadMedia",
-    params: {
-      win_id: win_id || 1,
-      ...params,
-    },
-  });
-};
-
-const getSubTitles = async ({ mediaPath }, win_id) => {
-  return post_rpc({
-    method: "getSubTitles",
-    params: {
-      win_id: win_id || 1,
-      mediaPath,
-    },
-  });
-};
 
 function waitForResult(cb, timeout = -1, interval = 100) {
   const startTime = Date.now();
@@ -775,7 +787,6 @@ module.exports = {
   getDisplayScreenSize,
   displayScreenshot,
   getWindowScreenshot,
-  pyautoguiClick,
   sendElectronClick,
   openTerminal,
   ping,
@@ -798,22 +809,11 @@ module.exports = {
   captureScreenshot,
   saveScreenshot,
   getScreenshotInfo,
+  sendElectronPaste,
   captureSystemScreenshot,
   saveSystemScreenshot,
   switchAccount,
   getAccountInfo,
   getAccountWindows,
-  pyautoguiType,
-  pyautoguiPress,
-  pyautoguiHotkey,
-  pyautoguiPaste,
-  pyautoguiMove,
-  pyautoguiPressEnter,
-  pyautoguiPressBackspace,
-  pyautoguiPressSpace,
-  pyautoguiPressEsc,
-  pyautoguiScreenshot,
-  pyautoguiWrite,
-  pyautoguiText,
   sleep,
 };

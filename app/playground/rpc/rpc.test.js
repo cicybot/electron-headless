@@ -15,7 +15,6 @@ const {
     getDisplayScreenSize,
     displayScreenshot,
     getWindowScreenshot,
-    pyautoguiClick,
     sendElectronClick,
     downloadMedia,
     openTerminal,
@@ -102,8 +101,6 @@ describe('RPC Tests', () => {
         
     });
 
-    it('pyautoguiClick', async () => {
-        const res = await pyautoguiClick(100, 100);
         
     });
 

@@ -2,7 +2,7 @@
 // Project: http://electronjs.org/
 // Definitions by: The Electron Team <https://github.com/electron/electron>
 // Definitions: https://github.com/electron/typescript-definitions
-
+//@ts-nocheck
 /// <reference types="node" />
 
 type DOMEvent = Event;

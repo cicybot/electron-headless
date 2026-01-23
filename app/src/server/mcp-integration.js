@@ -531,7 +531,7 @@ class McpIntegration {
               throw new Error(`Window ${win_id} does not belong to account ${account_index}`);
             }
           }
-          await this.rpcHandler.handleMethod("sendElectronCtlV", { win_id });
+          await this.rpcHandler.handleMethod("sendElectronPaste", { win_id });
           return {
             content: [{ type: "text", text: `Sent Ctrl+V to window ${win_id}` }],
           };
@@ -1117,7 +1117,6 @@ class McpIntegration {
    */
   setupPyAutoGUITools() {
     this.registerTool(
-      "pyautogui_click",
       "Perform mouse click with PyAutoGUI",
       {
         x: z.number().describe("X coordinate"),
@@ -1125,7 +1124,6 @@ class McpIntegration {
       },
       async ({ x, y }) => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiClick", { x, y });
           return {
             content: [{ type: "text", text: `Clicked at (${x}, ${y})` }],
           };
@@ -1139,14 +1137,12 @@ class McpIntegration {
     );
 
     this.registerTool(
-      "pyautogui_type",
       "Type text with PyAutoGUI",
       {
         text: z.string().describe("Text to type"),
       },
       async ({ text }) => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiType", { text });
           return {
             content: [{ type: "text", text: `Typed: "${text}"` }],
           };
@@ -1160,14 +1156,12 @@ class McpIntegration {
     );
 
     this.registerTool(
-      "pyautogui_hotkey",
       "Press hotkey combination with PyAutoGUI",
       {
         keys: z.array(z.string()).describe("Array of keys to press as hotkey combination"),
       },
       async ({ keys }) => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiHotkey", { keys });
           return {
             content: [{ type: "text", text: `Pressed hotkey: ${keys.join(" + ")}` }],
           };
@@ -1181,14 +1175,12 @@ class McpIntegration {
     );
 
     this.registerTool(
-      "pyautogui_press",
       "Press key with PyAutoGUI",
       {
         key: z.string().describe("Key to press"),
       },
       async ({ key }) => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiPress", { key });
           return {
             content: [{ type: "text", text: `Pressed key: ${key}` }],
           };
@@ -1201,9 +1193,7 @@ class McpIntegration {
       }
     );
 
-    this.registerTool("pyautogui_paste", "Paste content with PyAutoGUI", {}, async () => {
       try {
-        await this.rpcHandler.handleMethod("pyautoguiPaste", {});
         return {
           content: [{ type: "text", text: "Pasted content" }],
         };
@@ -1216,7 +1206,6 @@ class McpIntegration {
     });
 
     this.registerTool(
-      "pyautogui_move",
       "Move mouse with PyAutoGUI",
       {
         x: z.number().describe("X coordinate"),
@@ -1224,7 +1213,6 @@ class McpIntegration {
       },
       async ({ x, y }) => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiMove", { x, y });
           return {
             content: [{ type: "text", text: `Moved mouse to (${x}, ${y})` }],
           };
@@ -1237,9 +1225,7 @@ class McpIntegration {
       }
     );
 
-    this.registerTool("pyautogui_press_enter", "Press Enter key with PyAutoGUI", {}, async () => {
       try {
-        await this.rpcHandler.handleMethod("pyautoguiPressEnter", {});
         return {
           content: [{ type: "text", text: "Pressed Enter" }],
         };
@@ -1252,12 +1238,10 @@ class McpIntegration {
     });
 
     this.registerTool(
-      "pyautogui_press_backspace",
       "Press Backspace key with PyAutoGUI",
       {},
       async () => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiPressBackspace", {});
           return {
             content: [{ type: "text", text: "Pressed Backspace" }],
           };
@@ -1270,9 +1254,7 @@ class McpIntegration {
       }
     );
 
-    this.registerTool("pyautogui_press_space", "Press Space key with PyAutoGUI", {}, async () => {
       try {
-        await this.rpcHandler.handleMethod("pyautoguiPressSpace", {});
         return {
           content: [{ type: "text", text: "Pressed Space" }],
         };
@@ -1284,9 +1266,7 @@ class McpIntegration {
       }
     });
 
-    this.registerTool("pyautogui_press_esc", "Press Escape key with PyAutoGUI", {}, async () => {
       try {
-        await this.rpcHandler.handleMethod("pyautoguiPressEsc", {});
         return {
           content: [{ type: "text", text: "Pressed Escape" }],
         };
@@ -1298,9 +1278,7 @@ class McpIntegration {
       }
     });
 
-    this.registerTool("pyautogui_screenshot", "Take screenshot with PyAutoGUI", {}, async () => {
       try {
-        const result = await this.rpcHandler.handleMethod("pyautoguiScreenshot", {});
         return {
           content: [{ type: "text", text: JSON.stringify(result.result, null, 2) }],
         };
@@ -1313,7 +1291,6 @@ class McpIntegration {
     });
 
     this.registerTool(
-      "pyautogui_write",
       "Write text with interval with PyAutoGUI",
       {
         text: z.string().describe("Text to write"),
@@ -1321,7 +1298,6 @@ class McpIntegration {
       },
       async ({ text, interval }) => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiWrite", { text, interval });
           return {
             content: [{ type: "text", text: `Wrote: "${text}"` }],
           };
@@ -1335,14 +1311,12 @@ class McpIntegration {
     );
 
     this.registerTool(
-      "pyautogui_text",
       "Type text using PyAutoGUI",
       {
         text: z.string().describe("Text to type"),
       },
       async ({ text }) => {
         try {
-          await this.rpcHandler.handleMethod("pyautoguiText", { text });
           return {
             content: [{ type: "text", text: `Typed: "${text}"` }],
           };

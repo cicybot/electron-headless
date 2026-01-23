@@ -16,6 +16,13 @@
 | `get_windows` | 获取所有窗口列表 | {} | `{}` |
 | `show_window` | 显示隐藏的窗口 | window_id | `{"window_id": 1}` |
 | `hide_window` | 隐藏窗口 | window_id | `{"window_id": 1}` |
+| `get_window_state` | 获取窗口状态 | window_id | `{"window_id": 1}` |
+| `get_bounds` | 获取窗口边界信息 | window_id | `{"window_id": 1}` |
+| `get_window_size` | 获取窗口尺寸 | window_id | `{"window_id": 1}` |
+| `set_bounds` | 设置窗口边界和尺寸 | window_id, bounds | `{"window_id": 1, "bounds": {"x": 100, "y": 100, "width": 800, "height": 600}}` |
+| `set_window_size` | 设置窗口尺寸 | window_id, width, height | `{"window_id": 1, "width": 800, "height": 600}` |
+| `set_window_width` | 设置窗口宽度 | window_id, width | `{"window_id": 1, "width": 800}` |
+| `set_window_position` | 设置窗口位置 | window_id, x, y | `{"window_id": 1, "x": 100, "y": 100}` |
 
 ![窗口管理](https://via.placeholder.com/400x200/4A90E2/FFFFFF?text=窗口管理+工具集)
 
@@ -27,21 +34,25 @@
 | `load_url` | 在窗口中加载新页面 | window_id, url | `{"window_id": 1, "url": "https://example.com"}` |
 | `execute_javascript` | 执行页面脚本 | window_id, code | `{"window_id": 1, "code": "document.title"}` |
 | `get_page_title` | 获取页面标题 | window_id | `{"window_id": 1}` |
-| `get_element_rect` | 获取元素位置 | window_id, selector | `{"window_id": 1, "selector": "#login-btn"}` |
+| `get_url` | 获取页面URL | window_id | `{"window_id": 1}` |
+| `get_title` | 获取窗口标题 | window_id | `{"window_id": 1}` |
+| `reload` | 重新加载页面 | window_id | `{"window_id": 1}` |
+| `open_dev_tools` | 打开开发者工具 | window_id | `{"window_id": 1}` |
 
 ![页面操作](https://via.placeholder.com/400x200/7B68EE/FFFFFF?text=页面操作+工具集)
 
 ---
 
-### 🖱️ **屏幕自动化工具**
+### 🖱️ **输入事件工具**
 | 工具名 | 功能描述 | 参数 | 示例 |
 |--------|----------|------|------|
-| `pyautogui_click` | 鼠标点击 | x, y | `{"x": 300, "y": 400}` |
-| `pyautogui_type` | 键盘输入 | text | `{"text": "Hello World"}` |
-| `pyautogui_press` | 按键操作 | key | `{"key": "enter"}` |
-| `pyautogui_hotkey` | 组合键 | keys | `{"keys": ["ctrl", "c"]}` |
-| `pyautogui_move` | 鼠标移动 | x, y | `{"x": 500, "y": 300}` |
-| `pyautogui_screenshot` | 屏幕截图 | {} | `{}` |
+| `send_electron_click` | 发送点击事件 | window_id, x, y, button, clickCount | `{"window_id": 1, "x": 100, "y": 100}` |
+| `send_electron_select_all` | 全选 | window_id | `{"window_id": 1}` |
+| `send_electron_copy` | 复制 | window_id | `{"window_id": 1}` |
+| `send_electron_cut` | 剪切 | window_id | `{"window_id": 1}` |
+| `send_electron_paste` | 粘贴 | window_id | `{"window_id": 1}` |
+| `send_electron_press_enter` | 按回车 | window_id | `{"window_id": 1}` |
+| `write_clipboard` | 写入剪贴板 | text | `{"text": "Hello World"}` |
 
 ![屏幕自动化](https://via.placeholder.com/400x200/FF9800/FFFFFF?text=屏幕自动化+工具集)
 
@@ -54,6 +65,9 @@
 | `capture_system_screenshot` | 全屏截图 | options | `{"format": "jpeg", "quality": 80}` |
 | `get_screenshot_info` | 获取截图信息 | window_id | `{"window_id": 1}` |
 | `save_screenshot` | 保存截图到文件 | window_id, file_path | `{"window_id": 1, "file_path": "/tmp/screenshot.png"}` |
+| `save_system_screenshot` | 保存全屏截图 | file_path, options | `{"file_path": "/tmp/screen.png", "format": "png"}` |
+| `display_screenshot` | 显示系统截图 | {} | `{}` |
+| `get_window_screenshot` | 获取窗口截图 | window_id | `{"window_id": 1}` |
 
 ![截图工具](https://via.placeholder.com/400x200/4CAF50/FFFFFF?text=截图处理+工具集)
 
@@ -65,6 +79,51 @@
 | `import_cookies` | 导入Cookie | window_id, cookies | `{"window_id": 1, "cookies": [...]}` |
 | `export_cookies` | 导出Cookie | window_id, options | `{"window_id": 1, "format": "json"}` |
 | `set_user_agent` | 设置用户代理 | window_id, user_agent | `{"window_id": 1, "user_agent": "Custom-Agent/1.0"}` |
+
+### 👤 **账户管理工具**
+| 工具名 | 功能描述 | 参数 | 示例 |
+|--------|----------|------|------|
+| `switch_account` | 切换账户 | account_index | `{"account_index": 1}` |
+| `get_account_info` | 获取窗口账户信息 | window_id | `{"window_id": 1}` |
+| `get_account_windows` | 获取账户所有窗口 | account_index | `{"account_index": 1}` |
+
+### 🎯 **输入事件工具**
+| 工具名 | 功能描述 | 参数 | 示例 |
+|--------|----------|------|------|
+| `send_input_event` | 发送输入事件 | window_id, inputEvent | `{"window_id": 1, "inputEvent": {"type": "mouseDown", "x": 100, "y": 100}}` |
+| `send_electron_click` | 发送点击事件 | window_id, x, y, button, clickCount | `{"window_id": 1, "x": 100, "y": 100}` |
+| `send_electron_select_all` | 全选 | window_id | `{"window_id": 1}` |
+| `send_electron_copy` | 复制 | window_id | `{"window_id": 1}` |
+| `send_electron_cut` | 剪切 | window_id | `{"window_id": 1}` |
+| `send_electron_paste` | 粘贴 | window_id | `{"window_id": 1}` |
+| `send_electron_press_enter` | 按回车 | window_id | `{"window_id": 1}` |
+| `write_clipboard` | 写入剪贴板 | text | `{"text": "Hello World"}` |
+
+### 🌐 **网络监控工具**
+| 工具名 | 功能描述 | 参数 | 示例 |
+|--------|----------|------|------|
+| `get_requests` | 获取网络请求 | window_id | `{"window_id": 1}` |
+| `clear_requests` | 清除网络请求 | window_id | `{"window_id": 1}` |
+
+### 🎬 **媒体处理工具**
+| 工具名 | 功能描述 | 参数 | 示例 |
+|--------|----------|------|------|
+| `download_media` | 下载媒体文件 | window_id, mediaUrl, options | `{"window_id": 1, "mediaUrl": "https://example.com/video.mp4"}` |
+| `get_subtitles` | 获取字幕 | mediaPath | `{"mediaPath": "/path/to/video.mp4"}` |
+
+### 💬 **浮窗工具**
+| 工具名 | 功能描述 | 参数 | 示例 |
+|--------|----------|------|------|
+| `show_float_div` | 显示浮窗 | window_id, options | `{"window_id": 1, "options": {"content": "Hello", "position": {"x": 100, "y": 100}}}` |
+| `hide_float_div` | 隐藏浮窗 | window_id | `{"window_id": 1}` |
+
+### 🖥️ **系统工具**
+| 工具名 | 功能描述 | 参数 | 示例 |
+|--------|----------|------|------|
+| `ping` | 系统心跳检测 | {} | `{}` |
+| `info` | 获取系统信息 | {} | `{}` |
+| `get_display_screen_size` | 获取屏幕尺寸 | {} | `{}` |
+| `open_terminal` | 打开终端 | command, showWin | `{"command": "ls", "showWin": true}` |
 
 ---
 
@@ -97,24 +156,32 @@ const tools = [
     }
   },
   {
-    tool: "pyautogui_click",
-    arguments: { x: 300, y: 200 }
+    tool: "send_electron_click",
+    arguments: { window_id: 1, x: 300, y: 200 }
   },
   {
-    tool: "pyautogui_type",
+    tool: "write_clipboard",
     arguments: { text: "your-username" }
   },
   {
-    tool: "pyautogui_press",
-    arguments: { key: "tab" }
+    tool: "send_electron_paste",
+    arguments: { window_id: 1 }
   },
   {
-    tool: "pyautogui_type",
+    tool: "send_electron_press_enter",
+    arguments: { window_id: 1 }
+  },
+  {
+    tool: "write_clipboard",
     arguments: { text: "your-password" }
   },
   {
-    tool: "pyautogui_click",
-    arguments: { x: 400, y: 300 }
+    tool: "send_electron_paste",
+    arguments: { window_id: 1 }
+  },
+  {
+    tool: "send_electron_click",
+    arguments: { window_id: 1, x: 400, y: 300 }
   },
   {
     tool: "capture_screenshot",
@@ -180,7 +247,6 @@ const dataExtractionFlow = [
   
   // 4. 滚动页面加载更多
   {
-    tool: "pyautogui_press",
     arguments: { key: "page_down" }
   },
   
@@ -215,19 +281,15 @@ const formAutomation = [
   
   // 填写用户信息
   {
-    tool: "pyautogui_click",
     arguments: { x: 250, y: 150 }
   },
   {
-    tool: "pyautogui_type",
     arguments: { text: "john.doe@example.com" }
   },
   {
-    tool: "pyautogui_press",
     arguments: { key: "tab" }
   },
   {
-    tool: "pyautogui_type",
     arguments: { text: "SecurePassword123!" }
   },
   
@@ -414,11 +476,9 @@ const conditionalFlow = {
   // 失败分支  
   else_branch: [
     {
-      tool: "pyautogui_click",
       arguments: { x: 300, y: 200 }
     },
     {
-      tool: "pyautogui_type",
       arguments: { text: "success" }
     }
   ]
@@ -445,11 +505,9 @@ const batchProcessing = {
   // 循环体
   body: [
     {
-      tool: "pyautogui_click",
       arguments: { x: 400, y: 200 }  // 点击"处理"按钮
     },
     {
-      tool: "pyautogui_press",
       arguments: { key: "tab" }       // 跳到下一个
     }
   ]
@@ -491,11 +549,9 @@ const rollbackStrategy = {
   // 主要操作
   operation: [
     {
-      tool: "pyautogui_type",
       arguments: { text: "important-data" }
     },
     {
-      tool: "pyautogui_press", 
       arguments: { key: "enter" }
     }
   ],
@@ -605,8 +661,6 @@ const logStandard = {
   user_request: "帮我在页面登录",
   tool_sequence: [
     { tool: "open_window", status: "success", duration: 1200 },
-    { tool: "pyautogui_click", status: "success", duration: 300 },
-    { tool: "pyautogui_type", status: "success", duration: 800 }
   ],
   overall_result: "success",
   user_satisfaction: "high"
@@ -649,8 +703,6 @@ const aiConfig = {
   model: "gpt-4",
   tools: [
     "open_window",
-    "pyautogui_click", 
-    "pyautogui_type",
     "execute_javascript",
     "capture_screenshot"
   ],

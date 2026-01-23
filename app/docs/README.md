@@ -1,113 +1,180 @@
-# Electron MCP Browser Automation - Documentation
+# Modular Architecture
 
-## 📚 Documentation Index
+This document describes the modular architecture of the Electron Headless Browser application.
 
-This directory contains comprehensive documentation for the Electron MCP Browser Automation project.
-
-## Available Documentation
-
-### 🚀 **Core Documentation**
-- **[RPC-Methods-Mapping.md](./RPC-Methods-Mapping.md)** - Complete mapping of all RPC methods to utils.js functions and MCP tools
-- **[Window-Open-Handling.md](./Window-Open-Handling.md)** - Guide for intercepting and handling window.open events in Electron
-- **[PyAutoGUI-Service.md](./PyAutoGUI-Service.md)** - Documentation for the PyAutoGUI automation service
-
-### 🏗️ **Architecture & Development**
-- **[Architecture-Guide.md](./Architecture-Guide.md)** - System architecture and component overview
-- **[Development-Guide.md](./Development-Guide.md)** - Setup guide for developers
-- **[Testing-Guide.md](./Testing-Guide.md)** - Testing strategies and guidelines
-- **[Deployment-Guide.md](./Deployment-Guide.md)** - Deployment and production setup
-
-### 🛠️ **API References**
-- **[RPC-API-Reference.md](./RPC-API-Reference.md)** - Complete RPC API documentation
-- **[MCP-Tools-Reference.md](./MCP-Tools-Reference.md)** - MCP tools reference guide
-- **[Utils-API-Reference.md](./Utils-API-Reference.md)** - Utils.js function reference
-
-### 🎯 **Feature Guides**
-- **[Account-Management.md](./Account-Management.md)** - Multi-account system guide
-- **[Screenshot-Caching.md](./Screenshot-Caching.md)** - Screenshot caching system documentation
-- **[Cookie-Management.md](./Cookie-Management.md)** - Cookie import/export functionality
-- **[Network-Request-Tracking.md](./Network-Request-Tracking.md)** - Network request monitoring
-
-### 🔧 **Configuration**
-- **[Configuration-Guide.md](./Configuration-Guide.md)** - Application configuration options
-- **[Environment-Variables.md](./Environment-Variables.md)** - Available environment variables
-- **[Security-Guide.md](./Security-Guide.md)** - Security best practices
-
-### 📋 **Project Information**
-- **[Changelog.md](./Changelog.md)** - Project changelog and release notes
-- **[Contributing.md](./Contributing.md)** - Guidelines for contributing
-- **[License.md](./License.md)** - License information
-- **[FAQ.md](./FAQ.md)** - Frequently asked questions
-
-## 🚀 Quick Start
-
-### For Users:
-1. **Open Browser Window**: See [RPC-API-Reference.md](./RPC-API-Reference.md#openwindow)
-2. **Automate Browser Actions**: See [MCP-Tools-Reference.md](./MCP-Tools-Reference.md)
-3. **Handle Multiple Accounts**: See [Account-Management.md](./Account-Management.md)
-
-### For Developers:
-1. **Setup Development**: See [Development-Guide.md](./Development-Guide.md)
-2. **Understand Architecture**: See [Architecture-Guide.md](./Architecture-Guide.md)
-3. **API Integration**: See [Utils-API-Reference.md](./Utils-API-Reference.md)
-
-### For AI Integration:
-1. **MCP Tools**: See [MCP-Tools-Reference.md](./MCP-Tools-Reference.md)
-2. **RPC Methods**: See [RPC-Methods-Mapping.md](./RPC-Methods-Mapping.md)
-3. **Window Automation**: See [PyAutoGUI-Service.md](./PyAutoGUI-Service.md)
-
-## 📊 Documentation Structure
+## Directory Structure
 
 ```
-docs/
-├── README.md                              # This file - documentation index
-├── RPC-Methods-Mapping.md                  # Complete RPC methods mapping
-├── Window-Open-Handling.md                # Window.open event handling guide
-├── PyAutoGUI-Service.md                  # PyAutoGUI service documentation
-├── Architecture-Guide.md                  # System architecture
-├── Development-Guide.md                   # Development setup
-├── Testing-Guide.md                      # Testing guidelines
-├── Deployment-Guide.md                   # Deployment guide
-├── RPC-API-Reference.md                  # RPC API documentation
-├── MCP-Tools-Reference.md               # MCP tools reference
-├── Utils-API-Reference.md                # Utils.js API reference
-├── Account-Management.md                 # Account management
-├── Screenshot-Caching.md                 # Screenshot caching
-├── Cookie-Management.md                  # Cookie management
-├── Network-Request-Tracking.md           # Network request tracking
-├── Configuration-Guide.md                # Configuration options
-├── Environment-Variables.md              # Environment variables
-├── Security-Guide.md                    # Security best practices
-├── Changelog.md                         # Project changelog
-├── Contributing.md                       # Contributing guidelines
-├── License.md                           # License information
-└── FAQ.md                              # Frequently asked questions
+src/
+├── core/                    # Core application components
+│   ├── app-manager.js       # Main app lifecycle and global state
+│   ├── window-manager.js    # Window creation and management
+│   └── account-manager.js   # Account isolation logic
+├── server/                  # HTTP server and API components
+│   ├── express-server.js    # Express server setup and routes
+│   ├── rpc-handler.js       # RPC method routing and handling
+│   └── mcp-integration.js   # MCP server integration
+├── services/                # Business logic services
+│   ├── screenshot-cache-service.js # Screenshot caching and processing
+│   └── network-monitor.js   # Network request tracking
+├── utils/                   # Shared utilities
+│   ├── utils.js            # General utilities
+│   ├── utils-node.js       # Node.js specific utilities
+│   ├── utils-browser.js    # Browser-side utilities
+│   └── helpers.js          # Helper functions
+├── extension/              # Chrome extension files
+├── content-inject.js      # Content scripts (runs in browser)
+├── main.js                # Application entry point
+└── index.js               # Module exports
 ```
 
-## 🔍 How to Use This Documentation
+## Module Responsibilities
 
-1. **Browse by Topic**: Use the index above to find relevant documentation
-2. **Follow the Guides**: Start with README.md, then follow specific guides
-3. **Check API References**: For implementation details, check the API references
-4. **Search Documentation**: Use your editor's search to find specific topics
+### Core Modules
 
-## 📝 Documentation Standards
+#### `app-manager.js`
+- Manages global application state
+- Handles app lifecycle events
+- Provides system information
+- Manages media directories
 
-- **Clear Structure**: Each document follows consistent structure
-- **Code Examples**: All API methods include usage examples
-- **Practical Focus**: Documentation is task-oriented and practical
-- **Up-to-Date**: Documentation is kept in sync with code changes
-- **Cross-References**: Documents reference each other for complete coverage
+#### `window-manager.js`
+- Creates and manages browser windows
+- Handles window events and lifecycle
+- Manages window state tracking
+- Provides window lookup and control
 
-## 🤝 Contributing to Documentation
+#### `account-manager.js`
+- Manages account isolation contexts
+- Handles account switching
+- Validates account permissions
+- Manages resource sharing rules
 
-- **Report Issues**: Use GitHub issues to report documentation problems
-- **Submit Changes**: Follow [Contributing.md](./Contributing.md) guidelines
-- **Keep Consistent**: Follow established documentation patterns
-- **Test Examples**: Ensure all code examples work correctly
+### Server Modules
 
----
+#### `express-server.js`
+- Sets up Express HTTP server
+- Configures middleware and routes
+- Handles HTTP requests and responses
+- Integrates MCP endpoints
 
-**Happy automating! 🚀**
+#### `rpc-handler.js`
+- Routes RPC method calls to appropriate handlers
+- Provides unified interface for all operations
+- Handles error responses and logging
+- Manages method permissions and validation
 
-For specific questions, check the [FAQ.md](./FAQ.md) or open an issue on GitHub.
+#### `mcp-integration.js`
+- Implements MCP (Model Context Protocol) server
+- Provides Playwright-style automation tools
+- Handles MCP request/response protocol
+- Manages tool definitions and execution
+
+### Service Modules
+
+#### `screenshot-cache-service.js`
+- Multi-threaded caching system for screenshots
+- Captures screenshots from browser windows and desktop
+- Handles image processing and Mac-specific scaling
+- Manages screenshot caching and compression
+
+#### `network-monitor.js`
+- Tracks HTTP requests and responses
+- Provides request filtering and analysis
+- Supports multiple export formats (JSON, CSV, HAR)
+- Manages request statistics and insights
+
+## Data Flow
+
+1. **HTTP Request** → Express Server → RPC Handler
+2. **RPC Handler** → Core Managers/Services → Browser Operations
+3. **Results** → RPC Handler → HTTP Response
+4. **MCP Requests** → MCP Integration → Same Core Logic
+
+## Environment Separation
+
+### Node.js Environment (Main Process)
+- `app-manager.js`
+- `window-manager.js`
+- `express-server.js`
+- `rpc-handler.js`
+- `services/*.js`
+- `utils.js`
+- `utils-node.js`
+- `helpers.js`
+
+### Browser Environment (Renderer Process)
+- `utils-browser.js`
+- Content scripts in `content-inject.js`
+- Chrome extension files
+
+## Key Benefits
+
+### Maintainability
+- Single responsibility per module
+- Clear separation of concerns
+- Easy to test individual components
+- Simplified debugging and development
+
+### Scalability
+- Easy to add new features/services
+- Modular architecture supports growth
+- Clear interfaces between components
+- Independent deployment of modules
+
+### Testability
+- Each module can be unit tested independently
+- Mock dependencies for isolated testing
+- Clear input/output contracts
+- Easy integration testing
+
+### Code Reuse
+- Services can be used by both RPC and MCP interfaces
+- Browser utilities shared across contexts
+- Common patterns abstracted into utilities
+
+## Usage Examples
+
+### Creating a Window
+```javascript
+const { WindowManager } = require('./core/window-manager');
+const win = await WindowManager.createWindow(1, 'https://example.com');
+```
+
+### Taking a Screenshot
+```javascript
+const { ScreenshotCacheService } = require('./services/screenshot-cache-service');
+const image = await ScreenshotCacheService.captureWindowLive(windowId);
+```
+
+### Handling RPC Calls
+```javascript
+const { RPCHandler } = require('./server/rpc-handler');
+const result = await RPCHandler.handleMethod('openWindow', { url: 'https://example.com' });
+```
+
+### MCP Tool Usage
+```javascript
+const { McpIntegration } = require('./server/mcp-integration');
+// MCP server handles tool calls automatically
+```
+
+## Future Extensions
+
+### Additional Services
+- Performance monitoring service
+- Cookie/session management service
+- File download service
+- Device emulation service
+
+### New Interfaces
+- WebSocket API
+- GraphQL API
+- REST API endpoints
+- CLI interface
+
+### Enhanced Features
+- Multi-browser support
+- Cloud deployment options
+- Advanced automation workflows
+- Machine learning integrations

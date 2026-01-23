@@ -79,7 +79,6 @@ class RPCHandler {
     this.accountManager = require("../core/account-manager");
     
     // 业务服务
-    this.pyautoguiService = require("../services/pyautogui-service");
     this.screenshotCacheService = require("../services/screenshot-cache-service");
   }
   
@@ -87,7 +86,6 @@ class RPCHandler {
     // 路由分发到具体处理逻辑
     switch (method) {
       case "openWindow": return this.windowManager.createWindow(...);
-      case "pyautoguiClick": return this.pyautoguiService.click(...);
       // ... 60+ 其他方法
     }
   }
@@ -193,13 +191,10 @@ class PyAutoGUIService {
   async executePyAutoGUICode(code, variables = {}) {
     return new Promise((resolve, reject) => {
       const pythonScript = `
-import pyautogui
 import sys
 import json
 
 # 安全设置
-pyautogui.FAILSAFE = True
-pyautogui.PAUSE = 0.1
 
 # 执行用户代码
 ${code}
@@ -216,7 +211,6 @@ ${code}
   
   async click(params = {}) {
     const { x, y } = params;
-    const code = x && y ? `pyautogui.click(${x}, ${y})` : 'pyautogui.click()';
     return this.executePyAutoGUICode(code, { x, y });
   }
 }
@@ -289,9 +283,6 @@ sequenceDiagram
     WM->>RPC: return {id: 1, bounds: {...}}
     RPC->>UI: {ok: true, result: {id: 1, bounds: {...}}}
     
-    UI->>RPC: pyautoguiClick(x, y)
-    RPC->>PA: executePythonCode('pyautogui.click(x, y)')
-    PA->>PA: python3 -c "import pyautogui; pyautogui.click(x, y)"
     PA->>RPC: execution result
     RPC->>UI: {ok: true, result: 'clicked'}
     
@@ -353,7 +344,6 @@ app/
 │   │   └── menu-manager.js        # 菜单管理
 │   │
 │   ├── 🛠️ services/                 # 业务服务层
-│   │   ├── pyautogui-service.js    # 屏幕自动化服务
 │   │   ├── screenshot-cache-service.js # 截图缓存服务
 │   │   └── window-open-handler.js  # window.open处理
 │   │
@@ -443,14 +433,10 @@ class WindowPool {
 ### 🗄️ 懒加载
 ```javascript
 // 按需加载模块
-let pyautoguiService = null;
 
 function getPyAutoGUIService() {
-  if (!pyautoguiService) {
     console.log('🖱️ Loading PyAutoGUI service on demand...');
-    pyautoguiService = require('./services/pyautogui-service');
   }
-  return pyautoguiService;
 }
 ```
 
@@ -596,7 +582,6 @@ class DiagnosticTool {
   static async checkDependencies() {
     return {
       python: await this.checkPython(),
-      pyautogui: await this.checkPyAutoGUI(),
       electron: process.versions.electron,
       node: process.versions.node
     };

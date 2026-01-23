@@ -258,7 +258,6 @@ class ExpressServer {
       const filename = req.params.filename || "screen.png";
       const filePath = `c:\\${filename}`;
 
-      const result = await this.rpcHandler.handleMethod("pyautoguiScreenshot", {});
       if (!result.ok) {
         return res.status(500).json({ error: result.result });
       }

@@ -14,7 +14,7 @@ var require_utils_browser = __commonJS({
         if (res) {
           return JSON.parse(res)[0];
         } else {
-          null;
+          return null;
         }
       }
       static set(key, value) {
@@ -317,8 +317,17 @@ var require_utils_browser = __commonJS({
         outline: none;
     `;
       textarea.placeholder = "Enter your prompt here...";
+      const storageKey = `prompt_area_${window.location.href}`;
+      const cachedValue = localStorage.getItem(storageKey);
+      if (cachedValue) {
+        textarea.value = cachedValue;
+      }
+      textarea.addEventListener("input", (e) => {
+        localStorage.setItem(storageKey, e.target.value);
+      });
       textarea.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" && !e.shiftKey && textarea.value.trim() !== "") {
+        const isModifierKey = e.ctrlKey || e.metaKey;
+        if (e.key === "Enter" && isModifierKey && !e.shiftKey && textarea.value.trim() !== "") {
           e.preventDefault();
           window.handleElectronRender(textarea);
         }
@@ -331,42 +340,7 @@ var require_utils_browser = __commonJS({
         justify-content: space-between;
         align-items: center;
     `;
-      const visibilityContainer = document.createElement("div");
-      visibilityContainer.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #ccc;
-        font-size: 12px;
-    `;
-      const visibilityCheckbox = document.createElement("input");
-      visibilityCheckbox.type = "checkbox";
-      visibilityCheckbox.id = "prompt-visibility";
-      visibilityCheckbox.checked = true;
-      visibilityCheckbox.style.cssText = `
-        cursor: pointer;
-    `;
-      const visibilityLabel = document.createElement("label");
-      visibilityLabel.htmlFor = "prompt-visibility";
-      visibilityLabel.textContent = "Visible";
-      visibilityLabel.style.cssText = `
-        cursor: pointer;
-        user-select: none;
-    `;
       let actionButtonContainer;
-      visibilityCheckbox.addEventListener("change", (e) => {
-        if (e.target.checked) {
-          textarea.style.display = "block";
-          if (actionButtonContainer) actionButtonContainer.style.display = "flex";
-          visibilityLabel.textContent = "Visible";
-        } else {
-          textarea.style.display = "none";
-          if (actionButtonContainer) actionButtonContainer.style.display = "none";
-          visibilityLabel.textContent = "Hidden";
-        }
-      });
-      visibilityContainer.appendChild(visibilityCheckbox);
-      visibilityContainer.appendChild(visibilityLabel);
       actionButtonContainer = document.createElement("div");
       actionButtonContainer.style.cssText = `
         display: flex;
@@ -400,7 +374,6 @@ var require_utils_browser = __commonJS({
       cancelButton.addEventListener("click", hidePromptArea);
       actionButtonContainer.appendChild(submitButton);
       actionButtonContainer.appendChild(cancelButton);
-      buttonContainer.appendChild(visibilityContainer);
       buttonContainer.appendChild(actionButtonContainer);
       content.appendChild(textarea);
       content.appendChild(buttonContainer);
@@ -903,15 +876,6 @@ var require_utils = __commonJS({
         }
       });
     }
-    function pyautoguiClick(x, y) {
-      return post_rpc({
-        method: "pyautoguiClick",
-        params: {
-          x,
-          y
-        }
-      });
-    }
     function sendElectronClick(win_id, x, y) {
       return post_rpc({
         method: "sendElectronClick",
@@ -1021,6 +985,14 @@ var require_utils = __commonJS({
         }
       });
     }
+    function sendElectronPaste(win_id) {
+      return post_rpc({
+        method: "sendElectronPaste",
+        params: {
+          win_id
+        }
+      });
+    }
     function sendElectronPressEnter(win_id) {
       return post_rpc({
         method: "sendElectronPressEnter",
@@ -1051,6 +1023,115 @@ var require_utils = __commonJS({
         method: "hideFloatDiv",
         params: {
           win_id
+        }
+      });
+    }
+    function getWindowState(win_id) {
+      return post_rpc({
+        method: "getWindowState",
+        params: {
+          win_id
+        }
+      });
+    }
+    function loadURL(win_id, url) {
+      return post_rpc({
+        method: "loadURL",
+        params: {
+          win_id,
+          url
+        }
+      });
+    }
+    function sendInputEvent(win_id, inputEvent) {
+      return post_rpc({
+        method: "sendInputEvent",
+        params: {
+          win_id,
+          inputEvent
+        }
+      });
+    }
+    function downloadMedia(win_id, mediaUrl, options = {}) {
+      return post_rpc({
+        method: "downloadMedia",
+        params: {
+          win_id,
+          mediaUrl,
+          ...options
+        }
+      });
+    }
+    function getSubTitles(mediaPath) {
+      return post_rpc({
+        method: "getSubTitles",
+        params: {
+          mediaPath
+        }
+      });
+    }
+    function getRequests(win_id) {
+      return post_rpc({
+        method: "getRequests",
+        params: {
+          win_id
+        }
+      });
+    }
+    function clearRequests(win_id) {
+      return post_rpc({
+        method: "clearRequests",
+        params: {
+          win_id
+        }
+      });
+    }
+    function getScreenshotInfo(win_id) {
+      return post_rpc({
+        method: "getWindowScreenshotInfo",
+        params: {
+          win_id
+        }
+      });
+    }
+    function captureSystemScreenshot(options = {}) {
+      return post_rpc({
+        method: "captureSystemScreenshot",
+        params: {
+          ...options
+        }
+      });
+    }
+    function saveSystemScreenshot(filePath, options = {}) {
+      return post_rpc({
+        method: "saveSystemScreenshot",
+        params: {
+          filePath,
+          ...options
+        }
+      });
+    }
+    function switchAccount(account_index) {
+      return post_rpc({
+        method: "switchAccount",
+        params: {
+          account_index
+        }
+      });
+    }
+    function getAccountInfo(win_id) {
+      return post_rpc({
+        method: "getAccountInfo",
+        params: {
+          win_id
+        }
+      });
+    }
+    function getAccountWindows(account_index) {
+      return post_rpc({
+        method: "getAccountWindows",
+        params: {
+          account_index
         }
       });
     }
@@ -1140,92 +1221,6 @@ var require_utils = __commonJS({
         }
       });
     }
-    function pyautoguiType(text) {
-      return post_rpc({
-        method: "pyautoguiType",
-        params: {
-          text
-        }
-      });
-    }
-    function pyautoguiPress(key) {
-      return post_rpc({
-        method: "pyautoguiPress",
-        params: {
-          key
-        }
-      });
-    }
-    function pyautoguiHotkey(keys) {
-      return post_rpc({
-        method: "pyautoguiHotkey",
-        params: {
-          keys
-        }
-      });
-    }
-    function pyautoguiPaste() {
-      return post_rpc({
-        method: "pyautoguiPaste",
-        params: {}
-      });
-    }
-    function pyautoguiMove(x, y) {
-      return post_rpc({
-        method: "pyautoguiMove",
-        params: {
-          x,
-          y
-        }
-      });
-    }
-    function pyautoguiPressEnter() {
-      return post_rpc({
-        method: "pyautoguiPressEnter",
-        params: {}
-      });
-    }
-    function pyautoguiPressBackspace() {
-      return post_rpc({
-        method: "pyautoguiPressBackspace",
-        params: {}
-      });
-    }
-    function pyautoguiPressSpace() {
-      return post_rpc({
-        method: "pyautoguiPressSpace",
-        params: {}
-      });
-    }
-    function pyautoguiPressEsc() {
-      return post_rpc({
-        method: "pyautoguiPressEsc",
-        params: {}
-      });
-    }
-    function pyautoguiScreenshot() {
-      return post_rpc({
-        method: "pyautoguiScreenshot",
-        params: {}
-      });
-    }
-    function pyautoguiWrite(text, interval) {
-      return post_rpc({
-        method: "pyautoguiWrite",
-        params: {
-          text,
-          interval
-        }
-      });
-    }
-    function pyautoguiText(text) {
-      return post_rpc({
-        method: "pyautoguiText",
-        params: {
-          text
-        }
-      });
-    }
     function loadURL(url, win_id) {
       return post_rpc({
         method: "loadURL",
@@ -1235,15 +1230,6 @@ var require_utils = __commonJS({
         }
       });
     }
-    var sendInputEvent = async (inputEvent, win_id) => {
-      return post_rpc({
-        method: "sendInputEvent",
-        params: {
-          win_id: win_id || 1,
-          inputEvent
-        }
-      });
-    };
     async function simulateClick(x, y, win_id) {
       await sendInputEvent(
         {
@@ -1326,48 +1312,6 @@ return {
         params: {
           win_id: win_id || 1,
           code
-        }
-      });
-    };
-    var clearRequests = async (win_id) => {
-      return post_rpc({
-        method: "clearRequests",
-        params: {
-          win_id: win_id || 1
-        }
-      });
-    };
-    var getWindowState = async (win_id) => {
-      return post_rpc({
-        method: "getWindowState",
-        params: {
-          win_id: win_id || 1
-        }
-      });
-    };
-    var getRequests = async (win_id) => {
-      return post_rpc({
-        method: "getRequests",
-        params: {
-          win_id: win_id || 1
-        }
-      });
-    };
-    var downloadMedia = async (params, win_id) => {
-      return post_rpc({
-        method: "downloadMedia",
-        params: {
-          win_id: win_id || 1,
-          ...params
-        }
-      });
-    };
-    var getSubTitles = async ({ mediaPath }, win_id) => {
-      return post_rpc({
-        method: "getSubTitles",
-        params: {
-          win_id: win_id || 1,
-          mediaPath
         }
       });
     };
@@ -1471,7 +1415,6 @@ return {
       getDisplayScreenSize,
       displayScreenshot,
       getWindowScreenshot,
-      pyautoguiClick,
       sendElectronClick,
       openTerminal,
       ping,
@@ -1494,23 +1437,12 @@ return {
       captureScreenshot,
       saveScreenshot,
       getScreenshotInfo,
+      sendElectronPaste,
       captureSystemScreenshot,
       saveSystemScreenshot,
       switchAccount,
       getAccountInfo,
       getAccountWindows,
-      pyautoguiType,
-      pyautoguiPress,
-      pyautoguiHotkey,
-      pyautoguiPaste,
-      pyautoguiMove,
-      pyautoguiPressEnter,
-      pyautoguiPressBackspace,
-      pyautoguiPressSpace,
-      pyautoguiPressEsc,
-      pyautoguiScreenshot,
-      pyautoguiWrite,
-      pyautoguiText,
       sleep
     };
   }
@@ -1559,23 +1491,33 @@ var require_utils_extension = __commonJS({
       regVncEvent();
     }
     window.handleElectronRender = async (textarea) => {
-      const value = textarea.value;
+      const value1 = textarea.value;
+      const value = value1.split("------")[0];
+      if (!value.trim()) {
+        return alert("no value");
+      }
+      const newValue = `
+-------
+${value1}`;
       const uri = new URL(location.href);
       let win_id = uri.searchParams.get("win_id");
       const active_rpc_url = localStorage.getItem("active_rpc_url");
       if (!active_rpc_url || !win_id) {
-        return;
+      } else {
+        const uri1 = new URL(active_rpc_url);
+        const token = uri1.searchParams.get("token") || "";
+        const apiUrl = active_rpc_url.split("/rpc")[0];
+        utils.setBaseApi(apiUrl);
+        utils.setToken(token);
+        win_id = Number(win_id);
       }
-      win_id = Number(win_id);
-      const uri1 = new URL(active_rpc_url);
-      const token = uri1.searchParams.get("token") || "";
-      const apiUrl = active_rpc_url.split("/rpc")[0];
-      utils.setBaseApi(apiUrl);
-      utils.setToken(token);
       await utils.writeClipboard(value);
-      await utils.sendElectronClick(Number(win_id), 314, 159);
-      await utils.sendElectronCtlV(Number(win_id));
-      await utils.sendElectronPressEnter(Number(win_id));
+      await utils.sendElectronClick(win_id, 16, 50);
+      await utils.sendElectronPaste(win_id);
+      await utils.sendElectronPressEnter(win_id);
+      textarea.value = newValue;
+      const storageKey = `prompt_area_${window.location.href}`;
+      localStorage.setItem(storageKey, newValue);
     };
     window.regVncEvent__ = false;
     function regVncEvent() {
@@ -1619,7 +1561,6 @@ var require_utils_extension = __commonJS({
                 console.log(err);
               }
               await utils.post_rpc({
-                method: "pyautoguiHotkey",
                 params: {
                   hot: "ctrl",
                   key: "v"
@@ -1628,7 +1569,6 @@ var require_utils_extension = __commonJS({
             }
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "c") {
               await utils.post_rpc({
-                method: "pyautoguiHotkey",
                 params: {
                   hot: "ctrl",
                   key: "c"
@@ -1637,7 +1577,6 @@ var require_utils_extension = __commonJS({
             }
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
               await utils.post_rpc({
-                method: "pyautoguiHotkey",
                 params: {
                   hot: "ctrl",
                   key: "a"
@@ -1646,7 +1585,6 @@ var require_utils_extension = __commonJS({
             }
             if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "x") {
               await utils.post_rpc({
-                method: "pyautoguiHotkey",
                 params: {
                   hot: "ctrl",
                   key: "x"

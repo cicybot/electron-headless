@@ -17,8 +17,6 @@ cd electron-mcp/app
 # 安装依赖
 npm install
 
-# 全局安装 pyautogui
-pip3 install pyautogui
 ```
 
 ### 🚀 启动应用
@@ -47,10 +45,8 @@ async function demo() {
 
 ### 🖱️ 鼠标点击自动化
 ```javascript
-const { pyautoguiClick } = require('./src/utils');
 
 // 在指定位置点击
-await pyautoguiClick(300, 400);
 console.log('✅ 鼠标点击完成');
 ```
 ![鼠标点击](https://via.placeholder.com/800x400/2196F3/FFFFFF?text=🖱️+精准鼠标点击)
@@ -111,14 +107,10 @@ async function loginAndScreenshot() {
     await sleep(2000);
     
     // 3. 输入用户名
-    await pyautoguiType({ text: 'your-username' });
-    await pyautoguiPress({ key: 'tab' });
     
     // 4. 输入密码
-    await pyautoguiType({ text: 'your-password' });
     
     // 5. 点击登录按钮
-    await pyautoguiClick(500, 300);
     
     // 6. 等待登录完成
     await sleep(3000);
@@ -171,12 +163,9 @@ console.log('🚀 并发打开完成:', results);
 // 健壮的错误处理
 async function robustAutomation() {
   try {
-    await pyautoguiClick(100, 100);
   } catch (error) {
     console.log('⚠️ 点击失败，尝试备用方案');
     // 备用方案
-    await pyautoguiPress({ key: 'tab' });
-    await pyautoguiPress({ key: 'enter' });
   }
 }
 ```
@@ -187,9 +176,7 @@ async function robustAutomation() {
 process.env.DEBUG = 'true';
 
 // 查看执行日志
-// [ACT] pyautoguiClick {x: 100, y: 100}
 // [PyAutoGUI Service] Click executed successfully
-// [ACT] pyautoguiType {text: 'Hello'}
 // [PyAutoGUI Service] Type completed
 ```
 
@@ -205,13 +192,11 @@ async function autoLike() {
   
   // 2. 滚动到指定内容
   for (let i = 0; i < 5; i++) {
-    await pyautoguiPress({ key: 'page_down' });
     await sleep(1000);
   }
   
   // 3. 点赞前3个内容
   for (let j = 0; j < 3; j++) {
-    await pyautoguiClick(200 + j * 150, 400);
     await sleep(500);
   }
   
@@ -257,7 +242,6 @@ rm -rf node_modules package-lock.json
 npm install
 ```
 
-### ❌ **Python pyautogui 报错**
 ```bash
 # macOS 权限问题
 # 系统偏好设置 → 安全性与隐私 → 隐私 → 完全磁盘访问权限
@@ -268,7 +252,6 @@ pip3 install python3-tk
 
 # Windows 依赖问题
 pip3 install --upgrade pip
-pip3 install pyautogui --no-cache-dir
 ```
 
 ### ❌ **窗口打开失败**

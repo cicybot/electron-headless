@@ -48,23 +48,14 @@ This document maps all RPC methods to their corresponding utility functions in `
 | `simulateClick` | `simulateClick(x, y, win_id)` | `simulate_click` | Simulate mouse click |
 | `sendKey` | `sendKey(key, win_id)` | `send_key` | Send key to window |
 
-## PyAutoGUI Tools (Screen Automation)
+## Input Event Tools (Electron-based)
 
 | RPC Method | Utils.js Function | MCP Tool | Description |
 |-------------|------------------|-----------|-------------|
-| `pyautoguiClick` | `pyautoguiClick(x, y)` | `pyautogui_click` | Click at coordinates |
-| `pyautoguiType` | `pyautoguiType(text)` | `pyautogui_type` | Type text |
-| `pyautoguiHotkey` | *NEW* | `pyautogui_hotkey` | Press hotkey combination |
-| `pyautoguiPress` | `pyautoguiPress(key)` | `pyautogui_press` | Press single key |
-| `pyautoguiPaste` | `pyautoguiPaste()` | `pyautogui_paste` | Paste from clipboard |
-| `pyautoguiMove` | `pyautoguiMove(x, y)` | `pyautogui_move` | Move mouse cursor |
-| `pyautoguiPressEnter` | `pyautoguiPressEnter()` | `pyautogui_press_enter` | Press Enter key |
-| `pyautoguiPressBackspace` | `pyautoguiPressBackspace()` | `pyautogui_press_backspace` | Press Backspace key |
-| `pyautoguiPressSpace` | `pyautoguiPressSpace()` | `pyautogui_press_space` | Press Space key |
-| `pyautoguiPressEsc` | `pyautoguiPressEsc()` | `pyautogui_press_esc` | Press Escape key |
-| `pyautoguiScreenshot` | `pyautoguiScreenshot()` | `pyautogui_screenshot` | Take screenshot |
-| `pyautoguiWrite` | `pyautoguiWrite(text, interval)` | `pyautogui_write` | Write text with interval |
-| `pyautoguiText` | `pyautoguiText(text)` | `pyautogui_text` | Insert text |
+| `sendElectronClick` | `sendElectronClick(win_id, x, y)` | `send_electron_click` | Send click event to window |
+| `sendElectronPaste` | `sendElectronPaste(win_id)` | `send_electron_paste` | Paste text in window |
+| `sendElectronPressEnter` | `sendElectronPressEnter(win_id)` | `send_electron_press_enter` | Press Enter in window |
+| `writeClipboard` | `writeClipboard(text)` | `write_clipboard` | Write text to clipboard |
 
 ## Cookie Tools
 
@@ -136,19 +127,16 @@ The following RPC methods need utils.js functions added:
 
 | RPC Method | Status | Required Implementation |
 |-------------|---------|-----------------------|
-| `pyautoguiHotkey` | **MISSING** | Add `pyautoguiHotkey(keys)` function to utils.js |
 
 ## Usage Examples
 
 ### Using Utils.js Functions
 ```javascript
-const { openWindow, pyautoguiClick, captureScreenshot } = require('./utils');
 
 // Open a window
 await openWindow('https://example.com');
 
 // Click at coordinates
-await pyautoguiClick(100, 200);
 
 // Take screenshot
 const screenshot = await captureScreenshot(windowId);
@@ -166,7 +154,6 @@ const screenshot = await captureScreenshot(windowId);
 }
 
 {
-  "tool": "pyautogui_click", 
   "arguments": {
     "x": 100,
     "y": 200
@@ -178,6 +165,5 @@ const screenshot = await captureScreenshot(windowId);
 
 1. All utils.js functions use the `post_rpc` core function to communicate with the Electron backend
 2. MCP tools provide the same functionality but with standardized input schemas for AI integration
-3. PyAutoGUI methods have been updated to use Python pyautogui module instead of AppleScript
 4. All mappings maintain backward compatibility with existing code
 5. Parameter ordering may differ between utils.js and MCP tools for better UX

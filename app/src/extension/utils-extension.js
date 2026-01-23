@@ -44,25 +44,36 @@ function onReady() {
 }
 
 window.handleElectronRender = async (textarea)=>{
-  const value = textarea.value
+  const value1 = textarea.value
+  const value = value1.split("------")[0]
+  if(!value.trim()){
+    return alert("no value")
+
+  }
+  const newValue = `
+-------
+${value1}`
   const uri = new URL(location.href)
   let win_id = uri.searchParams.get("win_id")
-  //active_rpc_url
-
   const active_rpc_url = localStorage.getItem("active_rpc_url")
   if(!active_rpc_url || !win_id){
-    return
+  }else{
+    const uri1 = new URL(active_rpc_url)
+    const token = uri1.searchParams.get("token") || ""
+    const apiUrl = active_rpc_url.split("/rpc")[0]
+    utils.setBaseApi(apiUrl)
+    utils.setToken(token)
+    win_id = Number(win_id)
   }
-  win_id = Number(win_id)
-  const uri1 = new URL(active_rpc_url)
-  const token = uri1.searchParams.get("token") || ""
-  const apiUrl = active_rpc_url.split("/rpc")[0]
-  utils.setBaseApi(apiUrl)
-  utils.setToken(token)
   await utils.writeClipboard(value)
-  await utils.sendElectronClick(Number(win_id),314,159)
-  await utils.sendElectronCtlV(Number(win_id))
-  await utils.sendElectronPressEnter(Number(win_id))
+
+  await utils.sendElectronClick(win_id,16,50)
+  await utils.sendElectronPaste(win_id)
+  await utils.sendElectronPressEnter(win_id)
+
+  textarea.value = newValue
+  const storageKey = `prompt_area_${window.location.href}`;
+  localStorage.setItem(storageKey,newValue)
 }
 
 window.regVncEvent__ = false;
@@ -111,7 +122,6 @@ function regVncEvent() {
           }
 
           await utils.post_rpc({
-            method: "pyautoguiHotkey",
             params: {
               hot: "ctrl",
               key: "v",
@@ -121,7 +131,6 @@ function regVncEvent() {
 
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "c") {
           await utils.post_rpc({
-            method: "pyautoguiHotkey",
             params: {
               hot: "ctrl",
               key: "c",
@@ -130,7 +139,6 @@ function regVncEvent() {
         }
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "a") {
           await utils.post_rpc({
-            method: "pyautoguiHotkey",
             params: {
               hot: "ctrl",
               key: "a",
@@ -140,7 +148,6 @@ function regVncEvent() {
 
         if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "x") {
           await utils.post_rpc({
-            method: "pyautoguiHotkey",
             params: {
               hot: "ctrl",
               key: "x",

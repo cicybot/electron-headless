@@ -97,11 +97,9 @@ npm start
 ### 🔧 开发者API
 ```javascript
 // 简单易用的API
-const { openWindow, pyautoguiClick, screenshot } = require('./utils');
 
 // 打开窗口 → 点击 → 截图
 const win = await openWindow('https://github.com');
-await pyautoguiClick(100, 200);
 const screenshot = await screenshot(win.id);
 ```
 
@@ -173,7 +171,6 @@ D --> E[邮件通知]
 ### 📚 **资源推荐**
 - 📖 [Electron官方文档](https://electronjs.org/docs)
 - 🤖 [MCP协议规范](https://modelcontextprotocol.com)
-- 🎭 [PyAutoGUI指南](https://pyautogui.readthedocs.io)
 
 ### 🎯 **案例展示**
 - 🏪 [电商自动化案例集](./examples/ecommerce/)

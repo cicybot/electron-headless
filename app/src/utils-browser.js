@@ -4,7 +4,7 @@ class Storage {
     if (res) {
       return JSON.parse(res)[0];
     } else {
-      null;
+      return null;
     }
   }
 
@@ -388,10 +388,24 @@ function showPromptArea() {
     `;
   textarea.placeholder = "Enter your prompt here...";
 
+  // Load cached value on startup
+  const storageKey = `prompt_area_${window.location.href}`;
+  const cachedValue = localStorage.getItem(storageKey);
+  if (cachedValue) {
+    textarea.value = cachedValue;
+  }
+
+  // Save to localStorage on change
+  textarea.addEventListener("input", (e) => {
+    localStorage.setItem(storageKey, e.target.value);
+  });
+
   textarea.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey && textarea.value.trim() !== "") {
-      e.preventDefault();
-      window.handleElectronRender(textarea)
+    // 判断：Ctrl+Enter（Windows/Linux） 或 Cmd+Enter（Mac），且输入内容非空
+    const isModifierKey = e.ctrlKey || e.metaKey; // ctrl键 或 cmd键
+    if (e.key === "Enter" && isModifierKey && !e.shiftKey && textarea.value.trim() !== "") {
+      e.preventDefault(); // 阻止默认换行行为
+      window.handleElectronRender(textarea);
     }
   });
 
@@ -404,50 +418,8 @@ function showPromptArea() {
         align-items: center;
     `;
 
-  // Left side: visibility toggle
-  const visibilityContainer = document.createElement("div");
-  visibilityContainer.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #ccc;
-        font-size: 12px;
-    `;
-
-  const visibilityCheckbox = document.createElement("input");
-  visibilityCheckbox.type = "checkbox";
-  visibilityCheckbox.id = "prompt-visibility";
-  visibilityCheckbox.checked = true;
-  visibilityCheckbox.style.cssText = `
-        cursor: pointer;
-    `;
-  
-  const visibilityLabel = document.createElement("label");
-  visibilityLabel.htmlFor = "prompt-visibility";
-  visibilityLabel.textContent = "Visible";
-  visibilityLabel.style.cssText = `
-        cursor: pointer;
-        user-select: none;
-    `;
-
-  // Define the action button container before the event listener
-  // This will be assigned later
+  // Define the action button container
   let actionButtonContainer;
-  
-  visibilityCheckbox.addEventListener("change", (e) => {
-    if (e.target.checked) {
-      textarea.style.display = "block";
-      if (actionButtonContainer) actionButtonContainer.style.display = "flex";
-      visibilityLabel.textContent = "Visible";
-    } else {
-      textarea.style.display = "none";
-      if (actionButtonContainer) actionButtonContainer.style.display = "none";
-      visibilityLabel.textContent = "Hidden";
-    }
-  });
-
-  visibilityContainer.appendChild(visibilityCheckbox);
-  visibilityContainer.appendChild(visibilityLabel);
 
   // Right side: action buttons
   actionButtonContainer = document.createElement("div");
@@ -487,7 +459,6 @@ function showPromptArea() {
   actionButtonContainer.appendChild(submitButton);
   actionButtonContainer.appendChild(cancelButton);
 
-  buttonContainer.appendChild(visibilityContainer);
   buttonContainer.appendChild(actionButtonContainer);
 
   content.appendChild(textarea);
