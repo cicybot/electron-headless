@@ -33,6 +33,8 @@ class WindowManager {
         let initScript = `
       ${globalCode}
       window.__win_id = ${win.id};
+      window.__wc_id = ${win.webContents.id};
+      
       console.log("dom-ready")
       if(window._G){
         console.log("_G init")
@@ -294,7 +296,7 @@ class WindowManager {
    * Get window by ID
    */
   getWindow(winId) {
-    return BrowserWindow.fromId(winId);
+    return BrowserWindow.fromId(Number(winId));
   }
 
   /**

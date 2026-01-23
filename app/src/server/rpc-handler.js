@@ -5,7 +5,7 @@
 
 const { executeJavaScript, downloadMedia, getAppInfo, setCookies } = require("../helpers");
 const { whisperTranscribe } = require("../utils-node");
-const { MapArray } = require("../utils");
+
 const screenshotCacheService = require("../services/screenshot-cache-service");
 const pyautoguiService = require("../services/pyautogui-service");
 
@@ -202,13 +202,16 @@ class RPCHandler {
         case "sendElectronPressEnter":
           if (wc) {
             await wc.sendInputEvent({
-              type: "keyDown",
-              keyCode: "Return",
+              type: "rawKeyDown",
+              keyCode: "Enter",
             });
+
+            // Key up
             await wc.sendInputEvent({
               type: "keyUp",
-              keyCode: "Return",
+              keyCode: "Enter",
             });
+
           }
           break;
 
@@ -224,100 +227,30 @@ class RPCHandler {
             }
           }
           break;
-
-        case "showFloatDiv":
+        case "sendElectronSelectAll":
           if (wc) {
-            const options = params || {};
-            await wc.executeJavaScript(`window._G.showFloatDiv(${JSON.stringify(options)})`);
+            wc.focus();
+            win.webContents.selectAll();
           }
           break;
-
-        case "hideFloatDiv":
+        case "sendElectronPaste":
           if (wc) {
-            await wc.executeJavaScript("window._G.hideFloatDiv()");
+            wc.focus();
+            win.webContents.paste();
           }
           break;
-
-        case "sendElectronCtlV":
+        case "sendElectronCopy":
           if (wc) {
-            // Send Ctrl+V (Control key + V key) for paste
-            await wc.sendInputEvent({
-              type: "keyDown",
-              keyCode: "V",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "V",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "Control",
-            });
+            wc.focus();
+            win.webContents.copy();
           }
           break;
-
-        case "sendElectronCtlC":
+        case "sendElectronCut":
           if (wc) {
-            // Send Ctrl+C (Control key + C key) for copy
-            await wc.sendInputEvent({
-              type: "keyDown",
-              keyCode: "C",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "C",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "Control",
-            });
+            wc.focus();
+            win.webContents.cut();
           }
           break;
-
-        case "sendElectronCtlX":
-          if (wc) {
-            // Send Ctrl+X (Control key + X key) for cut
-            await wc.sendInputEvent({
-              type: "keyDown",
-              keyCode: "X",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "X",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "Control",
-            });
-          }
-          break;
-
-        case "sendElectronCtlA":
-          if (wc) {
-            // Send Ctrl+A (Control key + A key) for select all
-            await wc.sendInputEvent({
-              type: "keyDown",
-              keyCode: "A",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "A",
-              modifiers: ["control"],
-            });
-            await wc.sendInputEvent({
-              type: "keyUp",
-              keyCode: "Control",
-            });
-          }
-          break;
-
         // Cookies
         case "importCookies":
           if (wc) {

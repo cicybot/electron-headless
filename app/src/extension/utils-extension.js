@@ -43,11 +43,26 @@ function onReady() {
   regVncEvent();
 }
 
-window.handleElectronRender = (textarea)=>{
+window.handleElectronRender = async (textarea)=>{
   const value = textarea.value
   const uri = new URL(location.href)
-  const win_id = uri.searchParams.get("win_id")
-  console.log({win_id,uri,value})
+  let win_id = uri.searchParams.get("win_id")
+  //active_rpc_url
+
+  const active_rpc_url = localStorage.getItem("active_rpc_url")
+  if(!active_rpc_url || !win_id){
+    return
+  }
+  win_id = Number(win_id)
+  const uri1 = new URL(active_rpc_url)
+  const token = uri1.searchParams.get("token") || ""
+  const apiUrl = active_rpc_url.split("/rpc")[0]
+  utils.setBaseApi(apiUrl)
+  utils.setToken(token)
+  await utils.writeClipboard(value)
+  await utils.sendElectronClick(Number(win_id),314,159)
+  await utils.sendElectronCtlV(Number(win_id))
+  await utils.sendElectronPressEnter(Number(win_id))
 }
 
 window.regVncEvent__ = false;

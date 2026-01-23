@@ -283,10 +283,6 @@ function hidePromptIcon() {
 }
 
 function showPromptArea() {
-/**
- * Enhanced showPromptArea function with position/size display and visibility toggle
- */
-
   hidePromptArea();
   hidePromptIcon(); // Hide the small button when prompt area is shown
 
@@ -316,35 +312,8 @@ function showPromptArea() {
         cursor: move;
         font-weight: bold;
         user-select: none;
-        position: relative;
     `;
   header.textContent = "Prompt Area";
-
-  // Add position/size display to header
-  const positionDisplay = document.createElement("div");
-  positionDisplay.style.cssText = `
-        position: absolute;
-        right: 30px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 11px;
-        color: #888;
-        font-family: monospace;
-        pointer-events: none;
-        white-space: nowrap;
-    `;
-  
-  // Function to update position/size display
-  function updatePositionDisplay() {
-    const left = parseInt(div.style.left) || div.offsetLeft;
-    const top = parseInt(div.style.top) || div.offsetTop;
-    const width = parseInt(div.style.width) || div.offsetWidth;
-    const height = parseInt(div.style.height) || div.offsetHeight;
-    positionDisplay.textContent = `Pos: ${left},${top} | Size: ${width}×${height}`;
-  }
-
-  // Initialize position display
-  updatePositionDisplay();
 
   // Add close button to header
   const closeButton = document.createElement("span");
@@ -362,7 +331,6 @@ function showPromptArea() {
     hidePromptArea();
   });
   header.appendChild(closeButton);
-  header.appendChild(positionDisplay);
 
   const content = document.createElement("div");
   content.style.cssText = `
@@ -400,60 +368,7 @@ function showPromptArea() {
         display: flex;
         gap: 10px;
         margin-top: 10px;
-        justify-content: space-between;
-        align-items: center;
-    `;
-
-  // Left side: visibility toggle
-  const visibilityContainer = document.createElement("div");
-  visibilityContainer.style.cssText = `
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #ccc;
-        font-size: 12px;
-    `;
-
-  const visibilityCheckbox = document.createElement("input");
-  visibilityCheckbox.type = "checkbox";
-  visibilityCheckbox.id = "prompt-visibility";
-  visibilityCheckbox.checked = true;
-  visibilityCheckbox.style.cssText = `
-        cursor: pointer;
-    `;
-  
-  const visibilityLabel = document.createElement("label");
-  visibilityLabel.htmlFor = "prompt-visibility";
-  visibilityLabel.textContent = "Visible";
-  visibilityLabel.style.cssText = `
-        cursor: pointer;
-        user-select: none;
-    `;
-
-  // Define the action button container before the event listener
-  // This will be assigned later
-  let actionButtonContainer;
-  
-  visibilityCheckbox.addEventListener("change", (e) => {
-    if (e.target.checked) {
-      textarea.style.display = "block";
-      if (actionButtonContainer) actionButtonContainer.style.display = "flex";
-      visibilityLabel.textContent = "Visible";
-    } else {
-      textarea.style.display = "none";
-      if (actionButtonContainer) actionButtonContainer.style.display = "none";
-      visibilityLabel.textContent = "Hidden";
-    }
-  });
-
-  visibilityContainer.appendChild(visibilityCheckbox);
-  visibilityContainer.appendChild(visibilityLabel);
-
-  // Right side: action buttons
-  actionButtonContainer = document.createElement("div");
-  actionButtonContainer.style.cssText = `
-        display: flex;
-        gap: 10px;
+        justify-content: flex-end;
     `;
 
   const submitButton = document.createElement("button");
@@ -484,11 +399,8 @@ function showPromptArea() {
     `;
   cancelButton.addEventListener("click", hidePromptArea);
 
-  actionButtonContainer.appendChild(submitButton);
-  actionButtonContainer.appendChild(cancelButton);
-
-  buttonContainer.appendChild(visibilityContainer);
-  buttonContainer.appendChild(actionButtonContainer);
+  buttonContainer.appendChild(submitButton);
+  buttonContainer.appendChild(cancelButton);
 
   content.appendChild(textarea);
   content.appendChild(buttonContainer);
@@ -550,9 +462,6 @@ function showPromptArea() {
 
       div.style.left = `${Math.max(0, Math.min(newLeft, maxLeft))}px`;
       div.style.top = `${Math.max(0, Math.min(newTop, maxTop))}px`;
-      
-      // Update position display during drag
-      updatePositionDisplay();
     } else if (isResizing) {
       let newWidth = startWidth;
       let newHeight = startHeight;
@@ -581,9 +490,6 @@ function showPromptArea() {
       div.style.height = `${finalHeight}px`;
       div.style.left = `${newLeft}px`;
       div.style.top = `${newTop}px`;
-      
-      // Update position/size display during resize
-      updatePositionDisplay();
     }
   });
 
@@ -592,8 +498,6 @@ function showPromptArea() {
     isResizing = false;
   });
 }
-
-
 
 function hidePromptArea() {
   const div = document.getElementById(PROMPT_DIV_ID);

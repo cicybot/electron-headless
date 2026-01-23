@@ -1,7 +1,9 @@
 let ELECTRON_BASE_API_URL = "http://127.0.0.1:3456";
 const AI_BASE_API_URL = "https://api.cicy.de5.net";
 let TOKEN = "";
-
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 function setBaseApi(url) {
   ELECTRON_BASE_API_URL = url;
 }
@@ -253,7 +255,7 @@ function openDevTools(win_id) {
 // Input events
 function sendElectronCtlV(win_id) {
   return post_rpc({
-    method: "sendElectronCtlV",
+    method: "sendElectronPaste",
     params: {
       win_id,
     },
@@ -813,4 +815,5 @@ module.exports = {
   pyautoguiScreenshot,
   pyautoguiWrite,
   pyautoguiText,
+  sleep,
 };

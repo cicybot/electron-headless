@@ -1,3 +1,4 @@
+"use strict";
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -6,6 +7,7 @@ var __commonJS = (cb, mod) => function __require() {
 // src/utils-browser.js
 var require_utils_browser = __commonJS({
   "src/utils-browser.js"(exports, module) {
+    "use strict";
     var Storage = class {
       static get(key) {
         const res = localStorage.getItem("cicy_" + key);
@@ -254,8 +256,29 @@ var require_utils_browser = __commonJS({
         cursor: move;
         font-weight: bold;
         user-select: none;
+        position: relative;
     `;
       header.textContent = "Prompt Area";
+      const positionDisplay = document.createElement("div");
+      positionDisplay.style.cssText = `
+        position: absolute;
+        right: 30px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 11px;
+        color: #888;
+        font-family: monospace;
+        pointer-events: none;
+        white-space: nowrap;
+    `;
+      function updatePositionDisplay() {
+        const left = parseInt(div.style.left) || div.offsetLeft;
+        const top = parseInt(div.style.top) || div.offsetTop;
+        const width = parseInt(div.style.width) || div.offsetWidth;
+        const height = parseInt(div.style.height) || div.offsetHeight;
+        positionDisplay.textContent = `Pos: ${left},${top} | Size: ${width}\xD7${height}`;
+      }
+      updatePositionDisplay();
       const closeButton = document.createElement("span");
       closeButton.innerHTML = "\xD7";
       closeButton.style.cssText = `
@@ -271,6 +294,7 @@ var require_utils_browser = __commonJS({
         hidePromptArea();
       });
       header.appendChild(closeButton);
+      header.appendChild(positionDisplay);
       const content = document.createElement("div");
       content.style.cssText = `
         flex: 1;
@@ -304,7 +328,49 @@ var require_utils_browser = __commonJS({
         display: flex;
         gap: 10px;
         margin-top: 10px;
-        justify-content: flex-end;
+        justify-content: space-between;
+        align-items: center;
+    `;
+      const visibilityContainer = document.createElement("div");
+      visibilityContainer.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #ccc;
+        font-size: 12px;
+    `;
+      const visibilityCheckbox = document.createElement("input");
+      visibilityCheckbox.type = "checkbox";
+      visibilityCheckbox.id = "prompt-visibility";
+      visibilityCheckbox.checked = true;
+      visibilityCheckbox.style.cssText = `
+        cursor: pointer;
+    `;
+      const visibilityLabel = document.createElement("label");
+      visibilityLabel.htmlFor = "prompt-visibility";
+      visibilityLabel.textContent = "Visible";
+      visibilityLabel.style.cssText = `
+        cursor: pointer;
+        user-select: none;
+    `;
+      let actionButtonContainer;
+      visibilityCheckbox.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          textarea.style.display = "block";
+          if (actionButtonContainer) actionButtonContainer.style.display = "flex";
+          visibilityLabel.textContent = "Visible";
+        } else {
+          textarea.style.display = "none";
+          if (actionButtonContainer) actionButtonContainer.style.display = "none";
+          visibilityLabel.textContent = "Hidden";
+        }
+      });
+      visibilityContainer.appendChild(visibilityCheckbox);
+      visibilityContainer.appendChild(visibilityLabel);
+      actionButtonContainer = document.createElement("div");
+      actionButtonContainer.style.cssText = `
+        display: flex;
+        gap: 10px;
     `;
       const submitButton = document.createElement("button");
       submitButton.textContent = "Submit";
@@ -318,8 +384,7 @@ var require_utils_browser = __commonJS({
         font-size: 14px;
     `;
       submitButton.addEventListener("click", () => {
-        alert(textarea.value);
-        textarea.value = "";
+        window.handleElectronRender(textarea);
       });
       const cancelButton = document.createElement("button");
       cancelButton.textContent = "Cancel";
@@ -333,8 +398,10 @@ var require_utils_browser = __commonJS({
         font-size: 14px;
     `;
       cancelButton.addEventListener("click", hidePromptArea);
-      buttonContainer.appendChild(submitButton);
-      buttonContainer.appendChild(cancelButton);
+      actionButtonContainer.appendChild(submitButton);
+      actionButtonContainer.appendChild(cancelButton);
+      buttonContainer.appendChild(visibilityContainer);
+      buttonContainer.appendChild(actionButtonContainer);
       content.appendChild(textarea);
       content.appendChild(buttonContainer);
       const resizeHandles = ["nw", "ne", "sw", "se"];
@@ -387,6 +454,7 @@ var require_utils_browser = __commonJS({
           const maxTop = window.innerHeight - div.offsetHeight;
           div.style.left = `${Math.max(0, Math.min(newLeft, maxLeft))}px`;
           div.style.top = `${Math.max(0, Math.min(newTop, maxTop))}px`;
+          updatePositionDisplay();
         } else if (isResizing) {
           let newWidth = startWidth;
           let newHeight = startHeight;
@@ -412,6 +480,7 @@ var require_utils_browser = __commonJS({
           div.style.height = `${finalHeight}px`;
           div.style.left = `${newLeft}px`;
           div.style.top = `${newTop}px`;
+          updatePositionDisplay();
         }
       });
       document.addEventListener("mouseup", () => {
@@ -721,9 +790,13 @@ var require_utils_browser = __commonJS({
 // src/utils.js
 var require_utils = __commonJS({
   "src/utils.js"(exports2, module2) {
+    "use strict";
     var ELECTRON_BASE_API_URL = "http://127.0.0.1:3456";
     var AI_BASE_API_URL = "https://api.cicy.de5.net";
     var TOKEN = "";
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
     function setBaseApi(url) {
       ELECTRON_BASE_API_URL = url;
     }
@@ -942,7 +1015,7 @@ var require_utils = __commonJS({
     }
     function sendElectronCtlV(win_id) {
       return post_rpc({
-        method: "sendElectronCtlV",
+        method: "sendElectronPaste",
         params: {
           win_id
         }
@@ -1437,7 +1510,8 @@ return {
       pyautoguiPressEsc,
       pyautoguiScreenshot,
       pyautoguiWrite,
-      pyautoguiText
+      pyautoguiText,
+      sleep
     };
   }
 });
@@ -1445,6 +1519,7 @@ return {
 // src/extension/utils-extension.js
 var require_utils_extension = __commonJS({
   "src/extension/utils-extension.js"(exports2, module2) {
+    "use strict";
     var utils = require_utils();
     var utilsBrowser = require_utils_browser();
     function onReady2() {
@@ -1483,11 +1558,24 @@ var require_utils_extension = __commonJS({
       }, 2e4);
       regVncEvent();
     }
-    window.handleElectronRender = (textarea) => {
+    window.handleElectronRender = async (textarea) => {
       const value = textarea.value;
       const uri = new URL(location.href);
-      const win_id = uri.searchParams.get("win_id");
-      console.log({ win_id, uri, value });
+      let win_id = uri.searchParams.get("win_id");
+      const active_rpc_url = localStorage.getItem("active_rpc_url");
+      if (!active_rpc_url || !win_id) {
+        return;
+      }
+      win_id = Number(win_id);
+      const uri1 = new URL(active_rpc_url);
+      const token = uri1.searchParams.get("token") || "";
+      const apiUrl = active_rpc_url.split("/rpc")[0];
+      utils.setBaseApi(apiUrl);
+      utils.setToken(token);
+      await utils.writeClipboard(value);
+      await utils.sendElectronClick(Number(win_id), 314, 159);
+      await utils.sendElectronCtlV(Number(win_id));
+      await utils.sendElectronPressEnter(Number(win_id));
     };
     window.regVncEvent__ = false;
     function regVncEvent() {

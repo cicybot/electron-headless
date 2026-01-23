@@ -1,3 +1,4 @@
+"use strict";
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __commonJS = (cb, mod) => function __require() {
   return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -6,9 +7,13 @@ var __commonJS = (cb, mod) => function __require() {
 // src/utils.js
 var require_utils = __commonJS({
   "src/utils.js"(exports2, module2) {
+    "use strict";
     var ELECTRON_BASE_API_URL = "http://127.0.0.1:3456";
     var AI_BASE_API_URL = "https://api.cicy.de5.net";
     var TOKEN = "";
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
     function setBaseApi(url) {
       ELECTRON_BASE_API_URL = url;
     }
@@ -227,7 +232,7 @@ var require_utils = __commonJS({
     }
     function sendElectronCtlV(win_id) {
       return post_rpc({
-        method: "sendElectronCtlV",
+        method: "sendElectronPaste",
         params: {
           win_id
         }
@@ -722,7 +727,8 @@ return {
       pyautoguiPressEsc,
       pyautoguiScreenshot,
       pyautoguiWrite,
-      pyautoguiText
+      pyautoguiText,
+      sleep
     };
   }
 });
