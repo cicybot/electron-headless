@@ -9,31 +9,22 @@ const path = require("path");
 const os = require("os");
 const contextMenu = require("electron-context-menu").default || require("electron-context-menu");
 const platform = process.platform;
-//
-// if(platform === 'linux'){
-//   app.commandLine.appendSwitch('no-sandbox')
-//   app.commandLine.appendSwitch('disable-dev-shm-usage')
-//   app.commandLine.appendSwitch('enable-unsafe-swiftshader')
-//   app.commandLine.appendSwitch('disable-features=UseDBus')
-// }
-//
-// app.commandLine.appendSwitch('trace-warnings')
-//
-//
-// // app.commandLine.appendSwitch('remote-debugging-port', '9221')
-// // app.commandLine.appendSwitch('host-rules', 'MAP * 127.0.0.1')
-// // Disable hardware acceleration to fix DXGI duplication errors
-// app.disableHardwareAcceleration();
-//
-//
-//
-// // Additional flags to prevent desktop capture issues
-// app.commandLine.appendSwitch('disable-webrtc');
-// app.commandLine.appendSwitch('disable-desktop-notifications');
-// app.commandLine.appendSwitch('disable-gpu');
-// app.commandLine.appendSwitch('disable-gpu-compositing');
-// app.commandLine.appendSwitch('disable-software-rasterizer');
-// app.commandLine.appendSwitch('disable-background-timer-throttling');
+
+if(platform === 'linux'){
+  app.commandLine.appendSwitch('no-sandbox')
+  app.commandLine.appendSwitch('disable-dev-shm-usage')
+  app.commandLine.appendSwitch('enable-unsafe-swiftshader')
+  app.commandLine.appendSwitch('disable-features=UseDBus')
+  app.commandLine.appendSwitch('disable-webrtc');
+  app.commandLine.appendSwitch('disable-desktop-notifications');
+  app.commandLine.appendSwitch('disable-gpu');
+  app.commandLine.appendSwitch('disable-gpu-compositing');
+  app.commandLine.appendSwitch('disable-software-rasterizer');
+  app.commandLine.appendSwitch('disable-background-timer-throttling');
+
+}
+
+app.commandLine.appendSwitch('trace-warnings')
 
 // Set up logging to file
 const logDir = path.join(os.homedir(), "electron-mcp", "logs");
