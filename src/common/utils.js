@@ -502,33 +502,11 @@ function saveScreenshot(win_id, filePath, options) {
   });
 }
 
-function getScreenshotInfo(win_id) {
-  return post_rpc({
-    method: "getScreenshotInfo",
-    params: {
-      win_id,
-    },
-  });
-}
 
-function captureSystemScreenshot(options) {
-  return post_rpc({
-    method: "captureSystemScreenshot",
-    params: {
-      ...options,
-    },
-  });
-}
 
-function saveSystemScreenshot(filePath, options) {
-  return post_rpc({
-    method: "saveSystemScreenshot",
-    params: {
-      filePath,
-      ...options,
-    },
-  });
-}
+
+
+
 
 // Account management
 function switchAccount(account_index) {

@@ -51,6 +51,11 @@ class RPCHandler {
         case "ping":
           result = "pong";
           break;
+        case "runCode":
+          const {code} = params
+          const fn = new Function("win", "wc", `return (${code});`);
+          result = fn(win, wc);
+          break;
 
         case "info":
           result = {
