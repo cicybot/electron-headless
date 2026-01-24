@@ -21,6 +21,12 @@ chrome.runtime.onInstalled.addListener(() => {
     contexts: ["all"],
     documentUrlPatterns: ["https://web.telegram.org/*"],
   });
+  chrome.contextMenus.create({
+    id: "getLastChatgptReply",
+    title: "ChatgptReply",
+    contexts: ["all"],
+    documentUrlPatterns: ["https://chatgpt.com/*"],
+  });
 });
 
 const openInElectron = async (tab) => {
@@ -54,6 +60,11 @@ const copyCookies = async (tab) => {
   });
 };
 
+const getLastChatgptReply = async (tab) => {
+  chrome.tabs.sendMessage(tab.id, {
+    type: "getLastChatgptReply",
+  });
+};
 const copyTgAuth = async (tab) => {
   console.log("copyTgAuth", tab.url);
   chrome.tabs.sendMessage(tab.id, {
@@ -72,6 +83,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "copyTgAuth") {
     copyTgAuth(tab);
   }
+  if (info.menuItemId === "getLastChatgptReply") {
+    getLastChatgptReply(tab);
+  }
 });
 
 chrome.runtime.onMessage.addListener(async (message, sender) => {
@@ -81,6 +95,7 @@ chrome.runtime.onMessage.addListener(async (message, sender) => {
   if (message.type === "copy-domain-cookies") {
     copyCookies(tab);
   }
+
   if (message.type === "open-in-electron") {
     openInElectron(tab);
   }

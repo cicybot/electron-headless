@@ -71,9 +71,8 @@ function __getChats(chat) {
 }
 
 async function getChatGptChats() {
-  const db = window._G.useIndexedDB("ConversationsDatabase", "conversations");
+  const db = useIndexedDB("ConversationsDatabase", "conversations");
   const allItems = await db.getAllItems();
-  console.log("allItems", allItems);
   if (allItems.length === 0) {
     return null;
   }
@@ -872,7 +871,7 @@ const _l = (...args) => {
   console.debug("[CICY]", ...args);
 };
 const d = _l;
-module.exports = {
+const gg = {
   _l,
   preload,
   init,
@@ -897,6 +896,7 @@ module.exports = {
   showFloatDiv,
   hideFloatDiv,
 };
+module.exports = gg
 
 class GlobalObj{
   constructor(win_id) {
@@ -917,6 +917,7 @@ class GlobalObj{
 if (typeof window !== "undefined" && window.document) {
 
   window.g = new GlobalObj(window.__win_id)
+  window._G = gg;
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
       setTimeout(showPromptIcon, 100); // Small delay to ensure page is ready

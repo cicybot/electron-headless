@@ -1,8 +1,11 @@
-const { toggleDiv } = require("../utils-browser");
+const utilsBrowser = require("../utils-browser");
 const { onReady } = require("./utils-extension");
 // --- Constants ---
 const toastId = "injector-toast-display";
-
+const { toggleDiv } = utilsBrowser
+const getChatGpt = ()=>{
+  return utilsBrowser.getChatGptChats();
+}
 const handleSelect = async (options) => {
   let { text, mode } = options || {};
   if (!text) {
@@ -112,6 +115,9 @@ const showToast = (msg, options) => {
 // 1. Auto Inject on Page Load
 window.addEventListener("load", () => {
   console.log("load");
+  window.utilsBrowser = utilsBrowser
+  getChatGpt()
+  console.log(utilsBrowser)
   onReady();
 });
 
@@ -146,7 +152,7 @@ document.addEventListener("keydown", async (e) => {
 
 // 3. Listen for Context Menu Trigger
 if (chrome && chrome.runtime) {
-  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (message.type === "copyTgAuth") {
       let res = "";
       for (let i = 0; i < Object.keys(localStorage).length; i++) {
@@ -169,16 +175,24 @@ if (chrome && chrome.runtime) {
     if (message.type === "toggleDiv") {
       toggleDiv();
     }
+    if (message.type === "getLastChatgptReply") {
+      const chat = await utilsBrowser.getChatGptChats()
+      writeToClipboard(chat.messages[0])
+    }
     if (message.type === "copy-domain-cookies") {
       console.log("copy-domain-cookies", message.domain, message.payload);
-      navigator.clipboard
-        .writeText(JSON.stringify(message.payload))
-        .then(() => {
-          showToast(`Cookies copied for: ${message.domain}`, { timeout: 4 });
-        })
-        .catch(() => {
-          showToast("Clipboard write failed", { isError: true, timeout: 4 });
-        });
+
+      writeToClipboard(JSON.stringify(message.payload))
     }
   });
+}
+function writeToClipboard(text){
+  navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        showToast(`Cookies copied`, { timeout: 4 });
+      })
+      .catch(() => {
+        showToast("Clipboard write failed", { isError: true, timeout: 4 });
+      });
 }

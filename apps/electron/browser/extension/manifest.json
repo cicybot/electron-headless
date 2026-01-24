@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ElectronCicy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Inject local JavaScript into any webpage.",
   "permissions": [
     "cookies",

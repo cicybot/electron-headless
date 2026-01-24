@@ -50,11 +50,11 @@ function buildBrowser(src,dst){
 
 }
 async function main(){
-    buildBrowser(dir+'/browser/content-inject.js', 'dist/content.js')
-    build(dir+'/browser/extension/content.js', 'dist/chrome-extension/content.js')
-    build(dir+'/browser/extension/background.js', 'dist/chrome-extension/background.js')
+    buildBrowser(dir+'/browser/content-inject.js', dir+'/dist/content.js')
+    build(dir+'/browser/extension/content.js', dir+'/dist/chrome-extension/content.js')
+    build(dir+'/browser/extension/background.js', dir+'/dist/chrome-extension/background.js')
 
-    fs.copyFileSync(dir+"/browser/extension/index.html","dist/chrome-extension/index.html")
-    fs.copyFileSync(dir+"/browser/extension/manifest.json","dist/chrome-extension/manifest.json")
+    fs.copyFileSync(dir+"/browser/extension/index.html",dir+"/dist/chrome-extension/index.html")
+    fs.copyFileSync(dir+"/browser/extension/manifest.json",dir+"/dist/chrome-extension/manifest.json")
 }
 main()
