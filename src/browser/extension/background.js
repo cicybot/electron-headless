@@ -1,15 +1,12 @@
-const { openWindow } = require("../../common/utils");
+const { openWindow,setBaseApi,setToken } = require("../../common/utils");
+
+setBaseApi("http://127.0.0.1:3456")
+setToken("")
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "open-in-electron",
     title: "Open in Electron",
-    contexts: ["all"],
-  });
-
-  chrome.contextMenus.create({
-    id: "toggleDiv",
-    title: "Toggle Div",
     contexts: ["all"],
   });
 
@@ -56,12 +53,7 @@ const copyCookies = async (tab) => {
     domain,
   });
 };
-const toggleDiv = async (tab) => {
-  console.log("toggleDiv", tab.url);
-  chrome.tabs.sendMessage(tab.id, {
-    type: "toggleDiv",
-  });
-};
+
 const copyTgAuth = async (tab) => {
   console.log("copyTgAuth", tab.url);
   chrome.tabs.sendMessage(tab.id, {
@@ -72,9 +64,6 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   console.log("contextMenus clicked", info);
   if (info.menuItemId === "open-in-electron") {
     openInElectron(tab);
-  }
-  if (info.menuItemId === "toggleDiv") {
-    toggleDiv(tab);
   }
 
   if (info.menuItemId === "copy-domain-cookies") {
